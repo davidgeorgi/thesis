@@ -1,0 +1,25 @@
+# OS generated files
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+
+# Latex files
+*.aux
+*.log
+*.toc
+*.fdb_latexmk
+*.synctex.gz
+*.snm
+*.vrb
+*.nav
+*.out
+*.bbl
+*.blg
+
+# MS Office files
+*.tmp
+~$*.doc*
+~$*.xls*
+~$*.ppt*
