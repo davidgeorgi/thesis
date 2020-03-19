@@ -19,6 +19,9 @@
 *.blg
 *.bib.bak
 *.bib.sav
+*.lof
+*.lot
+*.pdf
 
 # MS Office files
 *.tmp
