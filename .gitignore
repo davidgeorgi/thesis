@@ -17,6 +17,8 @@
 *.out
 *.bbl
 *.blg
+*.bib.bak
+*.bib.sav
 
 # MS Office files
 *.tmp
