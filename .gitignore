@@ -31,6 +31,7 @@
 
 # Others
 *.ipynb
+.idea
 
 # Folder
 /data/*
