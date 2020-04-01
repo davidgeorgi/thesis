@@ -20,6 +20,7 @@ import nltk
 from nltk.stem import SnowballStemmer
 from nltk.corpus import stopwords
 
+
 def load_log(path):
     parameters = {"timestamp_sort": True}
     log = xes_import_factory.apply(path, variant="nonstandard", parameters=parameters)
@@ -39,6 +40,20 @@ def get_eventlist(log):
 
 def get_activities(log):
     return list(dict.fromkeys([dict(event)['concept:name'] for case in log for event in enumerate(case)] if log else []))
+
+
+def docs_to_vecs_ngram(docs, n=2, language="english"):
+    stemmer = SnowballStemmer(language, ignore_stopwords=True)
+    tokenizer = TfidfVectorizer().build_tokenizer()
+
+    def toknizer_with_stemming(doc):
+        return [stemmer.stem(word) for word in tokenizer(doc)]
+
+    vectorizer = TfidfVectorizer(tokenizer=toknizer_with_stemming, lowercase=True, stop_words=stopwords.words(language),
+                                 ngram_range=(n, n), max_features=None, analyzer='word', norm="l2")
+    vectors = vectorizer.fit_transform(docs)
+    return vectorizer, vectors.toarray()
+
 
 def vectorize_log(log):
 
