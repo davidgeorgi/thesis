@@ -28,3 +28,9 @@
 ~$*.doc*
 ~$*.xls*
 ~$*.ppt*
+
+# Others
+*.ipynb
+
+# Folder
+/data/*
