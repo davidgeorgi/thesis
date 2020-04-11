@@ -1,18 +1,22 @@
+
 The prediction of the future behavior of an process instance has been an important sub-field in the process mining research, that aims to enhance process monitoring capabilities.
 Depending on the use case e.g. predicting time-related attributes, the future path or the the outcome of a case can be of interest. 
 Most approaches presented in the literature either use machine learning based or process models based methods.
 
-
-\Citeauthor{DBLP:conf/otm/DongenCA08} presented five different non-parametric regression predictors for forecasting the total cycle time of an unfinished case. \cite{DBLP:conf/otm/DongenCA08}.
+\Citeauthor{DBLP:conf/otm/DongenCA08} presented five different non-parametric regression predictors for forecasting the total cycle time of an unfinished case\cite{DBLP:conf/otm/DongenCA08}.
 The estimates are based on activity occurrences, activity duration and attributes.
 
-\Citeauthor{DBLP:journals/is/AalstSS11} proposed to build a transition system using a set, bag or sequence abstraction, which is annotated with time related data in order to predict the remaining time of case \cite{DBLP:journals/is/AalstSS11}.
+\Citeauthor{DBLP:journals/is/AalstSS11} proposed to build a transition system using a set, bag or sequence abstraction, which is annotated with time-related data in order to predict the remaining time of case \cite{DBLP:journals/is/AalstSS11}.
+The core idea of this approach is to focus on the already completed cases, which are in some way most similar to new observed case.
 
+\citeauthor{DBLP:journals/computing/PolatoSBL18} presented a set of approaches that use support vector regression for remaining time prediction\cite{DBLP:journals/computing/PolatoSBL18}.
+In this work the authors implement different encoding for events including simple one-hot-encoding and a more advanced state based encoding using transition systems.
+Furthermore, they enhance the approach in  \cite{DBLP:journals/is/AalstSS11} by taking additional data attributes into account.
 
-\citeauthor{DBLP:conf/bpm/TeinemaaDMF16} applied text vectorization techniques like bag of n-grams (BoNG), Latent Dirichlet Allocation (LDA) and Paragraph Vectors (PV) to textual data of processes in order to predict a binary label describing the process outcome\cite{DBLP:conf/bpm/TeinemaaDMF16}. In this approach random forest and logistic regression classifiers for each prefix length of a trace are trained. 
-
-Several authors have applied recurrent neural networks in form of LSTM networks for process prediction. \citeauthor{ DBLP:conf/bpm/EvermannRF16} encode events using an embedding matrix as it is known for word embeddings. The embedded events are then used as input for an LSTM network that predicts the next activity\cite{DBLP:conf/bpm/EvermannRF16}.
+Most recently, several authors have applied recurrent neural networks in form of LSTM networks for process prediction. \citeauthor{ DBLP:conf/bpm/EvermannRF16} encode events using an embedding matrix as it is known for word embeddings. The embedded events are then used as input for an LSTM network that predicts the next activity\cite{DBLP:conf/bpm/EvermannRF16}.
 
 \citeauthor{DBLP:conf/caise/TaxVRD17}] use an one-hot-encoding of the activity and the timestamp of an event to predict the activity and timestamp of the next event. This is done by using a two-layered LSTM network\cite{DBLP:conf/caise/TaxVRD17}.
 
 More recent work by \citeauthor{DBLP:conf/ssci/NavarinVPS17} adopts this idea and extends the encoding to additional data attributes associated with each event\cite{DBLP:conf/ssci/NavarinVPS17}.
+
+\citeauthor{DBLP:conf/bpm/TeinemaaDMF16} applied text vectorization techniques like bag of n-grams (BoNG), Latent Dirichlet Allocation (LDA) and Paragraph Vectors (PV) to textual data of processes in order to predict a binary label describing the process outcome\cite{DBLP:conf/bpm/TeinemaaDMF16}. In this approach random forest and logistic regression classifiers for each prefix length of a trace are trained.
