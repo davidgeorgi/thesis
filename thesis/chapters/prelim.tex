@@ -1,0 +1,27 @@
+
+\section{Processes}
+
+\section{Basic notations, sequences}
+
+The set $\mathbb{N}$ denotes the set of all natural numbers $\{1, 2, 3, \dots\}$ while $\mathbb{N}_0 = \mathbb{N} \cup \{0\}$ denotes the set of natural numbers including 0.
+Given a set $A$, $A^n$ describes the set of all sequences $\langle a_1, a_2, \dots, a_n\rangle$ over $A$ of length $n$ with $a_i \in A$, $1 \leq i \leq n$.
+The set $A^0$ is defined as $\{\langle \rangle\}$, where $\langle \rangle$ is the empty sequence of length $0$.
+The set of all possible sequences over $A$ is given with $A^* = \bigcup\limits_{i\in \mathbb{N}_0} A^i$.
+
+
+
+\section{Events, traces, event logs}
+
+
+\begin{definition}
+An  $event$ is defined by tuple $e = (a,c,t,d_1,\dots, d_m) \in \mathcal{C} \times \mathcal{A}  \times \mathcal{T} \times \mathcal{D}_1 \times \dots \times \mathcal{D}_m$ where  $c \in \mathcal{C} $ is the case id, $a \in \mathcal{A}$ is the executed activity and $t \in \mathcal{T}$ is the timestamp of the event.
+Furthermore, each event contains a fixed number $m \in \mathbb{N}_0$ of additional attributes $d_1 \dots d_m$ in their corresponding domains $\mathcal{D}_1, \dots , \mathcal{D}_m$.
+In case that no additional attribute data is given ($m = 0$) the event space is reduced to $\mathcal{C} \times \mathcal{A}  \times \mathcal{T}$.
+\end{definition}
+
+Throughout this thesis,  $\mathcal{C} = \mathbb{N}_0$, $|\mathcal{A}| < \infty$ and $ \mathcal{T} = \mathbb{R}$ is assumed, where $t \in \mathcal{T}$ is given in Unix time, precisely the number of seconds since 00:00:00 UTC on 1 January 1970 minus the applied leap seconds.
+Each additional attribute is assumed to be numerical, categorical or textual, i.e. $D_i = \mathbb{R}$, $|D_i| < \infty$ or $D_i = \Sigma^\ast$  for $1 \leq i \leq m$ and some fixed Alphabet $\Sigma$.
+
+
+
+\section{Long short-term memory networks}
