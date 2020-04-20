@@ -13,7 +13,7 @@ With the non stopping rise of digitization and processes switching from the anal
 This motivates scientist and business to take advantage of this potential.
 The scientific engagement in this discipline is described by \textit{process mining}, which bridges the gab between the data-driven characteristic of data science and the process centric view of process science \cite{DBLP:books/sp/Aalst16}.
 The ongoing success of progress mining in research has been transferred to business that successfully offer or utilize this technology.
-Celonis, which can be considered as the biggest company in this field, has been valued 2.5 billion dollar only 9 years after the company was founded.
+Celonis, which can be considered as the biggest company in this field, has been valued 2.5 billion dollar only 9 years after the company was founded \cite{celonis}.
 
 Process mining can be divided into a set of subdisciplines mainly process discovery, conformance checking, process enhancement and process prediction.
 Process discovery aims to generate process models out of event data, which help to understand a process.
@@ -24,11 +24,30 @@ Driven by the fast and ongoing development of quantitative predictions methods i
 
 \section{Problem Statement}
 
-Before the problem can be formulated, the main concepts and terms in process mining need to be defined.
+Business process monitoring software is a key success factor for many businesses, since it allows to understand and supervise all connected processes of a company in real-time as the data is flowing in.
+The core idea of this approach is to automate process mining and connect the business data directly with the analytical tool set.
+
+However, traditional process mining tends to be backward-looking  \cite{DBLP:conf/scsc/Aalst18}, i.e. the focus relies in answering the question 'What did happen?', rather than 'What will happen?' or even 'What should be done?'.
+
+Businesses can develop a competitive advantage, if their process mining software has predictive capabilities, that allow to predict the future of a running process instance.
+For example, if it is known beforehand that a running process instance will probably exceed
+its deadline, measures can be initiated before damage occurs.
+
+Precisely, given an event log with past executions of a process and a running process instance, we would like to answer the following questions:
+
+\begin{itemize}
+	\item What will happen next? $\rightarrow$ Activity of next event
+	\item When will it happen? $\rightarrow$ Timestamp of next event
+	\item What is the outcome of the instance? $\rightarrow$ Activity of last event
+	\item When will the instance finish $\rightarrow$ Timestamp of last event
+	\item What is the most likely path of the instance $\rightarrow$  Activities and timestamps of all future events for the path that is most likely
+\end{itemize}
 
 
 
 \section{Research Goals}
+
+
 
 \section{Contribution}
 
