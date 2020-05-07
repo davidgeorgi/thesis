@@ -1,15 +1,15 @@
-from pm4py.objects.log.util.log import get_event_labels
 import numpy as np
 
 
 class LogEncoder:
+    
     def __init__(self, log, data_attributes=[], text_attribute=None, text_encoder=None):
-        self.activities = get_event_labels(log, "concept:name")
+        self.activities = _get_event_labels(log, "concept:name")
         self.data_attributes = data_attributes
         self.text_attribute = text_attribute
         self.text_encoder = text_encoder
         self.categorical_attributes = list(filter(lambda attribute: not _is_numerical_attribute(log, attribute), data_attributes))
-        self.categorical_attributes_values = [get_event_labels(log, attribute) for attribute in self.categorical_attributes]
+        self.categorical_attributes_values = [_get_event_labels(log, attribute) for attribute in self.categorical_attributes]
         self.numerical_attributes = list(filter(lambda attribute: _is_numerical_attribute(log, attribute), data_attributes))
         self.event_dim = _get_max_case_length(log)
 
@@ -104,6 +104,10 @@ class LogEncoder:
                 trace_dim_index += 1
 
         return x, y_next_act, y_final_act, y_next_time, y_final_time
+
+
+def _get_event_labels(log, attribute_name):
+    return list(dict.fromkeys([event[attribute_name] for case in log for event in case])) if log else []
 
 
 def _is_numerical(value):

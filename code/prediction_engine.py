@@ -2,6 +2,7 @@ import tensorflow as tf
 from tensorflow.keras import metrics
 from tensorflow.keras import layers
 
+
 class PredictionEngine:
 
     def __init__(self, log, log_encoder):
@@ -57,5 +58,8 @@ class PredictionEngine:
         x, y_next_act, y_final_act, y_next_time, y_final_time = self.log_encoder.encode(self.log)
         self.model = self.build_lstm_model(x.shape[1], x.shape[2])
         return self.model.fit(x, {'next_activity_output': y_next_act, 'final_activity_output': y_final_act, 'next_timestamp_output': y_next_time, 'final_timestamp_output': y_final_time}, epochs=epochs, batch_size=None, validation_split=0.2)
+
+    def predict(self, log):
+        pass
 
 
