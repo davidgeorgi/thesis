@@ -23,7 +23,7 @@ The event log is a set of events, that are usually grouped by their case ID. Dep
 Most common formats for event logs, which are not part of an database, are comma-separated values (CSV) and eXtensible Event Stream (XES) \cite{DBLP:conf/caise/VerbeekBDA10a}.
 
 Process mining is the discipline that covers all approaches aiming to generate value out of event data.
-As an umbrella term, Process Mining comprises or utilizes concepts of Business Process Management (BPM), Data Mining, Business Process Intelligence (BPI), Big Data, Workflow Management (WfM), Business Activity Monitoring (BAM) \cite{DBLP:books/sp/Aalst16} as well as Machine Learning (ML) \cite{DBLP:conf/caise/EvermannRF17}.
+As an umbrella term, Process Mining comprises or utilizes concepts of Business Process Management (BPM), Data Mining, Business Process Intelligence (BPI), Big Data, Workflow Management (WfM), Business Activity Monitoring (BAM) \cite{DBLP:books/sp/Aalst16} as well as Machine Learning (ML) \cite{DBLP:conf/bpm/VeitGMHT17}.
 
 Process mining can be divided into a set of subdisciplines mainly process discovery, conformance checking, process enhancement and process analytics \cite{DBLP:conf/caise/EckLLA15}.
 Process discovery aims to generate process models out of event data in order to understand a process and enable further analysis.
@@ -73,13 +73,16 @@ Although LSTM networks have been available for a long time, the breakthrough of 
 Gated recurrent units (GRU) \cite{DBLP:conf/emnlp/ChoMGBBSB14} are the competing gating mechanism by \citeauthor{DBLP:conf/emnlp/ChoMGBBSB14} that have fewer parameters and perform similar to LSTM.
 However, more recent studies show, that LSTM outperforms GRU consistently in neural machine translation tasks \cite{DBLP:journals/corr/BritzGLL17}.
 
-Basic feedforward neural networks comprise an input layer, arbitrarily many hidden layers and an output layer. Each layer consists of cells that compute and output the weighted sum of the cells of the previous layer that has been passed to an activation function.
+Basic feedforward neural networks comprise an input layer, arbitrarily many hidden layers and an output layer.
+Each layer consists of cells that compute and output the weighted sum of the cells of the previous layer that has been passed to an activation function.
 
 
 Recurrent neural networks extend traditional feed forward networks with backfeeding connections between hidden cells.
 This allows the network to keep a state across inputs and makes the neural network ready to process arbitrarily long sequences of input data.
 
-In LTSM networks the hidden cells are replaced with more complex LSTM cells. These cells uses as input the state $C_{t-1}$ and the output $h_{t-1}$ of the cell in the previous time step and the output of the previous layer. Each LSTM cell produces an output $h_t$ and state $C_t$.
+In LTSM networks the hidden cells are replaced with more complex LSTM cells.
+These cells uses as input the state $C_{t-1}$ and the output $h_{t-1}$ of the cell in the previous time step and the output of the previous layer.
+Each LSTM cell produces an output $h_t$ and state $C_t$.
 
 
 \begin{equation}\label{key}
@@ -108,3 +111,8 @@ In LTSM networks the hidden cells are replaced with more complex LSTM cells. The
 
 
 \section{Text mining}
+
+Text mining describes all techniques to generate value out of unstructured or semi-structured textual data.
+
+
+$\diff$
