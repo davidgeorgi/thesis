@@ -1,27 +1,60 @@
 import numpy as np
+from abc import ABC, abstractmethod
 
 
-class LogEncoder:
+class LogEncoder(ABC):
+
+    def __init__(self):
+        super().__init__()
+
+    @abstractmethod
+    def fit(self, docs):
+        pass
+
+    @abstractmethod
+    def transform(self, docs):
+        pass
+
+
+class LSTMLogEncoder(LogEncoder):
     
-    def __init__(self, log, data_attributes=[], text_attribute=None, text_encoder=None):
-        self.activities = _get_event_labels(log, "concept:name")
+    def __init__(self, text_encoder=None):
+        self.text_encoder = text_encoder
+        self.activities = []
+        self.data_attributes = []
+        self.text_attribute = None
+        self.categorical_attributes = []
+        self.categorical_attributes_values = []
+        self.numerical_attributes = []
+        self.event_dim = 0
+        self.feature_dim = 0
+        super().__init__()
+
+    def fit(self, log, activities=None, data_attributes=None, text_attribute=None):
+        self.activities = activities
         self.data_attributes = data_attributes
         self.text_attribute = text_attribute
-        self.text_encoder = text_encoder
-        self.categorical_attributes = list(filter(lambda attribute: not _is_numerical_attribute(log, attribute), data_attributes))
+        self.categorical_attributes = list(filter(lambda attribute: not _is_numerical_attribute(log, attribute), self.data_attributes))
         self.categorical_attributes_values = [_get_event_labels(log, attribute) for attribute in self.categorical_attributes]
-        self.numerical_attributes = list(filter(lambda attribute: _is_numerical_attribute(log, attribute), data_attributes))
+        self.numerical_attributes = list(filter(lambda attribute: _is_numerical_attribute(log, attribute), self.data_attributes))
+
+        # Event dimension: Maximum number of events in a case
         self.event_dim = _get_max_case_length(log)
 
-        #   Feature dimension: Encoding size of an event
-        # = Number of activities (1-hot)
-        # + 6 features for time
-        # + Size of encodings of additional categorical attributes (1-hot)
-        # + Number of additional numerical attributes
-        # + Size of text encoding
-        self.feature_dim = self.feature_dim = len(self.activities) + 6 + sum([len(values) for values in self.categorical_attributes_values]) + len(self.numerical_attributes) + 0
+        # Feature dimension: Encoding size of an event
+        activity_encoding_length = len(self.activities)
+        time_encoding_length = 6
+        categorical_attributes_encoding_length = sum([len(values) for values in self.categorical_attributes_values])
+        numerical_attributes_encoding_length = len(self.numerical_attributes)
+        text_encoding_length = self.text_encoder.encoding_length if self.text_encoder else 0
+        self.feature_dim = self.feature_dim = activity_encoding_length + time_encoding_length + categorical_attributes_encoding_length + numerical_attributes_encoding_length + text_encoding_length
 
-    def encode(self, log):
+        # Train text encoder
+        if self.text_encoder is not None and self.text_attribute is not None:
+            docs = [event[self.text_attribute] for case in log for event in case]
+            self.text_encoder.fit(docs)
+
+    def transform(self, log):
         case_dim = np.sum([len(case) for case in log])
 
         # Prepare input and output vectors/matrices
@@ -86,6 +119,10 @@ class LogEncoder:
                             offset += 1
 
                         # Encode textual attribute
+                        if self.text_encoder is not None and self.text_attribute is not None:
+                            text_vectors = self.text_encoder.transform([event[self.text_attribute]])
+                            x[trace_dim_index][event_index][offset:offset+self.text_encoder.encoding_length] = text_vectors[0]
+                            offset += self.text_encoder.encoding_length
 
                 # Set activity and time (since case start) of next event as target
                 if prefix_length == len(case):
