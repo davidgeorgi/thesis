@@ -1,6 +1,6 @@
+import numpy as np
 import multiprocessing
 import nltk
-import numpy as np
 from nltk.stem import WordNetLemmatizer
 from nltk.tokenize import word_tokenize
 from nltk.corpus import stopwords
@@ -59,10 +59,7 @@ class PVTextEncoder(TextEncoder):
         self.model = Doc2Vec(dm=0, vector_size=self.encoding_length, negative=5, hs=0, min_count=self.min_count, sample=0, workers=self.workers)
         self.model.build_vocab(tagged_docs)
 
-        for _ in range(self.epochs):
-            self.model.train(utils.shuffle(tagged_docs), total_examples=len(tagged_docs), epochs=1)
-            self.model.alpha -= 0.002
-            self.model.min_alpha = self.model.alpha
+        self.model.train(utils.shuffle(tagged_docs), total_examples=len(tagged_docs), epochs=self.epochs)
 
     def transform(self, docs):
         docs = preprocess_docs(docs, language=self.language)
@@ -70,8 +67,8 @@ class PVTextEncoder(TextEncoder):
 
 
 def preprocess_docs(docs, language="english"):
-    nltk.download('wordnet')
-    nltk.download('punkt')
+    nltk.download("wordnet")
+    nltk.download("punkt")
     stop_words = set(stopwords.words(language))
     lemmatizer = WordNetLemmatizer()
     docs_preprocessed = []

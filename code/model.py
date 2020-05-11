@@ -1,3 +1,4 @@
+import numpy as np
 import tensorflow as tf
 from tensorflow.keras import metrics
 from tensorflow.keras import layers
@@ -11,11 +12,14 @@ class Model(ABC):
         super().__init__()
 
     @abstractmethod
-    def fit(self, docs):
+    def fit(self, log):
         pass
 
     @abstractmethod
-    def predict(self, docs):
+    def predict_next(self, log):
+        pass
+
+    def predict_final(self, log):
         pass
 
 
@@ -30,6 +34,7 @@ class LSTMModel(Model):
         self.timesteps = 0
         self.feature_dim = 0
         self.model = None
+        super().__init__()
 
     def _build_model(self):
         # Input layer
@@ -74,12 +79,12 @@ class LSTMModel(Model):
         model.compile(loss=loss_param, metrics=metric_param, optimizer=optimizer_param)
         self.model = model
 
-    def fit(self, log, activities=None, data_attributes=None, text_attribute=None, epochs=100):
-        self.activities = activities
+    def fit(self, log, data_attributes=None, text_attribute=None, epochs=3):
 
-        #Encode training data
-        self.log_encoder.fit(log, activities=activities, data_attributes=data_attributes, text_attribute=text_attribute)
-        x, y_next_act, y_final_act, y_next_time, y_final_time = self.log_encoder.transform(log)
+        # Encode training data
+        self.activities = _get_event_labels(log, "concept:name")
+        self.log_encoder.fit(log, activities=self.activities, data_attributes=data_attributes, text_attribute=text_attribute)
+        x, y_next_act, y_final_act, y_next_time, y_final_time = self.log_encoder.transform(log, for_training=True)
 
         # Build model
         self.timesteps = x.shape[1]
@@ -87,16 +92,30 @@ class LSTMModel(Model):
         self._build_model()
 
         # Reduce learning rate if metrics do not improve anymore
-        reduce_lr = ReduceLROnPlateau(monitor='val_loss', factor=0.1, patience=10, min_lr=0.0001)
+        reduce_lr = ReduceLROnPlateau(monitor='val_loss', factor=0.1, patience=6, min_lr=0.0001)
         # Stop Early if metrics do not improve for longer time
-        early_stopping = EarlyStopping(monitor='val_loss', patience=50)
+        early_stopping = EarlyStopping(monitor='val_loss', patience=20)
         # Fit the model to data
         return self.model.fit(x, {'next_activity_output': y_next_act, 'final_activity_output': y_final_act, 'next_timestamp_output': y_next_time, 'final_timestamp_output': y_final_time}, epochs=epochs, batch_size=None, validation_split=0.2, callbacks=[reduce_lr, early_stopping])
 
-    def predict(self, log):
-        pass
+    def predict_next(self, log):
+        x = self.log_encoder.transform(log, for_training=False)
+        pred = self.model.predict(x)
+        next_activity = np.array([np.argmax(act) for act in pred[0]])
+        next_timestamp = pred[2].flatten() * self.log_encoder.time_scaling_divisor[1]
+        return pred, next_activity, next_timestamp
+
+    def predict_final(self, log):
+        x = self.log_encoder.transform(log, for_training=False)
+        pred = self.model.predict(x)
+        final_activity = np.array([np.argmax(act) for act in pred[1]])
+        final_timestamp = pred[3].flatten() * self.log_encoder.time_scaling_divisor[0]
+        return pred, final_activity, final_timestamp
+
+    def _get_activity_label(self, index):
+        return self.activities[index]
 
 
-
-
+def _get_event_labels(log, attribute_name):
+    return list(dict.fromkeys([event[attribute_name] for case in log for event in case])) if log else []
 
