@@ -32,6 +32,7 @@ class LSTMLogEncoder(LogEncoder):
         super().__init__()
 
     def fit(self, log, activities=None, data_attributes=None, text_attribute=None):
+        # Fit encoder to log
         self.activities = activities
         self.data_attributes = data_attributes
         self.text_attribute = text_attribute
@@ -83,49 +84,50 @@ class LSTMLogEncoder(LogEncoder):
             # For training: Encode prefixes. For predicting: Encode full trace only
             prefix_lengths = range(1, len(case) + 1) if for_training else range(len(case), len(case) + 1)
             for prefix_length in prefix_lengths:
-
                 # Encode the (prefix-)trace
                 previous_event_time = case_start_time
+                # Post padding of event sequences
+                padding = case_dim - prefix_length
                 for event_index, event in enumerate(case):
 
                     if event_index <= prefix_length - 1:
                         # Encode activity
-                        x[trace_dim_index][event_index][self.activities.index(event["concept:name"])] = 1
+                        x[trace_dim_index][padding+event_index][self.activities.index(event["concept:name"])] = 1
                         offset = len(self.activities)
 
                         # Encode time attributes
                         event_time = event["time:timestamp"]
                         # Seconds since case start
-                        x[trace_dim_index][event_index][offset] = (event_time.timestamp() - case_start_time)/self.time_scaling_divisor[0]
+                        x[trace_dim_index][padding+event_index][offset] = (event_time.timestamp() - case_start_time)/self.time_scaling_divisor[0]
                         # Seconds since previous event
-                        x[trace_dim_index][event_index][offset + 1] = (event_time.timestamp() - previous_event_time)/self.time_scaling_divisor[1]
+                        x[trace_dim_index][padding+event_index][offset + 1] = (event_time.timestamp() - previous_event_time)/self.time_scaling_divisor[1]
                         # Seconds since midnight
-                        x[trace_dim_index][event_index][offset + 2] = (event_time.timestamp() - event_time.replace(hour=0, minute=0, second=0, microsecond=0).timestamp())/self.time_scaling_divisor[2]
+                        x[trace_dim_index][padding+event_index][offset + 2] = (event_time.timestamp() - event_time.replace(hour=0, minute=0, second=0, microsecond=0).timestamp())/self.time_scaling_divisor[2]
                         # Seconds since last Monday
-                        x[trace_dim_index][event_index][offset + 3] = (event_time.weekday() * 86400 + event_time.hour * 3600 + event_time.second)/self.time_scaling_divisor[3]
+                        x[trace_dim_index][padding+event_index][offset + 3] = (event_time.weekday() * 86400 + event_time.hour * 3600 + event_time.second)/self.time_scaling_divisor[3]
                         # Seconds since last Januar 1
-                        x[trace_dim_index][event_index][offset + 4] = (event_time.timestamp() - event_time.replace(month=1, day=1, hour=0, minute=0, second=0, microsecond=0).timestamp())/self.time_scaling_divisor[4]
+                        x[trace_dim_index][padding+event_index][offset + 4] = (event_time.timestamp() - event_time.replace(month=1, day=1, hour=0, minute=0, second=0, microsecond=0).timestamp())/self.time_scaling_divisor[4]
                         # Seconds since process start
-                        x[trace_dim_index][event_index][offset + 5] = (event_time.timestamp() - process_start_time)/self.time_scaling_divisor[5]
+                        x[trace_dim_index][padding+event_index][offset + 5] = (event_time.timestamp() - process_start_time)/self.time_scaling_divisor[5]
 
                         previous_event_time = event_time.timestamp()
                         offset += 6
 
                         # Encode categorical attributes
                         for attribute_index, attribute in enumerate(self.categorical_attributes):
-                            x[trace_dim_index][event_index][
+                            x[trace_dim_index][padding+event_index][
                                 offset + self.categorical_attributes_values[attribute_index].index(event[attribute])] = 1
                             offset += len(self.categorical_attributes_values[attribute_index])
 
                         # Encode numerical attributes
                         for attribute_index, attribute in enumerate(self.numerical_attributes):
-                            x[trace_dim_index][event_index][offset] = float(event[attribute])
+                            x[trace_dim_index][padding+event_index][offset] = float(event[attribute])
                             offset += 1
 
                         # Encode textual attribute
                         if self.text_encoder is not None and self.text_attribute is not None:
                             text_vectors = self.text_encoder.transform([event[self.text_attribute]])
-                            x[trace_dim_index][event_index][offset:offset+self.text_encoder.encoding_length] = text_vectors[0]
+                            x[trace_dim_index][padding+event_index][offset:offset+self.text_encoder.encoding_length] = text_vectors[0]
                             offset += self.text_encoder.encoding_length
 
                 # Set activity and time (since case start) of next event as target
