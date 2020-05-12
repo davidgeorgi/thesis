@@ -1,13 +1,11 @@
-
-
 class PredictionEngine:
 
     def __init__(self, model):
         self.model = model
 
-    def fit(self, log, data_attributes=None, text_attribute=None):
+    def fit(self, log, data_attributes=None, text_attribute=None, epochs=10):
         # Build prediction model
-        return self.model.fit(log, data_attributes=data_attributes, text_attribute=text_attribute)
+        return self.model.fit(log, data_attributes=data_attributes, text_attribute=text_attribute, epochs=epochs)
 
     def predict_next_activity(self, log):
         return self.model.predict_next_activity(log)
@@ -23,6 +21,3 @@ class PredictionEngine:
 
     def evaluate(self, log):
         pass
-
-
-

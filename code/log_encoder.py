@@ -46,8 +46,8 @@ class LSTMLogEncoder(LogEncoder):
         time_between_events_max = np.max(
             [event["time:timestamp"].timestamp() - case[event_index - 1]["time:timestamp"].timestamp() for case in
              log for event_index, event in enumerate(case) if event_index > 0])
-        process_end_time = np.max([event["time:timestamp"].timestamp() for case in log for event in case])
-        self.time_scaling_divisor = [cycle_time_max, time_between_events_max, 86400, 604800, 31536000, process_end_time]
+        log_time = np.max([event["time:timestamp"].timestamp() for case in log for event in case]) - log[0][0]["time:timestamp"].timestamp()
+        self.time_scaling_divisor = [cycle_time_max, time_between_events_max, 86400, 604800, 31536000, log_time]
 
         # Event dimension: Maximum number of events in a case
         self.event_dim = _get_max_case_length(log)
@@ -87,7 +87,7 @@ class LSTMLogEncoder(LogEncoder):
                 # Encode the (prefix-)trace
                 previous_event_time = case_start_time
                 # Post padding of event sequences
-                padding = case_dim - prefix_length
+                padding = self.event_dim - prefix_length
                 for event_index, event in enumerate(case):
 
                     if event_index <= prefix_length - 1:

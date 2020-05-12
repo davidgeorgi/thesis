@@ -16,10 +16,16 @@ class Model(ABC):
         pass
 
     @abstractmethod
-    def predict_next(self, log):
+    def predict_next_activity(self, log):
         pass
 
-    def predict_final(self, log):
+    def predict_final_activity(self, log):
+        pass
+
+    def predict_next_time(self, log):
+        pass
+
+    def predict_final_time(self, log):
         pass
 
 
@@ -44,7 +50,7 @@ class LSTMModel(Model):
         previous_layer = inputs
         for layer in range(self.num_shared_layer):
             shared_lstm_layer = layers.LSTM(self.neurons_per_layer, implementation=2, kernel_initializer="glorot_uniform", return_sequences=True, dropout=0.2)(previous_layer)
-            shared_lstm_normalization_layer = layers.BatchNormalization()(shared_lstm_layer)
+            shared_lstm_normalization_layer = layers.LayerNormalization()(shared_lstm_layer)
             previous_layer = shared_lstm_normalization_layer
 
         previous_layer_next_activity = previous_layer
@@ -52,14 +58,16 @@ class LSTMModel(Model):
         previous_layer_next_timestamp = previous_layer
         previous_layer_final_timestamp = previous_layer
         for layer in range(self.num_specialized_layer):
-            next_activity_lstm_layer = layers.LSTM(self.neurons_per_layer, implementation=2, kernel_initializer="glorot_uniform", return_sequences=False, dropout=0.2)(previous_layer_next_activity)
-            final_activity_lstm_layer = layers.LSTM(self.neurons_per_layer, implementation=2, kernel_initializer="glorot_uniform", return_sequences=False, dropout=0.2)(previous_layer_final_activity)
-            next_timestamp_lstm_layer = layers.LSTM(self.neurons_per_layer, implementation=2, kernel_initializer="glorot_uniform", return_sequences=False, dropout=0.2)(previous_layer_next_timestamp)
-            final_timestamp_lstm_layer = layers.LSTM(self.neurons_per_layer, implementation=2, kernel_initializer="glorot_uniform", return_sequences=False, dropout=0.2)(previous_layer_final_timestamp)
-            next_activity_normalization_layer = layers.BatchNormalization()(next_activity_lstm_layer)
-            final_activity_normalization_layer = layers.BatchNormalization()(final_activity_lstm_layer)
-            next_timestamp_normalization_layer = layers.BatchNormalization()(next_timestamp_lstm_layer)
-            final_timestamp_normalization_layer = layers.BatchNormalization()(final_timestamp_lstm_layer)
+            # Do not return sequences in the last LSTM layer
+            return_sequences = False if layer == self.num_shared_layer-1 else True
+            next_activity_lstm_layer = layers.LSTM(self.neurons_per_layer, implementation=2, kernel_initializer="glorot_uniform", return_sequences=return_sequences, dropout=0.2)(previous_layer_next_activity)
+            final_activity_lstm_layer = layers.LSTM(self.neurons_per_layer, implementation=2, kernel_initializer="glorot_uniform", return_sequences=return_sequences, dropout=0.2)(previous_layer_final_activity)
+            next_timestamp_lstm_layer = layers.LSTM(self.neurons_per_layer, implementation=2, kernel_initializer="glorot_uniform", return_sequences=return_sequences, dropout=0.2)(previous_layer_next_timestamp)
+            final_timestamp_lstm_layer = layers.LSTM(self.neurons_per_layer, implementation=2, kernel_initializer="glorot_uniform", return_sequences=return_sequences, dropout=0.2)(previous_layer_final_timestamp)
+            next_activity_normalization_layer = layers.LayerNormalization()(next_activity_lstm_layer)
+            final_activity_normalization_layer = layers.LayerNormalization()(final_activity_lstm_layer)
+            next_timestamp_normalization_layer = layers.LayerNormalization()(next_timestamp_lstm_layer)
+            final_timestamp_normalization_layer = layers.LayerNormalization()(final_timestamp_lstm_layer)
             previous_layer_next_activity = next_activity_normalization_layer
             previous_layer_final_activity = final_activity_normalization_layer
             previous_layer_next_timestamp = next_timestamp_normalization_layer
@@ -79,7 +87,7 @@ class LSTMModel(Model):
         model.compile(loss=loss_param, metrics=metric_param, optimizer=optimizer_param)
         self.model = model
 
-    def fit(self, log, data_attributes=None, text_attribute=None, epochs=3):
+    def fit(self, log, data_attributes=None, text_attribute=None, epochs=10):
 
         # Encode training data
         self.activities = _get_event_labels(log, "concept:name")
@@ -124,4 +132,3 @@ class LSTMModel(Model):
 
 def _get_event_labels(log, attribute_name):
     return list(dict.fromkeys([event[attribute_name] for case in log for event in case])) if log else []
-
