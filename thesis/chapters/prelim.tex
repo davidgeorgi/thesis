@@ -10,63 +10,106 @@ In this section the basic concepts of process mining, long short-term memory net
 
 \section{Processes, Event Logs, Process Mining, }
 
-A (business-)process is a collection of activities that are performed in a specific order to archive a goal.
-Each performed activity belongs to specific case and is completed at a certain time \cite{DBLP:conf/bpm/AalstAM11}.
+A \textit{business process} is a collection of activities that are performed in a specific order to archive a goal \cite{DBLP:conf/bpm/AalstAM11}.
+A single execution of a process is a \textit{case} or \textit{process instance}, which is identified by a case ID.
+Each performed activity belongs to specific case and is completed at a certain time.
 A case can be e.g. a patient in a hospital, a customer of a company or an order and is usually identified by an ID, while 
 the time is specified by a timestamp.
-Each execution of a process refers to exactly one case.
 The trinity of case, activity and timestamp is called event.
 An event can have more attributes depending on the context, like resource, cost or transactional information.
 
-If the execution of a process is logged by an information system, the resulting event data is called event log.
-The event log is a set of events, that are usually grouped by their case ID. Depending on the format of the event log, it can also contain additional data on case level.
-Most common formats for event logs, which are not part of an database, are comma-separated values (CSV) and eXtensible Event Stream (XES) \cite{DBLP:conf/caise/VerbeekBDA10a}.
+\begin{table}[]
+	\begin{tabular}{@{}lllllll@{}}
+		\toprule
+		\textbf{Case ID} & \textbf{Activity}          & \textbf{Timestamp} & \textbf{Resource} & \textbf{Cost} & \textbf{Comment}                                                                                                & \textbf{...} \\ \midrule
+		0                & Register patient           & 01.02.2020:14.12   & SYSTEM            & 0             & -                                                                                                               & ...          \\
+		& Consultation               & 01.02.2020:14.34   & John Brown, MD    & 24.32         & \begin{tabular}[c]{@{}l@{}}The patient reports persistent\\ nausea.\end{tabular}                                & ...          \\
+		& Blood test                 & 01.02.2020:15.12   & Kim Smith         & 14.23         & Tests: Complete blood count                                                                                     & ...          \\
+		& Evaluate test result       & 01.02.2020:16.35   & John Brown, MD    & 38.67         & \begin{tabular}[c]{@{}l@{}}No abnormalities in the complete\\ blood count.\end{tabular}                         & ...          \\
+		& Release patient            & 01.02.2020:17.24   & SYSTEM            & 0             & -                                                                                                               & ...          \\
+		&                            &                    &                   &               &                                                                                                                 &              \\
+		1                & Register patient           & 02.02.2020:08.20   & SYSTEM            & 0             & -                                                                                                               & ...          \\
+		& Consultation               & 02.02.2020:14.12   & Jana Simpson, MD  & 24.32         & \begin{tabular}[c]{@{}l@{}}Noticeable tachycardia. No chronic pre-existing conditions\\ are known.\end{tabular} & ...          \\
+		& Magnetic resonance imaging & 02.02.2020:14.12   & Sara Taylor, MD   & 352.87        & -                                                                                                               & ...          \\
+		& Release patient            & 02.02.2020:14.12   & SYSTEM            & 0             & -                                                                                                               & ...          \\
+		&                            &                    &                   &               &                                                                                                                 &              \\
+		2                & Register patient           & 02.02.2020:09.08   & SYSTEM            & 0             & -                                                                                                               & ...          \\
+		& Consultation               & 02.02.2020:09.14   & Jana Simpson, MD  & 24.32         & \begin{tabular}[c]{@{}l@{}}The patient has severe leg injuries\\ due to a motorcycle accident.\end{tabular}     & ...          \\
+		& Patient hospitalized       & 02.02.2020:09.20   & Mike Johnson      & 130.37        & -                                                                                                               & ...          \\
+		...              & ...                        & ...                & ...               & ...           & ...                                                                                                             & ...          \\ \bottomrule
+	\end{tabular}
+	\caption{Artifical event log of patient treatment in a hospital}
+	\label{tab:event-log}
+\end{table}
+
+If the execution of a business process is logged by an information system, the resulting event data is called \textit{event log}.
+An event log is a set of events, that are usually grouped by their case ID. Depending on the format of the event log, it can also contain additional data on case level.
+Typical formats for event logs, which are not part of an database, are comma-separated values (CSV) and eXtensible Event Stream (XES) \cite{DBLP:conf/caise/VerbeekBDA10a}.
+A table-based representation of an artificial event log can be seen in Table \ref{tab:event-log}.
 
 Process mining is the discipline that covers all approaches aiming to generate value out of event data.
-As an umbrella term, Process Mining comprises or utilizes concepts of Business Process Management (BPM), Data Mining, Business Process Intelligence (BPI), Big Data, Workflow Management (WfM), Business Activity Monitoring (BAM) \cite{DBLP:books/sp/Aalst16} as well as Machine Learning (ML) \cite{DBLP:conf/bpm/VeitGMHT17}.
+As an umbrella term, Process Mining comprises or utilizes concepts of Business Process Management, Data Mining, Business Process Intelligence, Big Data, Workflow Management, Business Activity Monitoring \cite{DBLP:books/sp/Aalst16} as well as Machine Learning \cite{DBLP:conf/bpm/VeitGMHT17}.
 
 Process mining can be divided into a set of subdisciplines mainly process discovery, conformance checking, process enhancement and process analytics \cite{DBLP:conf/caise/EckLLA15}.
 Process discovery aims to generate process models out of event data in order to understand a process and enable further analysis.
 Conformance checking is about comparing the intended and observed behavior of a process. 
 On top of these diagnostic approaches, process enhancement deals with the improvement of processes.
 
-Driven by the fast and ongoing development of quantitative prediction methods in data science and machine learning, prediction-based methods have been applied to event data leading to process prediction, a major subject in process analytics.
-Forecasting the future of a running process instance is the main goal in process prediction and also the main topic of this thesis.
-
+Driven by the fast and ongoing development of quantitative prediction methods in data science and machine learning, prediction-based methods have been applied to event data leading to process prediction, a major subfield in process analytics.
+Forecasting the future of a running process instance is one of the main goals in process prediction and also the main topic of this thesis.
 
 
 \section{Basic notations, Sequences, Functions}
 
-The set $\mathbb{N}$ denotes the set of all natural numbers $\{1, 2, 3, \dots\}$ while $\mathbb{N}_0 = \mathbb{N} \cup \{0\}$ denotes the set of natural numbers including 0.
+The set $\mathbb{N}$ denotes the set of all natural numbers $\{1, 2, 3, \dots\}$, while $\mathbb{N}_0 = \mathbb{N} \cup \{0\}$ denotes the set of natural numbers including 0.
 Given a set $A$, $A^n$ describes the set of all sequences $\langle a_1, a_2, \dots, a_n\rangle$ over $A$ of length $n$ with $a_i \in A$, $1 \leq i \leq n$.
 The set $A^0$ is defined as $\{\langle \rangle\}$, where $\langle \rangle$ is the empty sequence of length $0$.
 The set of all possible sequences over $A$ is given with $A^* = \bigcup\limits_{i\in \mathbb{N}_0} A^i$.
 
+Sequences $\sigma_1$, $\sigma_2$ can be concatenated to $\sigma_1 \cdot \sigma_2$.
+The $i$th element of a sequence $\sigma = \langle a_1, a_2, \dots, a_n\rangle$ is accessed by $\sigma(i)= a_i$ for $1 \leq i \leq n$.
+A function $f \in A \rightarrow B$ is applied to sequences $\sigma$ over $A$ element-wise, precisely:
+
+	\[
+	f(\sigma) =
+	\begin{cases}
+	\langle \rangle & \text{if $\sigma = \langle \rangle$} \\
+	\langle f(a_1), f(a_2), \dots, f(a_n)\rangle & \text{else} 
+	\end{cases}
+	\]
 
 
 \section{Events and Traces}
 
 \begin{definition}
-An  $event$ is defined by tuple $e = (a,c,t,d_1,\dots, d_m) \in \mathcal{C} \times \mathcal{A}  \times \mathcal{T} \times \mathcal{D}_1 \times \dots \times \mathcal{D}_m =  \mathcal{E}$ where  $c \in \mathcal{C} $ is the case id, $a \in \mathcal{A}$ is the executed activity and $t \in \mathcal{T}$ is the timestamp of the event.
+Formally, an  $event$ is defined by tuple $e = (a,c,t,d_1,\dots, d_m) \in \mathcal{C} \times \mathcal{A}  \times \mathcal{T} \times \mathcal{D}_1 \times \dots \times \mathcal{D}_m =  \mathcal{E}$ where  $c \in \mathcal{C} $ is the case id, $a \in \mathcal{A}$ is the executed activity and $t \in \mathcal{T}$ is the timestamp of the event.
 Furthermore, each event contains a fixed number $m \in \mathbb{N}_0$ of additional attributes $d_1 \dots d_m$ in their corresponding domains $\mathcal{D}_1, \dots , \mathcal{D}_m$.
-In case that no additional attribute data is given ($m = 0$) the event space $\mathcal{E}$ is reduced to $\mathcal{C} \times \mathcal{A}  \times \mathcal{T}$.
+In case that no additional attribute data is given ($m = 0$) the event space $\mathcal{E}$ (set of all possible events) is reduced to $\mathcal{C} \times \mathcal{A}  \times \mathcal{T}$.
 \end{definition}
+
+Each attribute $d \in \mathcal{D}$ of an event (including activity, timestamp and case ID) can be accessed by a projection function $\pi_D \in \mathcal{E} \rightarrow \mathcal{D}$.
+E.g. the activity $a$ of an event $e$ is retrieved by $\pi_\mathcal{A}(e) = a$
 
 Throughout this thesis,  $\mathcal{C} = \mathbb{N}_0$, $|\mathcal{A}| < \infty$ and $ \mathcal{T} = \mathbb{R}$ is assumed, where $t \in \mathcal{T}$ is given in Unix time, precisely the number of seconds since 00:00:00 UTC on 1 January 1970 minus the applied leap seconds.
 Each additional attribute is assumed to be numerical, categorical or textual, i.e. $D_i = \mathbb{R}$, $|D_i| < \infty$ or $D_i = \Sigma^\ast$  for $1 \leq i \leq m$ and some fixed Alphabet $\Sigma$.
 
 \begin{definition}
-	A $trace$ is a finite and non-empty sequence of events $\sigma = \langle e_1, e_2, \dots\rangle \in  \mathcal{E}^\ast$ with increasing timestamps, i.e. $\pi_\mathcal{T} (e_i) < \pi_\mathcal{T} (e_j) $ for $1 \leq i < j \leq |\sigma|$.
+	A $trace$ is a finite and non-empty sequence of events $\sigma = \langle e_1, e_2, \dots\rangle \in  \mathcal{E}^\ast$ with increasing timestamps and the same case ID, i.e. $\pi_\mathcal{T} (e_i) < \pi_\mathcal{T} (e_j) $ for $1 \leq i < j \leq |\sigma|$ and $\pi_\mathcal{C} (e_i) = \pi_\mathcal{C} (e_j) \forall i,j \in \{1, 2, \dots n\}$.
 \end{definition}
 
+A trace can be transformed to a sequence of attributes by applying a projection function to the trace.
+E.g. $\pi_\mathcal{A}(\sigma)$ gives a sequence of the attributes of the events in $\sigma$.
 
 
+\section{Text mining}
+
+Text mining describes all techniques to generate value out of unstructured or semi-structured textual data.
 
 \section{Long short-term memory networks}
 
-Long short-term memory (LSMT) is an advanced recurrent neural network architecture originally presented by \citeauthor{DBLP:journals/neco/HochreiterS97} in \citeyear{DBLP:journals/neco/HochreiterS97}  \cite{DBLP:journals/neco/HochreiterS97}.
+Long short-term memory (LSMT) is an advanced recurrent neural network architecture for sequential data originally presented by \citeauthor{DBLP:journals/neco/HochreiterS97} in \citeyear{DBLP:journals/neco/HochreiterS97}  \cite{DBLP:journals/neco/HochreiterS97}.
 This approach addresses the well-known vanishing and exploding gradient problem \cite{DBLP:conf/icml/PascanuMB13}  of traditional recurrent neural networks by introducing more complex LSTM cells as hidden units.
-The proposed architecture has been significantly improved several times with the introduction of forget gates \cite{DBLP:journals/neco/GersSC00} and the removal of output activation functions \cite {DBLP:journals/tnn/GreffSKSS17}.
+The proposed architecture has been improved several times \cite{DBLP:journals/neco/GersSC00} \cite {DBLP:journals/tnn/GreffSKSS17} and belongs to the most successful recurrent neural network models.
 Although LSTM networks have been available for a long time, the breakthrough of this technology is dated around 2016 after many success stories of LSTM in combination with large data sets and GPU hardware have been reported for sequence to sequence tasks like text translation \cite{DBLP:journals/corr/WuSCLNMKCGMKSJL16}.
 
 
@@ -75,12 +118,13 @@ However, more recent studies show, that LSTM outperforms GRU consistently in neu
 
 Basic feedforward neural networks comprise an input layer, arbitrarily many hidden layers and an output layer.
 Each layer consists of cells that compute and output the weighted sum of the cells of the previous layer that has been passed to an activation function.
-
+These networks can learn complex functions in supervised learning settings where input and output pattern are provided.
+The network computes a loss function for each training pattern and adjusts its weights using a back-propagation algorithm \cite{rumelhart1986learning}.
 
 Recurrent neural networks extend traditional feed forward networks with backfeeding connections between hidden cells.
-This allows the network to keep a state across inputs and makes the neural network ready to process arbitrarily long sequences of input data.
+This allows the network to keep a state across inputs and allows the neural network to process arbitrarily long sequences of input data while learning temporal dependencies.
 
-In LTSM networks the hidden cells are replaced with more complex LSTM cells.
+In LTSM networks the hidden neurons are replaced with more complex LSTM cells.
 These cells uses as input the state $C_{t-1}$ and the output $h_{t-1}$ of the cell in the previous time step and the output of the previous layer.
 Each LSTM cell produces an output $h_t$ and state $C_t$.
 
@@ -110,9 +154,4 @@ Each LSTM cell produces an output $h_t$ and state $C_t$.
 \end{equation}
 
 
-\section{Text mining}
 
-Text mining describes all techniques to generate value out of unstructured or semi-structured textual data.
-
-
-$\diff$
