@@ -1,1 +1,67 @@
 \section{Overview}
+
+\section{Encoding}
+
+\subsection{Encoding of Activity and other Categorical Attributes}
+
+\subsection{Encoding of Time and other numerical Attributes}
+
+\subsection{Text Encoding}
+
+In order to prepare the textual data of the event log for a prediction model, the texts have to be encoded in a "useful" numerical vector representation.
+Useful in that context means, that texts with similar semantic meanings should also have similar representations.
+Extracting the meaning of textual information remains a challenge even for humans, because textual data is unstructured, language dependent and domain specific.
+In addition, grammatical variations and the importance of context in language makes text mining even more difficult.
+
+The text vectorization is realized in a 2-step procedure.
+First, all text data associated with the events in the corresponding textual attribute is collected in a so called \textit{text corpus}.
+Each document in the text corpus is then preprocessed in order to filter out linguistic noise or useless information.
+Finally, the text corpus is used to build up a vocabulary and a text vectorization technique is applied to encode the text attribute to a fixed of vector.
+
+\subsubsection{Text Preprocessing}
+
+In the preprocessing step each document is transformed by a processing pipeline which consists of the following four steps:
+
+\begin{enumerate} 
+	\item Letters are converted to lowercase
+	\item Document is tokenized by word
+	\item Each word is lemmatized
+	\item Stop words are filtered out
+\end{enumerate}
+
+In the tokenenization step a document is split up in a list of words.
+Each word is then lemmatized, i.e. it is converted to its canonical form.
+The idea is to unify words that have a very similar meaning and filter out grammatical variations.
+For example, the words  "go", "going", "goes", "gone" and "went" are all transformed to the basic form "go".
+Ultimately, all stop words are filtered out of each document.
+Stop words are words with low information value like "the", "of", "here" or "there".
+
+Stop word lists are language dependent and can be more or less aggressive at filtering.
+Usually they contains articles, auxiliary verbs, prepositions and generic verbs like "be" and "have".
+In addition, punctuation marks or numerical information are excluded.
+
+\begin{table}[]
+	\begin{tabularx}{\textwidth}{l l p{9.8cm}}
+		\toprule
+		\textbf{Step} & \textbf{Transformation} & \textbf{Document}                                                       \\ \midrule
+		0             & Original       & "The patient has been diagnosed with high blood pressure by Dr. Brown." \\
+		1             & Lowercase               & "the patient has been diagnosed with high blood pressure by dr. brown." \\
+		2 & Tokenization  & {[}"the", "patient", "has", "been", "diagnosed", "with", "high", "blood", "pressure", "by", "dr", ".", "brown", "."{]} \\
+		3 & Lemmatization & {[}"the", "patient", "have", "is", "diagnose", "with", "high", "blood", "pressure", "by", "dr", ".", "brown", "."{]}   \\
+		4             & Stop word filtering     & {[}"patient", "diagnose", "high", "blood", "pressure", "dr", "brown"{]} \\ \bottomrule
+	\end{tabularx}
+	\caption{Preprocessing transformation of an example document}
+	\label{tab:text-preprocessing}
+\end{table}
+
+
+
+
+
+
+
+
+\subsubsection{Bag-of-N-Gram}
+\subsubsection{Paragraph Vector}
+
+\section{Network}
