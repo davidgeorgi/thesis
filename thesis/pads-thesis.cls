@@ -246,3 +246,6 @@
 \RequirePackage[noend]{algpseudocode}
 \RequirePackage{multirow}
 %\setlength{\parindent}{0pt} % removes paragraph indentation
+
+\RequirePackage{booktabs}
+\RequirePackage{tabularx}
