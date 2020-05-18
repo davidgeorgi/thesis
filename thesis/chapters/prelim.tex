@@ -68,7 +68,12 @@ The set of all possible sequences over $A$ is given with $A^* = \bigcup\limits_{
 
 Sequences $\sigma_1$, $\sigma_2$ can be concatenated to $\sigma_1 \cdot \sigma_2$.
 The $i$th element of a sequence $\sigma = \langle a_1, a_2, \dots, a_n\rangle$ is accessed by $\sigma(i)= a_i$ for $1 \leq i \leq n$.
-A function $f \in A \rightarrow B$ is applied to sequences $\sigma$ over $A$ element-wise, precisely:
+To derive a subsequence of $\sigma$ we write $\sigma(i,j)=\langle a_i, a_{i+1} \dots, a_j\rangle$ with $1 \leq i < j \leq n$.
+The length of a sequence is denoted by $|\sigma|$. If a sequence $\sigma$ contains an element $a_i$, we also write $a_i \in \sigma$.
+
+
+
+A function $f \in A \rightarrow B$ can be lifted to sequences $\sigma$ over $A$ element-wise, precisely:
 
 	\[
 	f(\sigma) =
@@ -91,7 +96,7 @@ Each attribute $d \in \mathcal{D}$ of an event (including activity, timestamp an
 E.g. the activity $a$ of an event $e$ is retrieved by $\pi_\mathcal{A}(e) = a$
 
 Throughout this thesis,  $\mathcal{C} = \mathbb{N}_0$, $|\mathcal{A}| < \infty$ and $ \mathcal{T} = \mathbb{R}$ is assumed, where $t \in \mathcal{T}$ is given in Unix time, precisely the number of seconds since 00:00:00 UTC on 1 January 1970 minus the applied leap seconds.
-Each additional attribute is assumed to be numerical, categorical or textual, i.e. $D_i = \mathbb{R}$, $|D_i| < \infty$ or $D_i = \Sigma^\ast$  for $1 \leq i \leq m$ and some fixed Alphabet $\Sigma$.
+Each additional attribute is assumed to be numerical, categorical or textual, i.e. $\mathcal{D}_i = \mathbb{R}$, $|\mathcal{D}_i| < \infty$ or $\mathcal{D}_i = \Sigma^\ast$  for $1 \leq i \leq m$ and some fixed Alphabet $\Sigma$.
 
 \begin{definition}
 	A $trace$ is a finite and non-empty sequence of events $\sigma = \langle e_1, e_2, \dots\rangle \in  \mathcal{E}^\ast$ with increasing timestamps and the same case ID, i.e. $\pi_\mathcal{T} (e_i) < \pi_\mathcal{T} (e_j) $ for $1 \leq i < j \leq |\sigma|$ and $\pi_\mathcal{C} (e_i) = \pi_\mathcal{C} (e_j) \forall i,j \in \{1, 2, \dots n\}$.

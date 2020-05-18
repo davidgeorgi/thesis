@@ -130,7 +130,7 @@
 								\emph{Author :} & 	\textbf{\Large{\gAuthor}} \\
 								\rule{0pt}{15ex} 
 								
-								\emph{Supervisor :} & 
+								\emph{Supervisors :} & 
 								\makecell[l]{ \gSupervisor} \\
 								
 								\rule{0pt}{8ex} 

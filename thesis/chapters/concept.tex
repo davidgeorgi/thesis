@@ -10,9 +10,22 @@ In this chapter a novel approach for process prediction is presented that is abl
 
 
 
+\section{Log Encoding}
+
+
+Given an event log $\eventlog = \{\sigma_1, \dots, \sigma_l\}$ with historical event data, the set of all prefix traces $\{\sigma(1,k) \mid \forall \sigma \in \eventlog, 1 \leq k \leq |\sigma|\}$ is computed.
+Each prefix corresponds to one training example for the prediction model.
+The total number of training examples that can be generated out of the log is $\sum_{\sigma \in \eventlog}|\sigma|$, which is exactly the number of events in the log.
+
 \section{Event Encoding}
 
+Each event is encoded in a fixed-length vector using the event's activity, timestamp and additional categorical, numerical and textual attributes.
+The encoding of each attributes 
+
+$ encode(e_i)$
 \subsection{Encoding of Activities and other Categorical Attributes}
+
+
 
 \subsection{Encoding of Time and other numerical Attributes}
 
