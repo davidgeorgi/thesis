@@ -1,23 +1,36 @@
-Text-aware process prediction aims to utilize unstructured text information in event data to improve case predictions.
+Text-aware process prediction aims to utilize unstructured text information in event data to improve predictions for unfinished cases.
 While many prediction methods have been applied to event data, almost none of them are able to handle textual data.
-An exception is the approach presented in \cite{DBLP:conf/bpm/TeinemaaDMF16}, where traces are encoded as fixed vectors and a classifier is learned for each prefix length.
+An exception is the approach presented in \cite{DBLP:conf/bpm/TeinemaaDMF16}, where traces with text data are encoded as fixed vectors and a classifier is learned for each prefix length.
 
 In this chapter a novel approach for process prediction is presented that is able to handle numerical, categorical and textual data, captures temporal dependencies and concept drifts using an event-wise encoding and a sequential prediction model (LSTM).
 
 \section{Overview}
 
+The proposed framework consists of a preprocessing, log encoder, text encoder and prediction model component, which operate in an offline and online phase.
+
+In the offline phase a historical event log with completed traces of a business process is used to train the prediction model.
+Given an event log $\eventlog = \{\sigma_1, \dots, \sigma_l\}$ with historical event data, the set of all prefix traces $\eventlog_\mathrm{prefix} = \{\sigma(1,k) \mid \forall \sigma \in \eventlog, 1 \leq k \leq |\sigma|\}$ is computed.
+Each prefix with the desired target value corresponds to one training example for the prediction model.
+The total number of training examples that can be generated out of the log is $\sum_{\sigma \in \eventlog}|\sigma|$, which is exactly the number of events in the log.
+
+As target the activity and timestamp (relative to case start) of the next event as well as the outcome and cycle time (time between first and last event) of the case is chosen.
+For completed cases the next event's activity is an artificial "<Process End>" with the same timestamp as the final event.
+
+The text data of the historical log is extracted to build a text corpus and construct a text model.
+
+The prefix traces are encoded to sequences of fixed-length event vectors using the text model.
 
 
+
+
+\begin{figure}
+	\includegraphics[width=\textwidth]{figures/framework}
+	\caption{Framework}
+	\label{fig:framework}
+\end{figure}
 
 
 \section{Log Encoding}
-
-
-Given an event log $\eventlog = \{\sigma_1, \dots, \sigma_l\}$ with historical event data, the set of all prefix traces $\{\sigma(1,k) \mid \forall \sigma \in \eventlog, 1 \leq k \leq |\sigma|\}$ is computed.
-Each prefix corresponds to one training example for the prediction model.
-The total number of training examples that can be generated out of the log is $\sum_{\sigma \in \eventlog}|\sigma|$, which is exactly the number of events in the log.
-
-\section{Event Encoding}
 
 Each event is encoded in a fixed-length vector using the event's activity, timestamp and additional categorical, numerical and textual attributes.
 The encoding of each attributes 
