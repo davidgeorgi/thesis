@@ -7,7 +7,7 @@ Most approaches presented in the literature either use machine learning based or
 The estimates are based on activity occurrences, activity duration and attributes.
 
 \Citeauthor{DBLP:journals/is/AalstSS11} proposed to build a transition system using a set, bag or sequence abstraction, which is annotated with time-related data in order to predict the remaining time of case \cite{DBLP:journals/is/AalstSS11}.
-The core idea of this approach is to focus on the already completed cases, which are in some way most similar to new observed case.
+The core idea of this approach is to replay unfinished cases on the learned transition system and compute the prediction using the annotated data.
 
 \citeauthor{DBLP:journals/computing/PolatoSBL18} presented a set of approaches that use support vector regression for remaining time prediction\cite{DBLP:journals/computing/PolatoSBL18}.
 In this work the authors implement different encoding for events including simple one-hot-encoding and a more advanced state based encoding using transition systems.
@@ -15,7 +15,7 @@ Furthermore, they enhance the approach in  \cite{DBLP:journals/is/AalstSS11} by 
 
 Most recently, several authors have applied recurrent neural networks in form of LSTM networks for process prediction. \citeauthor{ DBLP:conf/bpm/EvermannRF16} encode events using an embedding matrix as it is known for word embeddings. The embedded events are then used as input for an LSTM network that predicts the next activity\cite{DBLP:conf/bpm/EvermannRF16}.
 
-\citeauthor{DBLP:conf/caise/TaxVRD17}] use an one-hot-encoding of the activity and the timestamp of an event to predict the activity and timestamp of the next event. This is done by using a two-layered LSTM network\cite{DBLP:conf/caise/TaxVRD17}.
+\citeauthor{DBLP:conf/caise/TaxVRD17} use an one-hot-encoding of the activity and the timestamp of an event to predict the activity and timestamp of the next event. This is done by using a two-layered LSTM network\cite{DBLP:conf/caise/TaxVRD17}.
 
 More recent work by \citeauthor{DBLP:conf/ssci/NavarinVPS17} adopts this idea and extends the encoding to additional data attributes associated with each event\cite{DBLP:conf/ssci/NavarinVPS17}.
 
@@ -24,3 +24,32 @@ In this approach random forest and logistic regression classifiers for each pref
 
 \citeauthor{DBLP:journals/tkdd/TeinemaaDRM19} presented an in-depth review and benchmark of outcome-oriented predictive process monitoring approaches.
 The study showed that aggregated encoding like counting frequencies of activities as most reliable encoding for outcome-prediction \cite{DBLP:journals/tkdd/TeinemaaDRM19}.
+
+A comparison of suggested process prediction methods is presented in \ref{tab:preliminaries}.
+
+\begin{table}[]
+	\renewcommand{\arraystretch}{1.5}
+	\begin{tabularx}{\textwidth}{l l p{3.2cm} p{1.1cm} p{1.1cm} p{3cm}}
+		
+		\toprule
+		\textbf{Author} & \textbf{Year} & \textbf{Model}  & \textbf{Data-Aware} &  \textbf{Text-Aware} & \textbf{Predictions} \\ \midrule
+		 \Citeauthor{DBLP:conf/otm/DongenCA08} \cite{DBLP:conf/otm/DongenCA08}& \citeyear{DBLP:conf/otm/DongenCA08} & Regression  & \checkmark & - & Remaining time\\
+		 
+		 \Citeauthor{DBLP:journals/is/AalstSS11} \cite{DBLP:journals/is/AalstSS11}&  \citeyear{DBLP:journals/is/AalstSS11}& Transition system  
+		   & - & - & Remaining time \\
+		 
+		 \citeauthor{ DBLP:conf/bpm/EvermannRF16} \cite{ DBLP:conf/bpm/EvermannRF16} &  \citeyear{ DBLP:conf/bpm/EvermannRF16}& LSTM & - & - & Next activity \\
+		 
+		 \citeauthor{DBLP:conf/bpm/TeinemaaDMF16}  \cite{DBLP:conf/bpm/TeinemaaDMF16} &  \citeyear{DBLP:conf/bpm/TeinemaaDMF16} & Random Forest \newline Logistic regression & \checkmark & \checkmark & Case outcome \\
+		 
+		 \citeauthor{DBLP:conf/caise/TaxVRD17} \cite{DBLP:conf/caise/TaxVRD17} & \citeyear{DBLP:conf/caise/TaxVRD17} & LSTM & - & - & Next activity \newline Future path \newline Next event time \newline Remaining time\\
+		 \citeauthor{DBLP:conf/ssci/NavarinVPS17} \cite{DBLP:conf/ssci/NavarinVPS17} &  \citeyear{DBLP:conf/ssci/NavarinVPS17}&  LSTM & \checkmark  &- & Remaining time\\
+		 
+		 \citeauthor{DBLP:journals/computing/PolatoSBL18} \cite{DBLP:journals/computing/PolatoSBL18}&  \citeyear{DBLP:journals/computing/PolatoSBL18} &  Transition system \newline + SVR &  \checkmark & - & Next activity  \newline Future path \newline Remaining time \\
+		 
+		 This work &  2020 &  LSTM & \checkmark & \checkmark &  Next activity \newline Future path \newline Next event time  \newline Remaining time \newline Case outcome 
+	 	\\ \bottomrule
+	\end{tabularx}
+	\caption{Comparison  of process prediction methods.}
+	\label{tab:preliminaries}
+\end{table}
