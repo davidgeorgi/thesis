@@ -22,25 +22,28 @@ Therefore, new techniques are required to add the forward-perspective to process
 \section{Problem Statement}
 
 Businesses can develop a competitive advantage, if their process mining software has predictive capabilities, that allow to predict the future of a running process instance.
-For example, if it is known beforehand that a running process instance will probably exceed
-its deadline, measures can be initiated before damage occurs.
+For example, if it is known beforehand that a running process instance will probably exceed its deadline, measures can be initiated before damage occurs.
+Furthermore, information about the next event or the future path of process instance can be of interest.
+In some scenarios, processes instances have an outcome like success/failure or accepted/declined that can be predicted.
 
-Precisely, given an event log with past executions of a process and a running process instance, we would like to answer the following questions:
+Precisely, given an event log with past executions of a process and a running (i.e. not completed) process instance, we would like to answer the following questions:
 
 \begin{itemize}
-	\item What will happen next? $\rightarrow$ Activity of next event
-	\item When will it happen? $\rightarrow$ Timestamp of next event
-	\item What is the outcome of the instance? $\rightarrow$ Activity of last event
-	\item When will the instance finish $\rightarrow$ Timestamp of last event
-	\item What is the most likely path of the instance $\rightarrow$  Activities and timestamps of all future events for the path that is most likely
+	\item What will happen next?
+	\item When will it happen?
+	\item What is the most likely future path of the instance?
+	\item When will the instance finish?
+	\item What is the outcome of the instance?
 \end{itemize}
 
 
 
 \section{Research Goals}
 
-This thesis aims to improve current state-of-art approaches for process prediction.
-The main research goal is to design and implement a predictive model for event data that is able to take advantage of additional attribute and textual data associated with each event. 
+This thesis aims to improve current state-of-art approaches for process prediction to improve the capabilities of process monitoring software.
+The main research goal is to design, implement and evaluate a predictive model for event data that is able to take advantage of additional attribute and textual data associated with each event.
+Since most current approach are not able to handle textual data, we would like to know to which extend textual data can improve the quality of process prediction.
+Furthermore, we want to evaluate different design choices for a text-aware process prediction model and point out potential trade-offs.
 
 \section{Contribution}
 
@@ -48,3 +51,10 @@ The main research goal is to design and implement a predictive model for event d
 
 \section{Thesis Structure}
 
+This thesis is structured in seven chapters.
+Chapter \ref{chap:related_work} summarizes relevant scientific contributions which focus on the problem of prediction in process mining to give an overview of already available methods and their capabilities.
+In Chapter \ref{chap:prelim} the notations, definitions and concepts used in this contribution are introduced.
+A novel text-aware process prediction model is presented in Chapter \ref{chap:concept}.
+Moreover, the details regarding the implementation of the model are given in Chapter \ref{chap:impl}.
+In Chapter \ref{chap:eval} the performance of the model is evaluated and compared to current state-of-the-art prediction methods.
+Finally, in Chapter \ref{chap:conclusion} a conclusion about all findings and an outlook towards future potential research on process prediction is given.
