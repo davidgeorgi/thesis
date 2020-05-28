@@ -1,11 +1,11 @@
 In this section the basic concepts of process mining, long short-term memory networks, text mining as well as necessary formal definitions and notations are defined.
 
 
-\begin{figure}
-	\centering
-	\includegraphics[width=0.5\textwidth]{figures/predictive-process-mining}
-	\caption{Predictive Process Mining combines the concepts of process science, data science and prediction}
-\end{figure}
+%\begin{figure}
+	%\centering
+	%\includegraphics[width=0.5\textwidth]{figures/predictive-process-mining}
+	%\caption{Predictive Process Mining combines the concepts of process science, data %science and prediction}
+%\end{figure}
 
 
 \section{Processes and Process Mining}
@@ -67,7 +67,7 @@ The set $A^0$ is defined as $\{\langle \rangle\}$, where $\langle \rangle$ is th
 The set of all possible sequences over $A$ is given with $A^* = \bigcup\limits_{i\in \mathbb{N}_0} A^i$.
 
 Sequences $\sigma_1$, $\sigma_2$ can be concatenated to $\sigma_1 \cdot \sigma_2$.
-The $i$th element of a sequence $\sigma = \langle a_1, a_2, \dots, a_n\rangle$ is accessed by $\sigma(i)= a_i$ for $1 \leq i \leq n$.
+Moreover, the $i$th element of a sequence $\sigma = \langle a_1, a_2, \dots, a_n\rangle$ is accessed by $\sigma(i)= a_i$ for $1 \leq i \leq n$.
 To derive a subsequence of $\sigma$ we write $\sigma(i,j)=\langle a_i, a_{i+1} \dots, a_j\rangle$ with $1 \leq i < j \leq n$.
 The length of a sequence is denoted by $|\sigma|$. If a sequence $\sigma$ contains an element $a_i$, we also write $a_i \in \sigma$.
 
@@ -85,7 +85,7 @@ A function $f \in A \rightarrow B$ can be lifted to sequences $\sigma$ over $A$ 
 \section{Events, Traces, Event logs}
 
 \begin{definition}
-Formally, an  \textit{event} is defined by tuple $e = (a,c,t,d_1,\dots, d_m) \in \mathcal{C} \times \mathcal{A}  \times \mathcal{T} \times \mathcal{D}_1 \times \dots \times \mathcal{D}_m =  \mathcal{E}$ where  $c \in \mathcal{C} $ is the case id, $a \in \mathcal{A}$ is the executed activity and $t \in \mathcal{T}$ is the timestamp of the event.
+An  \textit{event} is defined by tuple $e = (a,c,t,d_1,\dots, d_m) \in \mathcal{C} \times \mathcal{A}  \times \mathcal{T} \times \mathcal{D}_1 \times \dots \times \mathcal{D}_m =  \mathcal{E}$ where  $c \in \mathcal{C} $ is the case id, $a \in \mathcal{A}$ is the executed activity and $t \in \mathcal{T}$ is the timestamp of the event.
 Furthermore, each event contains a fixed number $m \in \mathbb{N}_0$ of additional attributes $d_1 \dots d_m$ in their corresponding domains $\mathcal{D}_1, \dots , \mathcal{D}_m$.
 In case that no additional attribute data is given ($m = 0$) the event space $\mathcal{E}$ (set of all possible events) is reduced to $\mathcal{C} \times \mathcal{A}  \times \mathcal{T}$.
 \end{definition}
@@ -97,19 +97,29 @@ Throughout this thesis,  $\mathcal{C} = \mathbb{N}_0$, $|\mathcal{A}| < \infty$ 
 Each additional attribute is assumed to be numerical, categorical or textual, i.e. $\mathcal{D}_i = \mathbb{R}$, $|\mathcal{D}_i| < \infty$ or $\mathcal{D}_i = \Sigma^\ast$  for $1 \leq i \leq m$ and some fixed Alphabet $\Sigma$.
 
 \begin{definition}
-	A \textit{trace} is a finite and non-empty sequence of events $\sigma = \langle e_1, e_2, \dots\rangle \in  \mathcal{E}^\ast$ with increasing timestamps and the same case ID, i.e. $\pi_\mathcal{T} (e_i) < \pi_\mathcal{T} (e_j) $ for $1 \leq i < j \leq |\sigma|$ and $\pi_\mathcal{C} (e_i) = \pi_\mathcal{C} (e_j), \forall i,j \in \{1, 2, \dots, n\}$.
+	A \textit{trace} is a finite and non-empty sequence of events $\sigma = \langle e_1, e_2, \dots\rangle \in  \mathcal{E}^\ast$ with increasing timestamps, i.e. $\pi_\mathcal{T} (e_i) < \pi_\mathcal{T} (e_j) $ for $1 \leq i < j \leq |\sigma|$.
 \end{definition}
 
+
 By lifting the projection functions to sequences a trace can be transformed into a sequence of attributes by applying the projection function to the trace.
-E.g. $\pi_\mathcal{A}(\sigma)$ gives the sequence of the activities of the events in $\sigma$.
+For example, $\pi_\mathcal{A}(\sigma)$ gives the sequence of the activities of the events in $\sigma$.
 
 \begin{definition}
-	An \textit{event log} $\eventlog = \{ \sigma_1, \sigma _2, \dots, \sigma_k \}$ is a set of traces with unique case IDs, i.e. $\pi_\mathcal{C}(e_1) \neq \pi_\mathcal{C}(e_2), \forall e_1 \in \sigma_i, \forall e_2 \in \sigma_j, \forall \sigma_i, \sigma_j \in \eventlog, i \neq j$.
+	An \textit{event log} $\eventlog = \{ \sigma_1, \sigma _2, \dots, \sigma_k \}$ is a set of traces, where each event of a trace is unique in the log and all events of a trace share a case IDs, which is unique per trace.
 \end{definition}
 
 \section{Text mining}
 
 Text mining describes all techniques to generate value out of unstructured or semi-structured textual data.
+It combines concepts of natural language processing, machine learning and data mining \cite{DBLP:journals/coling/Mihalcea08}.
+The base object in text mining is a \textit{document} containing textual data.
+The text can be completed unstructured, i.e. it does not conform to a pre-defined data model, or semi-structured, like in an e-mail, where text information is assigned to sender, subject, message etc.
+A collection of documents is called \textit{text corpus}, which forms the basis for many text mining techniques.
+
+In order to derive a mathematical representation of the text data that can be interpreted by a computer, a text model has to be build using the text corpus.
+Popular text models are Bag-of-words, Bag-of-n-gram, Paragraph vector (a.k.a. Doc2Vec) \cite{DBLP:conf/icml/LeM14} and Latent Dirichlet Allocation \cite{DBLP:journals/jmlr/BleiNJ03}.
+Most models require a text preprocessing step, where the text is cleaned from linguistic variation as well as meaningless words and symbols.
+
 
 \section{Long short-term memory networks}
 
