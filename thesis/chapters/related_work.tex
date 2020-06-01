@@ -1,6 +1,6 @@
 
 The prediction of the future behavior of an process instance has been an important sub-field in the process mining research, that aims to enhance process monitoring capabilities.
-Depending on the use case e.g. predicting time-related attributes, the future path or the the outcome of a case can be of interest. 
+Depending on the use case e.g. predicting time-related attributes, the future path or the the outcome of a case can be of interest.
 Most approaches presented in the literature either use machine learning based or process models based methods.
 
 \Citeauthor{DBLP:conf/otm/DongenCA08} presented five different non-parametric regression predictors for forecasting the total cycle time of an unfinished case\cite{DBLP:conf/otm/DongenCA08}.
@@ -35,11 +35,13 @@ Furthermore, they enhance the approach in  \cite{DBLP:journals/is/AalstSS11} by 
 \citeauthor{DBLP:journals/tkdd/TeinemaaDRM19} reported an in-depth review and benchmark of outcome-oriented predictive process monitoring approaches.
 The study showed that aggregated encoding like counting frequencies of activities as most reliable encoding for outcome-prediction \cite{DBLP:journals/tkdd/TeinemaaDRM19}.
 
-A comparison of suggested process prediction methods is presented in \ref{tab:preliminaries}.
+\citeauthor{DBLP:conf/icpm/ParkS19} showed how LSTM-based predictions can be used to solve a resource allocation problem, leading to direct recommendation for process improvement \cite{DBLP:conf/icpm/ParkS19}.
+
+A comparison of suggested process prediction methods is presented in Table \ref{tab:preliminaries}.
 
 \begin{table}[]
 	\renewcommand{\arraystretch}{1.5}
-	\begin{tabularx}{\textwidth}{l l p{3.2cm} p{1.1cm} p{1.1cm} p{3cm}}
+	\begin{tabularx}{\textwidth}{p{3.5cm} l p{3.2cm} p{1.1cm} p{1.1cm} p{3cm}}
 		
 		\toprule
 		\textbf{Approach} & \textbf{Year} & \textbf{Model(s)}  & \textbf{Data-Aware} &  \textbf{Text-Aware} & \textbf{Predictions} \\ \midrule
@@ -54,14 +56,16 @@ A comparison of suggested process prediction methods is presented in \ref{tab:pr
 		 
 		 \citeauthor{DBLP:conf/dis/CeciLFCM14} \cite{DBLP:conf/dis/CeciLFCM14} & \citeyear{DBLP:conf/dis/CeciLFCM14} & Sequence Tree \newline Decision Tree& \checkmark & - & Next activity \newline Remaining time \\
 		 
-		 \citeauthor{ DBLP:conf/bpm/EvermannRF16} \cite{ DBLP:conf/bpm/EvermannRF16} &  \citeyear{ DBLP:conf/bpm/EvermannRF16}& LSTM & - & - & Next activity \\
-		 
 		 \citeauthor{DBLP:conf/bpm/TeinemaaDMF16}  \cite{DBLP:conf/bpm/TeinemaaDMF16} &  \citeyear{DBLP:conf/bpm/TeinemaaDMF16} & Random Forest \newline Logistic regression & \checkmark & \checkmark & Case outcome \\
+		 
+		 \citeauthor{ DBLP:conf/bpm/EvermannRF16} \cite{ DBLP:conf/bpm/EvermannRF16} &  \citeyear{ DBLP:conf/bpm/EvermannRF16}& LSTM & - & - & Next activity \\
 		 
 		 \citeauthor{DBLP:conf/caise/TaxVRD17} \cite{DBLP:conf/caise/TaxVRD17} & \citeyear{DBLP:conf/caise/TaxVRD17} & LSTM & - & - & Next activity \newline Future path \newline Next event time \newline Remaining time\\
 		 \citeauthor{DBLP:conf/ssci/NavarinVPS17} \cite{DBLP:conf/ssci/NavarinVPS17} &  \citeyear{DBLP:conf/ssci/NavarinVPS17}&  LSTM & \checkmark  &- & Remaining time\\
 		 
-		 \citeauthor{DBLP:journals/computing/PolatoSBL18} \cite{DBLP:journals/computing/PolatoSBL18}&  \citeyear{DBLP:journals/computing/PolatoSBL18} &  Transition system \newline SVR &  \checkmark & - & Next activity  \newline Future path \newline Remaining time \\
+		 \citeauthor{DBLP:journals/computing/PolatoSBL18} \cite{DBLP:journals/computing/PolatoSBL18}&  \citeyear{DBLP:journals/computing/PolatoSBL18} &  Transition system \newline SVR \newline Naive Bayes &  \checkmark & - & Next activity  \newline Future path \newline Remaining time \\
+		 
+		 \citeauthor{DBLP:conf/icpm/ParkS19} \cite{DBLP:conf/icpm/ParkS19} & \citeyear{DBLP:conf/icpm/ParkS19} & LSTM & \checkmark & - &Next activity \newline Next event time  \\
 		 
 		 This approach &  2020 &  LSTM & \checkmark & \checkmark &  Next activity \newline Future path \newline Next event time  \newline Remaining time \newline Case outcome 
 	 	\\ \bottomrule
