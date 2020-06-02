@@ -48,7 +48,7 @@ Typical formats for event logs, which are not part of an database, are comma-sep
 A table-based representation of an artificial event log can be seen in Table \ref{tab:event-log}.
 
 Process mining is the discipline that covers all approaches aiming to generate value out of event data.
-As an umbrella term, Process Mining comprises or utilizes concepts of Business Process Management, Data Mining, Business Process Intelligence, Big Data, Workflow Management, Business Activity Monitoring \cite{DBLP:books/sp/Aalst16} as well as Machine Learning \cite{DBLP:conf/bpm/VeitGMHT17}.
+As an umbrella term, Process Mining includes or utilizes concepts of Business Process Management, Data Mining, Business Process Intelligence, Big Data, Workflow Management, Business Activity Monitoring \cite{DBLP:books/sp/Aalst16} as well as Machine Learning \cite{DBLP:conf/bpm/VeitGMHT17}.
 
 Process mining can be divided into a set of subdisciplines mainly process discovery, conformance checking, process enhancement and process analytics \cite{DBLP:conf/caise/EckLLA15}.
 Process discovery aims to generate process models out of event data in order to understand a process and enable further analysis.
@@ -125,24 +125,32 @@ Most models require a text preprocessing step, where the text is cleaned from li
 
 Long short-term memory (LSMT) is an advanced recurrent neural network architecture for sequential data originally presented by \citeauthor{DBLP:journals/neco/HochreiterS97} in \citeyear{DBLP:journals/neco/HochreiterS97}  \cite{DBLP:journals/neco/HochreiterS97}.
 This approach addresses the well-known vanishing and exploding gradient problem \cite{DBLP:conf/icml/PascanuMB13}  of traditional recurrent neural networks by introducing more complex LSTM cells as hidden units.
-The proposed architecture has been improved several times \cite{DBLP:journals/neco/GersSC00} \cite {DBLP:journals/tnn/GreffSKSS17} and belongs to the most successful recurrent neural network models.
+The proposed architecture has been improved several times \cite{DBLP:journals/neco/GersSC00} \cite {DBLP:journals/tnn/GreffSKSS17} and considered as one of the most successful recurrent neural network models.
 Although LSTM networks have been available for a long time, the breakthrough of this technology is dated around 2016 after many success stories of LSTM in combination with large data sets and GPU hardware have been reported for sequence to sequence tasks like text translation \cite{DBLP:journals/corr/WuSCLNMKCGMKSJL16}.
 
 Gated recurrent units (GRU) \cite{DBLP:conf/emnlp/ChoMGBBSB14} are the competing gating mechanism by \citeauthor{DBLP:conf/emnlp/ChoMGBBSB14} that have fewer parameters and perform similar to LSTM.
 However, more recent studies show, that LSTM outperforms GRU consistently in neural machine translation tasks \cite{DBLP:journals/corr/BritzGLL17}.
 
-Basic feedforward neural networks comprise an input layer, arbitrarily many hidden layers and an output layer.
-Each layer consists of cells that compute and output the weighted sum of the cells of the previous layer that has been passed to an activation function.
-These networks can learn complex functions in supervised learning settings where input and output pattern are provided.
-The network computes a loss function for each training pattern and adjusts its weights using a back-propagation algorithm \cite{rumelhart1986learning}.
+A simple feedforward neural networks consists of an input layer, arbitrarily many hidden layers and an output layer, where each layer consists of neurons that compute and output the weighted sum of the cells of the previous layer that has been passed to an activation function \cite{DBLP:journals/nn/Schmidhuber15}.
+These networks can learn and compute complex functions in supervised learning settings, where input and output pattern are provided.
+The network computes a loss function for each training pattern and adjusts its weights with gradient descents using a back-propagation algorithm in order to minimize the loss function \cite{rumelhart1986learning}.
 
-Recurrent neural networks extend traditional feed forward networks with backfeeding connections between hidden cells.
-This allows the network to keep a state across inputs and allows the neural network to process arbitrarily long sequences of input data while learning temporal dependencies.
+Recurrent neural networks extend traditional feed forward networks with backfeeding connections between hidden layers.
+This enables the network to keep a state across inputs and allows the neural network to process arbitrarily long sequences of input data while learning temporal dependencies.
 
-In LTSM networks the hidden neurons are replaced with more complex LSTM cells.
-These cells uses as input the state $C_{t-1}$ and the output $h_{t-1}$ of the cell in the previous time step and the output of the previous layer.
-Each LSTM cell produces an output $h_t$ and state $C_t$.
+In LTSM networks the layers are replaced by more complex LSTM modules, where each module contains four different sublayers.
+The module uses as input the state $C_{t-1}$ and the hidden output $h_{t-1}$ of the module in the previous time step as well as the output of the previous layer $x_t$ to compute a new cell state $C_{t}$ and a (hidden) output $h_{t}$.
 
+\begin{figure}
+	\centering
+	\includegraphics[width=0.8\textwidth]{figures/lstm-module}
+	\caption{An LSTM module with four sublayers that manipulate the cell state and compute the module's output. Graphic is adapted from \cite{lstm-blog}}.
+	\label{fig:lstm-module}
+\end{figure}
+
+The input vector $x_t$ is concatenated with the previous hidden output $h_{t-1}$ and fed to four neural network layers, which are designed to decide what part of the cell state will remain (forget gate $f_t$), how it is updated (update gate $i_t$ and 	$\bar{C}_t$) and what the output of the layer will be (output gate $o_t$ leading to $h_t$).
+
+The output of the sublayers are computed with the following equations:
 
 \begin{equation}\label{key}
 	f_t = \sigma(W_f \cdot [h_{t-1}, x_t] + b_f)
@@ -153,20 +161,25 @@ Each LSTM cell produces an output $h_t$ and state $C_t$.
 \end{equation}
 
 \begin{equation}\label{key}
-	\bar{C} = \tanh (W_C \cdot [h_{t-1}, x_t] + b_C)
-\end{equation}
-
-\begin{equation}\label{key}
-	C_t = f_t \times C_{t-1} + i_t \times \bar{C}_t
+	\bar{C}_t = \tanh (W_C \cdot [h_{t-1}, x_t] + b_C)
 \end{equation}
 
 \begin{equation}\label{key}
 	o_t = \sigma (W_o \cdot [h_{t-1}, x_t] + b_o)
 \end{equation}
 
+$W_f$, $W_i$, $W_C$ and $W_o$ are the sublayer's learned weights and $b_f$, $b_i$, $b_C$ and $b_o$ are the corresponding biases.
+
+The new cell state $C_t$ is then a combination of the old cell state $C_{t-1}$ and the result of the update gate $\bar{C}_t$, where the layer computations $f_t$ and $i_t$ determine the proportions.
+
+\begin{equation}\label{key}
+	C_t = f_t \times C_{t-1} + i_t \times \bar{C}_t
+\end{equation}
+
+The result of the output gate $o_t$ is point-wise multiplied with the tanh-activated new cell state to calculate the hidden output $h_t$ of the module.
+
 \begin{equation}\label{key}
 	h_t = o_t \times \tanh(C_t )
 \end{equation}
 
-
-
+LSTM networks are able to backpropagate a more stable error with this gating mechanism, such that these networks are much more capable of learning complex functions for sequences, compared to standard recurrent neural networks.
