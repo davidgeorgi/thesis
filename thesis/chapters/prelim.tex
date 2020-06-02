@@ -141,7 +141,7 @@ This enables the network to keep a state across inputs and allows the neural net
 In LTSM networks the layers are replaced by more complex LSTM modules, where each module contains four different sublayers.
 The module uses as input the state $C_{t-1}$ and the hidden output $h_{t-1}$ of the module in the previous time step as well as the output of the previous layer $x_t$ to compute a new cell state $C_{t}$ and a (hidden) output $h_{t}$.
 
-\begin{figure}
+\begin{figure}[htbp!]
 	\centering
 	\includegraphics[width=0.8\textwidth]{figures/lstm-module}
 	\caption{An LSTM module with four sublayers that manipulate the cell state and compute the module's output. Graphic is adapted from \cite{lstm-blog}}.
@@ -149,15 +149,14 @@ The module uses as input the state $C_{t-1}$ and the hidden output $h_{t-1}$ of 
 \end{figure}
 
 The input vector $x_t$ is concatenated with the previous hidden output $h_{t-1}$ and fed to four neural network layers, which are designed to decide what part of the cell state will remain (forget gate $f_t$), how it is updated (update gate $i_t$ and 	$\bar{C}_t$) and what the output of the layer will be (output gate $o_t$ leading to $h_t$).
-
-The output of the sublayers are computed with the following equations:
+The sublayer have pointwise $\text{sigmoid}(x) = \frac{1}{1+\mathrm{e}^{-x}}$ or $\tanh(x) = \frac{\mathrm{e}^{x} - \mathrm{e}^{-x}}{\mathrm{e}^{x} + \mathrm{e}^{-x}}$ activation functions, leading to the following equations:
 
 \begin{equation}\label{key}
-	f_t = \sigma(W_f \cdot [h_{t-1}, x_t] + b_f)
+	f_t = \text{sigmoid}(W_f \cdot [h_{t-1}, x_t] + b_f)
 \end{equation}
 
 \begin{equation}\label{key}
-	i_t = \sigma (W_i \cdot [h_{t-1}, x_t] + b_i)
+	i_t =  \text{sigmoid} (W_i \cdot [h_{t-1}, x_t] + b_i)
 \end{equation}
 
 \begin{equation}\label{key}
@@ -165,21 +164,21 @@ The output of the sublayers are computed with the following equations:
 \end{equation}
 
 \begin{equation}\label{key}
-	o_t = \sigma (W_o \cdot [h_{t-1}, x_t] + b_o)
+	o_t =  \text{sigmoid} (W_o \cdot [h_{t-1}, x_t] + b_o)
 \end{equation}
 
 $W_f$, $W_i$, $W_C$ and $W_o$ are the sublayer's learned weights and $b_f$, $b_i$, $b_C$ and $b_o$ are the corresponding biases.
 
-The new cell state $C_t$ is then a combination of the old cell state $C_{t-1}$ and the result of the update gate $\bar{C}_t$, where the layer computations $f_t$ and $i_t$ determine the proportions.
+The new cell state $C_t$ is then a combination of the old cell state $C_{t-1}$ and the result of the update gate $\bar{C}_t$, where the layer computations $f_t$ and $i_t$ determine the proportions by a pointwise multiplication ($\odot$) with the cell states.
 
 \begin{equation}\label{key}
-	C_t = f_t \times C_{t-1} + i_t \times \bar{C}_t
+	C_t = f_t \odot C_{t-1} + i_t \odot \bar{C}_t
 \end{equation}
 
 The result of the output gate $o_t$ is point-wise multiplied with the tanh-activated new cell state to calculate the hidden output $h_t$ of the module.
 
 \begin{equation}\label{key}
-	h_t = o_t \times \tanh(C_t )
+	h_t = o_t \odot \tanh(C_t )
 \end{equation}
 
-LSTM networks are able to backpropagate a more stable error with this gating mechanism, such that these networks are much more capable of learning complex functions for sequences, compared to standard recurrent neural networks.
+LSTM networks are able to backpropagate a more stable error with this gating mechanism, such that these networks are much more capable of learning complex functions for sequences compared to standard recurrent neural networks.
