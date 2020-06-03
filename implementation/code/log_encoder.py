@@ -29,6 +29,7 @@ class LSTMLogEncoder(LogEncoder):
         self.event_dim = 0
         self.feature_dim = 0
         self.time_scaling_divisor = [1, 1, 1, 1, 1, 1]
+        self.process_start_time = 0
         super().__init__()
 
     def fit(self, log, activities=None, data_attributes=None, text_attribute=None):
@@ -76,12 +77,14 @@ class LSTMLogEncoder(LogEncoder):
             y_next_time = np.zeros(case_dim)
             y_final_time = np.zeros(case_dim)
 
+            self.process_start_time = log[0][0]["time:timestamp"].timestamp()
+
         # Encode traces and prefix traces
         trace_dim_index = 0
-        process_start_time = log[0][0]["time:timestamp"].timestamp()
         for case_index, case in enumerate(log):
+            print(log)
             case_start_time = log[case_index][0]["time:timestamp"].timestamp()
-            # For training: Encode prefixes. For predicting: Encode full trace only
+            # For training: Encode all prefixes. For predicting: Encode given prefix only
             prefix_lengths = range(1, len(case) + 1) if for_training else range(len(case), len(case) + 1)
             for prefix_length in prefix_lengths:
                 # Encode the (prefix-)trace
@@ -108,7 +111,7 @@ class LSTMLogEncoder(LogEncoder):
                         # Seconds since last Januar 1
                         x[trace_dim_index][padding+event_index][offset + 4] = (event_time.timestamp() - event_time.replace(month=1, day=1, hour=0, minute=0, second=0, microsecond=0).timestamp())/self.time_scaling_divisor[4]
                         # Seconds since process start
-                        x[trace_dim_index][padding+event_index][offset + 5] = (event_time.timestamp() - process_start_time)/self.time_scaling_divisor[5]
+                        x[trace_dim_index][padding+event_index][offset + 5] = (event_time.timestamp() - self.process_start_time)/self.time_scaling_divisor[5]
 
                         previous_event_time = event_time.timestamp()
                         offset += 6
@@ -135,11 +138,11 @@ class LSTMLogEncoder(LogEncoder):
                     if prefix_length == len(case):
                         # Case 1: Set <Process end> as next activity target
                         y_next_act[trace_dim_index][len(self.activities)] = 1
-                        y_next_time[trace_dim_index] = (case[-1]["time:timestamp"].timestamp() - case_start_time) / self.time_scaling_divisor[1]
+                        y_next_time[trace_dim_index] = (case[-1]["time:timestamp"].timestamp() - case_start_time) / self.time_scaling_divisor[0]
                     else:
                         # Case 2: Set next activity as target
                         y_next_act[trace_dim_index][self.activities.index(case[prefix_length]["concept:name"])] = 1
-                        y_next_time[trace_dim_index] = (case[prefix_length]["time:timestamp"].timestamp() - case_start_time) / self.time_scaling_divisor[1]
+                        y_next_time[trace_dim_index] = (case[prefix_length]["time:timestamp"].timestamp() - case_start_time) / self.time_scaling_divisor[0]
                     # Set final activity and case cycle time as target
                     y_final_act[trace_dim_index][self.activities.index(case[-1]["concept:name"])] = 1
                     y_final_time[trace_dim_index] = (case[-1]["time:timestamp"].timestamp() - case_start_time) / self.time_scaling_divisor[0]

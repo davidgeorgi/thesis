@@ -21,7 +21,6 @@
 *.bib.sav
 *.lof
 *.lot
-*.pdf
 
 # MS Office files
 *.tmp
@@ -34,4 +33,7 @@
 .idea
 
 # Folder
-/data/*
+/implementation/models/*
+/implementation/logs/*
+/implementation/results/*
+/implementation/code/__pycache__/*
