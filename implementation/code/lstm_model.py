@@ -1,6 +1,6 @@
 import numpy as np
+import pandas as pd
 import tensorflow as tf
-import csv
 from datetime import datetime
 import os
 from tensorflow.keras import metrics
@@ -67,7 +67,7 @@ class LSTMModel(PredictionModel):
         model.compile(loss=loss_param, metrics=metric_param, optimizer=optimizer_param)
         self.model = model
 
-    def fit(self, log, data_attributes=None, text_attribute=None, epochs=10):
+    def fit(self, log, data_attributes=None, text_attribute=None, epochs=100):
 
         # Encode training data
         self.activities = _get_event_labels(log, "concept:name")
@@ -80,9 +80,9 @@ class LSTMModel(PredictionModel):
         self._build_model()
 
         # Reduce learning rate if metrics do not improve anymore
-        reduce_lr = ReduceLROnPlateau(monitor="val_loss", factor=0.1, patience=3, min_lr=0.0001)
+        reduce_lr = ReduceLROnPlateau(monitor="val_loss", factor=0.1, patience=8, min_lr=0.0001)
         # Stop early if metrics do not improve for longer time
-        early_stopping = EarlyStopping(monitor="val_loss", patience=5)
+        early_stopping = EarlyStopping(monitor="val_loss", patience=20)
         # Save model
         model_checkpoint = ModelCheckpoint("../models/model_{epoch:02d}-{val_loss:.2f}.h5", monitor="val_loss", verbose=0, save_best_only=True, save_weights_only=False, mode="auto")
         # Fit the model to data
@@ -90,41 +90,59 @@ class LSTMModel(PredictionModel):
 
     def predict_next_activity(self, log):
         x = self.log_encoder.transform(log, for_training=False)
-        pred = self.model.predict(x)
-        return pred[0]
+        prediction = self.model.predict(x)
+        return prediction[0]
 
     def predict_final_activity(self, log):
         x = self.log_encoder.transform(log, for_training=False)
-        pred = self.model.predict(x)
-        return np.array([np.argmax(act) for act in pred[1]])
+        prediction = self.model.predict(x)
+        return prediction[1]
 
     def predict_next_time(self, log):
         x = self.log_encoder.transform(log, for_training=False)
-        pred = self.model.predict(x)
-        return pred[2].flatten() * self.log_encoder.time_scaling_divisor[0]
+        prediction = self.model.predict(x)
+        return prediction[2].flatten() * self.log_encoder.time_scaling_divisor[0]
 
     def predict_final_time(self, log):
         x = self.log_encoder.transform(log, for_training=False)
-        pred = self.model.predict(x)
-        return pred[3].flatten() * self.log_encoder.time_scaling_divisor[0]
+        prediction = self.model.predict(x)
+        return prediction[3].flatten() * self.log_encoder.time_scaling_divisor[0]
+
+    def predict(self, log):
+        x = self.log_encoder.transform(log, for_training=False)
+        prediction = self.model.predict(x)
+        prediction[2] = prediction[2].flatten() * self.log_encoder.time_scaling_divisor[0]
+        prediction[3] = prediction[3].flatten() * self.log_encoder.time_scaling_divisor[0]
+        return prediction
 
     def evaluate(self, log):
         folder_path = "../results/lstm-" + datetime.now().strftime("%Y-%m-%d-%H-%M-%S")
         os.mkdir(folder_path)
 
-        # Next activity prediction
-        with open(folder_path + "/next-activity.csv", "w") as csvfile:
-            spamwriter = csv.writer(csvfile, delimiter=",", quotechar='|', quoting=csv.QUOTE_MINIMAL)
-            spamwriter.writerow(["CaseID", "Prefix length", "True activity", "Predicted activity"] + self.activities + ["CASE END"])
-            for case_index, case in enumerate(log):
-                caseid = case.attributes["concept:name"]
-                for prefix_length in range(1, len(case) + 1):
-                    true_activity = len(self.activities) if prefix_length == len(case) else self.activities.index(case[prefix_length]["concept:name"])
-                    prediction = self.predict_next_activity([case[0:prefix_length]])[0]
-                    predicted_activity = np.argmax(prediction)
-                    print(prediction)
-                    spamwriter.writerow([caseid, prefix_length, true_activity, predicted_activity] + list(prediction))
-        return
+        # Make predictions
+        predictions = []
+        for case in log:
+            caseID = case.attributes["concept:name"]
+            for prefix_length in range(1, len(case) + 1):
+                prediction = self.predict([case[0:prefix_length]])
+
+                true_next_activity = len(self.activities) if prefix_length == len(case) else self.activities.index(case[prefix_length]["concept:name"])
+                true_case_outcome = self.activities.index(case[-1]["concept:name"])
+                true_next_time = (case[-1]["time:timestamp"].timestamp() - case[prefix_length - 1]["time:timestamp"].timestamp())/86400 if prefix_length == len(case) else (case[prefix_length]["time:timestamp"].timestamp() - case[prefix_length - 1]["time:timestamp"].timestamp())/86400
+                true_cycle_time = (case[-1]["time:timestamp"].timestamp() - case[0]["time:timestamp"].timestamp())/86400
+
+                predicted_next_activity = np.argmax(prediction[0][0])
+                predicted_case_outcome = np.argmax(prediction[1][0])
+                predicted_next_time = prediction[2][0] / 86400
+                predicted_cycle_time = prediction[3][0] / 86400
+
+                predictions.append([caseID, prefix_length, true_next_activity, predicted_next_activity, true_case_outcome, predicted_case_outcome, true_next_time, predicted_next_time, true_cycle_time, predicted_cycle_time])
+
+        # Save predictions in csv file
+        columns = ["CaseID", "Prefix length", "True next activity", "Predicted next activity", "True case outcome", "Predicted case outcome", "True next time", "Predicted next time", "True cycle time", "Predicted cylce time"]
+        df = pd.DataFrame(predictions, columns=columns)
+        df.to_csv(folder_path + "/predictions.csv", encoding='utf-8', sep=',', index=False)
+        return df
 
     def _get_activity_label(self, index):
         return self.activities[index]

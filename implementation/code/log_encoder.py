@@ -40,6 +40,7 @@ class LSTMLogEncoder(LogEncoder):
         self.categorical_attributes = list(filter(lambda attribute: not _is_numerical_attribute(log, attribute), self.data_attributes))
         self.categorical_attributes_values = [_get_event_labels(log, attribute) for attribute in self.categorical_attributes]
         self.numerical_attributes = list(filter(lambda attribute: _is_numerical_attribute(log, attribute), self.data_attributes))
+        self.process_start_time = log[0][0]["time:timestamp"].timestamp()
 
         # Scaling divisors for time related features to achieve values between 0 and 1
         cycle_time_max = np.max(
@@ -77,13 +78,10 @@ class LSTMLogEncoder(LogEncoder):
             y_next_time = np.zeros(case_dim)
             y_final_time = np.zeros(case_dim)
 
-            self.process_start_time = log[0][0]["time:timestamp"].timestamp()
-
         # Encode traces and prefix traces
         trace_dim_index = 0
-        for case_index, case in enumerate(log):
-            print(log)
-            case_start_time = log[case_index][0]["time:timestamp"].timestamp()
+        for case in log:
+            case_start_time = case[0]["time:timestamp"].timestamp()
             # For training: Encode all prefixes. For predicting: Encode given prefix only
             prefix_lengths = range(1, len(case) + 1) if for_training else range(len(case), len(case) + 1)
             for prefix_length in prefix_lengths:

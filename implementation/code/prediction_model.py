@@ -26,6 +26,10 @@ class PredictionModel(ABC):
     def predict_final_time(self, log):
         pass
 
+    @abstractmethod
+    def predict(selfself, log):
+        pass
+
     def predict_suffix(self, log):
         pass
 
