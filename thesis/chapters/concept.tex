@@ -2,11 +2,12 @@ Text-aware process prediction aims to utilize unstructured text information in e
 While many prediction methods have been applied to event data, almost none of them are able to handle textual data.
 An exception is the approach presented in \cite{DBLP:conf/bpm/TeinemaaDMF16}, where traces with text data are encoded as fixed vectors and a classifier is learned for each prefix length.
 
-In this chapter a novel approach for process prediction is presented that is able to handle numerical, categorical and textual data, captures temporal dependencies and concept drifts using an event-wise encoding and a sequential prediction model (LSTM).
+In this chapter a novel approach for process prediction is presented that considers control flow, additional numerical, categorical and textual data, captures temporal dependencies, seasonal variability and concept drifts using an event-wise encoding and a sequential prediction model (LSTM).
 
 \section{Overview}
 
-The proposed framework consists of a preprocessing, log encoder, text encoder and prediction model component, which operate in an offline and online phase.
+The proposed framework consists of a preprocessing, encoding and prediction model component, which operate in an offline and online phase.
+The encoding component distinguish between categorical or numerical data that can be encoded directly and textual data, which requires a textual model.
 
 In the offline phase a historical event log with completed traces of a business process is used to train the prediction model.
 Given an event log $\eventlog = \{\sigma_1, \dots, \sigma_l\}$ with historical event data, the set of all prefix traces $\eventlog_\mathrm{prefix} = \{\sigma(1,k) \mid \forall \sigma \in \eventlog, 1 \leq k \leq |\sigma|\}$ is computed.
@@ -30,17 +31,48 @@ The prefix traces are encoded to sequences of fixed-length event vectors using t
 \end{figure}
 
 
-\section{Log Encoding}
+\section{Event Encoding}
 
-Each event is encoded in a fixed-length vector using the event's activity, timestamp and additional categorical, numerical and textual attributes.
-The encoding of each attributes 
+In the offline training phase as well as during online prediction, traces are encoded as sequences of event vectors.
+Each event is encoded as a fixed-length vector using the event's activity, timestamp and additional categorical, numerical and textual attributes.
+The resulting feature vector is the concatenation of 
 
-$ encode(e_i)$
-\subsection{Encoding of Activities and other Categorical Attributes}
+\begin{equation}
+	\bm{x_e}=(
+	\bm{a}_e,
+	\bm{t}_e,
+	\bm{d}_1^\mathrm{num}, \dots,\bm{d}_r^\mathrm{num},
+	\bm{d}_1^\mathrm{cat}, \dots,\bm{d}_s^\mathrm{cat},
+	\bm{d}_1^\mathrm{text}, \dots, \bm{d}_u^\mathrm{text})
+\end{equation}
 
 
+\begin{table}
 
-\subsection{Encoding of Time and other numerical Attributes}
+
+\begin{tabularx}{\textwidth}{l l p{10cm} }
+	\toprule
+	 \textbf{Feature Vector} &  \textbf{Dimension} &  \textbf{Description} \\
+	 \midrule
+	 	$\bm{a}$ & $|\mathcal{A}|$& One-hot encoding of the activity. \\
+	 	$\bm{t}$ & 6 & Time-based feature vector. See Section \ref{sec:time}.\\
+	 	$\bm{d}_i^\mathrm{num}$ & 1 & Normalized value of the $i$-th numerical attribute\\
+	 	$\bm{d}_i^\mathrm{cat}$ &$|\mathcal{D}_i|$ & One-hot encoding of the $i$-th categorical attribute.\\
+	 	$\bm{d}_i^\mathrm{text}$ & $z_i$& Fixed-length vectorization of the $i$-th text attribute. \newline See Section \ref{sec:text}.\\
+	\bottomrule
+	 
+\end{tabularx}
+	\caption{Feature vectors for event encoding.}
+	\label{tab:features}
+\end{table}
+
+\begin{equation}
+	|\bm{x}_e|= |\mathcal{A}| + r + \sum_{i=1}^{s} |\mathcal{D}_i| + \sum_{j=1}^{u} z_j + 6
+\end{equation}
+
+
+\section{Capturing Temporal Dependencies}\label{sec:time}
+
 
 For timestamp prediction of the next and final event of running process instance a set of time-based features is computed from the timestamp data in the event log.
 Given an event log $\eventlog$ an event $e_i$ from a trace $\sigma = \langle e_1, \dots, e_n \rangle$ the following time features are computed for the encoding of $e_i$: 
@@ -68,12 +100,12 @@ For example, some activities might only be executed during office hours, before 
 Each feature $t_1, \dots t_6$ as well as all additional numerical attributes $d_i$ are scaled to the interval $ [0, 1]$ to improve learning efficiency using min-max normalizing.
 The scaling for a numerical feature $x$ is realized with the transformation
 
-$$\hat{x} = \dfrac{x-\min(x)}{\max(x) - \min(x)} \in [0, 1],$$
+$$\hat{x} = \dfrac{x-\min(x)}{\max(x) - \min(x)},$$
 
 where $\min(x)$ is the lowest and $\max(x)$ is the highest value $x$ can take.
 If the limits are not bounded conceptually, the lowest or highest value of $x$ in the event log is used for scaling.
 
-\subsection{Text Encoding}
+\section{Text Vectorization}\label{sec:text}
 
 In order to prepare the textual data of the event log for a prediction model, the texts have to be encoded in a "useful" numerical vector representation.
 Useful in that context means, that texts with similar semantic meanings should also have similar representations.
@@ -85,7 +117,7 @@ First, all text data associated with the events in the corresponding textual att
 Each document in the text corpus is then preprocessed in order to filter out linguistic noise or useless information.
 Finally, the text corpus is used to build up a vocabulary and a text vectorization technique is applied to encode the text attribute to a fixed of vector.
 
-\subsubsection{Text Preprocessing}
+\subsection{Text Preprocessing}
 
 In the preprocessing step each document is transformed by a processing pipeline which consists of the following four steps:
 
@@ -117,7 +149,7 @@ In addition, punctuation marks or numerical information are excluded.
 		3 & Lemmatization & {[}"the", "patient", "have", "be", "diagnose", "with", "high", "blood", "pressure", "."{]}   \\
 		4             & Stop word filtering     & {[}"patient", "diagnose", "high", "blood", "pressure"{]} \\ \bottomrule
 	\end{tabularx}
-	\caption{Preprocessing transformation of an example document}
+	\caption{Preprocessing transformation of an example document.}
 	\label{tab:text-preprocessing}
 \end{table}
 
@@ -127,8 +159,11 @@ In addition, punctuation marks or numerical information are excluded.
 
 
 
+\subsection{Bag-of-Words}
+\subsection{Bag-of-N-Gram}
+\subsection{Paragraph Vector}
+\subsection{Latent Dirichlet Allocation}
 
-\subsubsection{Bag-of-N-Gram}
-\subsubsection{Paragraph Vector}
+\section{Network Architecture and Training}
 
-\section{Network}
+\section{Online Prediction}
