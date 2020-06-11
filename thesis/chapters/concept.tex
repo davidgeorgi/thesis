@@ -35,7 +35,17 @@ The prefix traces are encoded to sequences of fixed-length event vectors using t
 
 In the offline training phase as well as during online prediction, traces are encoded as sequences of event vectors.
 Each event is encoded as a fixed-length vector using the event's activity, timestamp and additional categorical, numerical and textual attributes.
-The resulting feature vector is the concatenation of 
+The encoded event vector is the concatenation of feature vectors, which are constructed from the event data.
+
+The activity of an event is represented using \textit{one-hot encoding}.
+Given the set of possible activities $\mathcal{A}$, an arbitrary but fixed ordering over is introduced with a bijective index function $index_\mathcal{A} \in \mathcal{A} \rightarrow \{1, \dots, |\mathcal{A}|\}$.
+Using this function, the activity is encoded as a vector of size $|\mathcal{A}|$, where the component $index_\mathcal{A}(\pi_\mathcal{A}(e))$ has value 1 and all the other components have value 0.
+We write $\mathds{1}$
+
+The timestamp of an event is used to compute a set of time-related features, which is 
+
+
+
 
 \begin{equation}
 	\bm{x_e}=(
@@ -47,20 +57,18 @@ The resulting feature vector is the concatenation of
 \end{equation}
 
 
-\begin{table}
+\begin{table}[!htbp]
 
-
-\begin{tabularx}{\textwidth}{l l p{10cm} }
+\begin{tabularx}{\textwidth}{p{2cm} l l p{10cm} }
 	\toprule
-	 \textbf{Feature Vector} &  \textbf{Dimension} &  \textbf{Description} \\
+	 \textbf{Feature} \newline \textbf{Vector} & \textbf{Construction} &\textbf{Dimension} &  \textbf{Description} \\
 	 \midrule
-	 	$\bm{a}$ & $|\mathcal{A}|$& One-hot encoding of the activity. \\
-	 	$\bm{t}$ & 6 & Time-based feature vector. See Section \ref{sec:time}.\\
-	 	$\bm{d}_i^\mathrm{num}$ & 1 & Normalized value of the $i$-th numerical attribute\\
-	 	$\bm{d}_i^\mathrm{cat}$ &$|\mathcal{D}_i|$ & One-hot encoding of the $i$-th categorical attribute.\\
-	 	$\bm{d}_i^\mathrm{text}$ & $z_i$& Fixed-length vectorization of the $i$-th text attribute. \newline See Section \ref{sec:text}.\\
+	 	$\bm{a}$ &$\mathds{1}(\pi_\mathcal{A}(e))$& $|\mathcal{A}|$& One-hot encoding of the activity. \\
+	 	$\bm{t}$ & See Section \ref{sec:time} &6 & Time-based feature vector.\\
+	 	$\bm{d}_i^\mathrm{num}$ & &1 & Normalized value of the $i$-th numerical attribute\\
+	 	$\bm{d}_i^\mathrm{cat}$ & $\mathds{1}(\pi_{{\mathcal{D}_i}^\mathrm{cat}}(e))$&$|\mathcal{D}_i|$ & One-hot encoding of the $i$-th categorical attribute.\\
+	 	$\bm{d}_i^\mathrm{text}$ & See Section \ref{sec:text} & $z_i$& Fixed-length vectorization of the $i$-th text attribute.\\
 	\bottomrule
-	 
 \end{tabularx}
 	\caption{Feature vectors for event encoding.}
 	\label{tab:features}
@@ -107,12 +115,15 @@ If the limits are not bounded conceptually, the lowest or highest value of $x$ i
 
 \section{Text Vectorization}\label{sec:text}
 
-In order to prepare the textual data of the event log for a prediction model, the texts have to be encoded in a "useful" numerical vector representation.
+In order to prepare the textual data of the event log for a prediction model, the texts have to be encoded in a compact, finite and "useful" numerical vector representationu using a text model.
 Useful in that context means, that texts with similar semantic meanings should also have similar representations.
+The vector representation of text data is an important aspect in \textit{Natural Language Processing} (NLP).
 Extracting the meaning of textual information remains a challenge even for humans, because textual data is unstructured, language dependent and domain specific.
-In addition, grammatical variations and the importance of context in language makes text mining even more difficult.
+Many words are ambiguous, for example the word "apple" might denote a fruit or a global technology company.
+In addition, grammatical variations and the importance of context in language makes extracting the semantic meaning even more difficult for computers.
 
-The text vectorization is realized in a 2-step procedure.
+
+In our setting, the text vectorization is realized in a 2-step procedure.
 First, all text data associated with the events in the corresponding textual attribute is collected in a so called \textit{text corpus}.
 Each document in the text corpus is then preprocessed in order to filter out linguistic noise or useless information.
 Finally, the text corpus is used to build up a vocabulary and a text vectorization technique is applied to encode the text attribute to a fixed of vector.
@@ -160,7 +171,25 @@ In addition, punctuation marks or numerical information are excluded.
 
 
 \subsection{Bag-of-Words}
-\subsection{Bag-of-N-Gram}
+
+The \textit{bag-of-words} (BoW) Model is a simple text model, which represents documents based on the \textit{term frequencies} of its words.
+Given the learned vocabulary $V$ a document is represented by a vector of size $|V|$, where the $i$-th component gives the number of occurrences of the word indexed with $i$ in the document.
+
+Since this approach does not reflect the prior distributions of words in the corpus, i.e. how likely certain words appear in a document, the term frequencies are usually normalized by the so-called \textit{inverse document frequency} of a word.
+The inverse document frequency indicates the specificity of a word in the corpus and is computed by dividing the total number of documents by the number of documents that contain the specific word and scaling that value logarithmically.
+
+The bag-of-words model is easy to build and effective for certain applications, but limited in several ways.
+First, the model completely ignores the order of words, which is often crucial for understanding the semantic meaning. For example, the sentences "The patient's health state went from stable to critical." and "The patient's health state went from critical to stable." would result in the same vector representation, while the meaning is clearly inverted.
+Second, the vector representations are sparse and of high dimensionality since they depend of the size of the vocabulary.
+However, the dimension can be reduced by limiting the size of the vocabulary. For example, this can be realized for exampand omit certain words.
+
+\subsection{Bag-of-N-Grams}
+
+The \textit{bag-of-n-grams} model is a generalization of the Bag-of-Words model, which addresses the missing word order awareness of the latter.
+Instead of single words, the vocabulary consists of $n$-tuples of words, that appear consecutive in the corpus.
+The unigram model ($n=1$) is equivalent to the BoW model.
+
+
 \subsection{Paragraph Vector}
 \subsection{Latent Dirichlet Allocation}
 
