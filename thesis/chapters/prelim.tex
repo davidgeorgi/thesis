@@ -131,7 +131,7 @@ Although LSTM networks have been available for a long time, the breakthrough of 
 Gated recurrent units (GRU) \cite{DBLP:conf/emnlp/ChoMGBBSB14} are the competing gating mechanism by \citeauthor{DBLP:conf/emnlp/ChoMGBBSB14} that have fewer parameters and perform similar to LSTM.
 However, more recent studies show, that LSTM outperforms GRU consistently in neural machine translation tasks \cite{DBLP:journals/corr/BritzGLL17}.
 
-A simple feedforward neural networks consists of an input layer, arbitrarily many hidden layers and an output layer, where each layer consists of neurons that compute and output the weighted sum of the cells of the previous layer that has been passed to an activation function \cite{DBLP:journals/nn/Schmidhuber15}.
+A simple feedforward neural networks consists of an input layer, arbitrarily many hidden layers and an output layer, where each layer consists of neurons that compute and output the weighted sum of the cells of the previous layer that has been passed to an non-linear activation function \cite{DBLP:journals/nn/Schmidhuber15}.
 These networks can learn and compute complex functions in supervised learning settings, where input and output pattern are provided.
 The network computes a loss function for each training pattern and adjusts its weights with gradient descents using a back-propagation algorithm in order to minimize the loss function \cite{rumelhart1986learning}.
 
@@ -144,7 +144,7 @@ The module uses as input the state $C_{t-1}$ and the hidden output $h_{t-1}$ of 
 \begin{figure}[htbp!]
 	\centering
 	\includegraphics[width=0.8\textwidth]{figures/lstm-module}
-	\caption{An LSTM module with four sublayers that manipulate the cell state and compute the module's output. Graphic is adapted from \cite{lstm-blog}}.
+	\caption{An LSTM module with four sublayers that manipulate the cell state and compute the module's output. Graphic adapted from \cite{lstm-blog}.}
 	\label{fig:lstm-module}
 \end{figure}
 
@@ -175,7 +175,7 @@ The new cell state $C_t$ is then a combination of the old cell state $C_{t-1}$ a
 	C_t = f_t \odot C_{t-1} + i_t \odot \bar{C}_t
 \end{equation}
 
-The result of the output gate $o_t$ is point-wise multiplied with the tanh-activated new cell state to calculate the hidden output $h_t$ of the module.
+The result of the output gate $o_t$ is pointwise multiplied with the tanh-activated new cell state to calculate the hidden output $h_t$ of the module.
 
 \begin{equation}\label{key}
 	h_t = o_t \odot \tanh(C_t )

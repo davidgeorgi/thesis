@@ -249,3 +249,5 @@
 
 \RequirePackage{booktabs}
 \RequirePackage{tabularx}
+\RequirePackage{bm}
+\RequirePackage{dsfont}
