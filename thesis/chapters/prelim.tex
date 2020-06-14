@@ -48,7 +48,7 @@ Typical formats for event logs, which are not part of an database, are comma-sep
 A table-based representation of an artificial event log can be seen in Table \ref{tab:event-log}.
 
 Process mining is the discipline that covers all approaches aiming to generate value out of event data.
-As an umbrella term, Process Mining includes or utilizes concepts of Business Process Management, Data Mining, Business Process Intelligence, Big Data, Workflow Management, Business Activity Monitoring \cite{DBLP:books/sp/Aalst16} as well as Machine Learning \cite{DBLP:conf/bpm/VeitGMHT17}.
+As an umbrella term, Process Mining includes or utilizes concepts of Business Process Management, Data Mining, Business Process Intelligence, Big Data, Workflow Management, Business Process Monitoring \cite{DBLP:books/sp/Aalst16} as well as Machine Learning \cite{DBLP:conf/bpm/VeitGMHT17}.
 
 Process mining can be divided into a set of subdisciplines mainly process discovery, conformance checking, process enhancement and process analytics \cite{DBLP:conf/caise/EckLLA15}.
 Process discovery aims to generate process models out of event data in order to understand a process and enable further analysis.
@@ -59,33 +59,43 @@ Driven by the fast and ongoing development of quantitative prediction methods in
 Forecasting the future of a running process instance is one of the main goals in process prediction and also the main topic of this thesis.
 
 
-\section{Basic notations, Sequences and Functions}
+\section{Basic notations and Sequences}
 
-The set $\mathbb{N}$ denotes the set of all natural numbers $\{1, 2, 3, \dots\}$, while $\mathbb{N}_0 = \mathbb{N} \cup \{0\}$ denotes the set of natural numbers including 0.
-Given a set $A$, $A^n$ describes the set of all sequences $\langle a_1, a_2, \dots, a_n\rangle$ over $A$ of length $n$ with $a_i \in A$, $1 \leq i \leq n$.
-The set $A^0$ is defined as $\{\langle \rangle\}$, where $\langle \rangle$ is the empty sequence of length $0$.
+The set $\mathbb{N}$ denotes the set of all natural numbers $\{1, 2, 3, \dots\}$ and $\mathbb{N}_0 = \mathbb{N} \cup \{0\}$ denotes the set of natural numbers including 0.
+The set of natural numbers up to $n$ is noted as $[n] = \{1, 2, \dots, n\} \subset \mathbb{N}$ with [0] = $\emptyset$.
+
+\begin{definition}[Sequence]
+		A \textit{sequence} of length $n \in \mathbb{N}_0$ over a set $A$ is an ordered collection of elements defined by function $\sigma \colon [n]\to A$, which assigns each index an element of $A$.
+		A sequence  of length $n$ is represented explicitly as $\sigma = \langle a_1, a_2, \dots, a_n\rangle $ with $a_i \in A$ for $1 \leq i \leq n$. In addition, $\langle \rangle$ is the empty sequence of length $0$.
+\end{definition}
+
+Given a set $A$, $A^n$ describes the set of all sequences $\langle a_1, a_2, \dots, a_n\rangle$ over $A$ of length $n$.
+The set $A^0$ is defined as $\{\langle \rangle\}$, the set that only contains the empty sequence.
 The set of all possible sequences over $A$ is given with $A^* = \bigcup\limits_{i\in \mathbb{N}_0} A^i$.
 
-Sequences $\sigma_1$, $\sigma_2$ can be concatenated to $\sigma_1 \cdot \sigma_2$.
-Moreover, the $i$th element of a sequence $\sigma = \langle a_1, a_2, \dots, a_n\rangle$ is accessed by $\sigma(i)= a_i$ for $1 \leq i \leq n$.
-To derive a subsequence of $\sigma$ we write $\sigma(i,j)=\langle a_i, a_{i+1} \dots, a_j\rangle$ with $1 \leq i < j \leq n$.
-The length of a sequence is denoted by $|\sigma|$. If a sequence $\sigma$ contains an element $a_i$, we also write $a_i \in \sigma$.
+Given sequences $\sigma_1$ and $\sigma_2$, the concatenation of both sequences is denoted $\sigma_1 \cdot \sigma_2$.
+Moreover, the $i$-th element of a sequence $\sigma = \langle a_1, a_2, \dots, a_n\rangle$ is accessed by $\sigma(i)= a_i$ for $1 \leq i \leq n$.
+The length of a sequence is denoted by $|\sigma|$.
+For a sequence $\sigma=\langle a_1, a_2, \dots, a_n\rangle$, the function
+$hd^k(\sigma)= \langle a_1, a_2, \dots, a_k\rangle$ gives the prefix of length $k$ of $\sigma$ and $tl^k(\sigma)= \langle a_{k+1}, a_{k+2}, \dots, a_n\rangle$ the suffix of length $n-k$, for $0 \leq k \leq n$.
+Note that $\sigma = hd^k(\sigma) \cdot tl^k(\sigma)$ for corresponding $k$.
+%If an element $a_i \in A$ appears in a sequence $\sigma$, we also write $a_i \in \sigma$.
 
-A function $f \in A \rightarrow B$ can be lifted to sequences $\sigma$ over $A$ element-wise, precisely:
+A function $f \colon A \to B$ can be lifted element-wise to sequences over $A$, precisely:
+\[
+f(\sigma) =
+\begin{cases}
+\langle \rangle & \text{if $\sigma = \langle \rangle$} \\
+\langle f(a_1), f(a_2), \dots, f(a_n)\rangle & \text{else} 
+\end{cases}
+\]
 
-	\[
-	f(\sigma) =
-	\begin{cases}
-	\langle \rangle & \text{if $\sigma = \langle \rangle$} \\
-	\langle f(a_1), f(a_2), \dots, f(a_n)\rangle & \text{else} 
-	\end{cases}
-	\]
 
 
 \section{Events, Traces, Event logs}
 
-\begin{definition}
-An  \textit{event} is defined by tuple $e = (a,c,t,d_1,\dots, d_m) \in \mathcal{C} \times \mathcal{A}  \times \mathcal{T} \times \mathcal{D}_1 \times \dots \times \mathcal{D}_m =  \mathcal{E}$ where  $c \in \mathcal{C} $ is the case id, $a \in \mathcal{A}$ is the executed activity and $t \in \mathcal{T}$ is the timestamp of the event.
+\begin{definition}[Event]
+An  \textit{event} is defined by tuple $e = (a,c,t,d_1,\dots, d_m) \in \mathcal{C} \times \mathcal{A}  \times \mathcal{T} \times \mathcal{D}_1 \times \dots \times \mathcal{D}_m =  \mathcal{E}$ where  $c \in \mathcal{C} $ is the case ID, $a \in \mathcal{A}$ is the executed activity and $t \in \mathcal{T}$ is the timestamp of the event.
 Furthermore, each event contains a fixed number $m \in \mathbb{N}_0$ of additional attributes $d_1 \dots d_m$ in their corresponding domains $\mathcal{D}_1, \dots , \mathcal{D}_m$.
 In case that no additional attribute data is given ($m = 0$) the event space $\mathcal{E}$ (set of all possible events) is reduced to $\mathcal{C} \times \mathcal{A}  \times \mathcal{T}$.
 \end{definition}
@@ -96,7 +106,7 @@ For example, the activity $a$ of an event $e$ is retrieved by $\pi_\mathcal{A}(e
 Throughout this thesis,  $\mathcal{C} = \mathbb{N}_0$, $|\mathcal{A}| < \infty$ and $ \mathcal{T} = \mathbb{R}$ is assumed, where $t \in \mathcal{T}$ is given in Unix time, precisely the number of seconds since 00:00:00 UTC on 1 January 1970 minus the applied leap seconds.
 Each additional attribute is assumed to be numerical, categorical or textual, i.e. $\mathcal{D}_i = \mathbb{R}$, $|\mathcal{D}_i| < \infty$ or $\mathcal{D}_i = \Sigma^\ast$  for $1 \leq i \leq m$ and some fixed Alphabet $\Sigma$.
 
-\begin{definition}
+\begin{definition}[Trace]
 	A \textit{trace} is a finite and non-empty sequence of events $\sigma = \langle e_1, e_2, \dots\rangle \in  \mathcal{E}^\ast$ with increasing timestamps, i.e. $\pi_\mathcal{T} (e_i) < \pi_\mathcal{T} (e_j) $ for $1 \leq i < j \leq |\sigma|$.
 \end{definition}
 
@@ -104,7 +114,7 @@ Each additional attribute is assumed to be numerical, categorical or textual, i.
 By lifting the projection functions to sequences a trace can be transformed into a sequence of attributes by applying the projection function to the trace.
 For example, $\pi_\mathcal{A}(\sigma)$ gives the sequence of the activities of the events in $\sigma$.
 
-\begin{definition}
+\begin{definition}[Event log]
 	An \textit{event log} $\eventlog = \{ \sigma_1, \sigma _2, \dots, \sigma_k \}$ is a set of traces, where each event of a trace is unique in the log and all events of a trace share a case IDs, which is unique per trace.
 \end{definition}
 
@@ -139,7 +149,7 @@ Recurrent neural networks extend traditional feed forward networks with backfeed
 This enables the network to keep a state across inputs and allows the neural network to process arbitrarily long sequences of input data while learning temporal dependencies.
 
 In LTSM networks the layers are replaced by more complex LSTM modules, where each module contains four different sublayers.
-The module uses as input the state $C_{t-1}$ and the hidden output $h_{t-1}$ of the module in the previous time step as well as the output of the previous layer $x_t$ to compute a new cell state $C_{t}$ and a (hidden) output $h_{t}$.
+The module uses as input the state $\bm{c}_{t-1}$ and the hidden output $\bm{h}_{t-1}$ of the module in the previous time step as well as the output of the previous layer $\bm{x}_t$ to compute a new cell state $\bm{c}_{t}$ and a (hidden) output $\bm{h}_{t}$.
 
 \begin{figure}[htbp!]
 	\centering
@@ -148,37 +158,38 @@ The module uses as input the state $C_{t-1}$ and the hidden output $h_{t-1}$ of 
 	\label{fig:lstm-module}
 \end{figure}
 
-The input vector $x_t$ is concatenated with the previous hidden output $h_{t-1}$ and fed to four neural network layers, which are designed to decide what part of the cell state will remain (forget gate $f_t$), how it is updated (update gate $i_t$ and 	$\bar{C}_t$) and what the output of the layer will be (output gate $o_t$ leading to $h_t$).
+
+The input vector $\bm{x}_t$ is concatenated with the previous hidden output $\bm{h}_{t-1}$ and fed to four neural network layers, which are designed to decide what part of the cell state will remain (forget gate $\bm{f}_t$), how it is updated (update gate $\bm{i}_t$ and $\bm{\bar{c}}_t$) and what the output of the layer will be (output gate $\bm{o}_t$ leading to $\bm{h}_t$).
 The sublayer have pointwise $\text{sigmoid}(x) = \frac{1}{1+\mathrm{e}^{-x}}$ or $\tanh(x) = \frac{\mathrm{e}^{x} - \mathrm{e}^{-x}}{\mathrm{e}^{x} + \mathrm{e}^{-x}}$ activation functions, leading to the following equations:
 
 \begin{equation}\label{key}
-	f_t = \text{sigmoid}(W_f \cdot [h_{t-1}, x_t] + b_f)
+	\bm{f}_t = \text{sigmoid}(\bm{W}_f \cdot (\bm{h}_{t-1}, \bm{x}_t) + \bm{b}_f)
 \end{equation}
 
 \begin{equation}\label{key}
-	i_t =  \text{sigmoid} (W_i \cdot [h_{t-1}, x_t] + b_i)
+	\bm{i}_t =  \text{sigmoid} (\bm{W}_i \cdot (\bm{h}_{t-1}, \bm{x}_t) + \bm{b}_i)
 \end{equation}
 
 \begin{equation}\label{key}
-	\bar{C}_t = \tanh (W_C \cdot [h_{t-1}, x_t] + b_C)
+	\bm{\bar{c}}_t = \tanh (\bm{W}_c \cdot (\bm{h}_{t-1}, \bm{x}_t) + \bm{b}_c)
 \end{equation}
 
 \begin{equation}\label{key}
-	o_t =  \text{sigmoid} (W_o \cdot [h_{t-1}, x_t] + b_o)
+	\bm{o}_t =  \text{sigmoid} (\bm{W}_o \cdot (\bm{h}_{t-1}, \bm{x}_t) + \bm{b}_o)
 \end{equation}
 
-$W_f$, $W_i$, $W_C$ and $W_o$ are the sublayer's learned weights and $b_f$, $b_i$, $b_C$ and $b_o$ are the corresponding biases.
+$\bm{W}_f$, $\bm{W}_i$, $\bm{W}_c$ and $\bm{W}_o$ are the sublayer's learned weights and $\bm{b}_f$, $\bm{b}_i$, $\bm{b}_c$ and $\bm{b}_o$ are the corresponding biases.
 
-The new cell state $C_t$ is then a combination of the old cell state $C_{t-1}$ and the result of the update gate $\bar{C}_t$, where the layer computations $f_t$ and $i_t$ determine the proportions by a pointwise multiplication ($\odot$) with the cell states.
+The new cell state $\bm{c}_t$ is then a combination of the old cell state $\bm{c}_{t-1}$ and the result of the update gate $\bm{\bar{c}}_t$, where the layer computations $\bm{f}_t$ and $\bm{i}_t$ determine the proportions by a pointwise multiplication ($\odot$) with the cell states.
 
 \begin{equation}\label{key}
-	C_t = f_t \odot C_{t-1} + i_t \odot \bar{C}_t
+	\bm{c}_t = f_t \odot \bm{c}_{t-1} + \bm{i}_t \odot \bm{\bar{c}}_t
 \end{equation}
 
-The result of the output gate $o_t$ is pointwise multiplied with the tanh-activated new cell state to calculate the hidden output $h_t$ of the module.
+The result of the output gate $\bm{o}_t$ is pointwise multiplied with the tanh-activated new cell state to calculate the hidden output $\bm{h}_t$ of the module.
 
 \begin{equation}\label{key}
-	h_t = o_t \odot \tanh(C_t )
+	\bm{h}_t = \bm{o}_t \odot \tanh(\bm{c}_t )
 \end{equation}
 
 LSTM networks are able to backpropagate a more stable error with this gating mechanism, such that these networks are much more capable of learning complex functions for sequences compared to standard recurrent neural networks.
