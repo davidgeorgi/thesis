@@ -247,7 +247,9 @@
 \RequirePackage{multirow}
 %\setlength{\parindent}{0pt} % removes paragraph indentation
 
+% Additional Packages
 \RequirePackage{booktabs}
 \RequirePackage{tabularx}
 \RequirePackage{bm}
 \RequirePackage{dsfont}
+\RequirePackage{pifont}

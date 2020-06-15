@@ -1,4 +1,4 @@
-In this section the basic concepts of process mining, long short-term memory networks, text mining as well as necessary formal definitions and notations are defined.
+In this chapter the basic concepts of process mining, text mining, supervised learning, long short-term memory networks are presented. Furthermore, formal definitions and notations are introduced.
 
 
 %\begin{figure}
@@ -13,10 +13,9 @@ In this section the basic concepts of process mining, long short-term memory net
 A \textit{business process} is a collection of activities that are performed in a specific order to archive a goal \cite{DBLP:conf/bpm/AalstAM11}.
 A single execution of a process is a \textit{case} or \textit{process instance}, which is identified by a case ID.
 Each performed activity belongs to specific case and is completed at a certain time.
-A case can be e.g. a patient in a hospital, a customer of a company or an order and is usually identified by an ID, while 
-the time is specified by a timestamp.
-The trinity of case, activity and timestamp is called event.
-An event can have more attributes like describing the resource, costs or transactional information of the event.
+For example, a case can be a patient in a hospital, a customer journey or an online order. The time on which an activity for a certain case is performed is specified by a timestamp.
+The trinity of case, activity and timestamp is called \textit{event}.
+An event can have more attributes, for example resource, costs or transactional information.
 
 \begin{table}[]
 	\begin{tabularx}{\textwidth}{@{}lllllll@{}}
@@ -44,22 +43,23 @@ An event can have more attributes like describing the resource, costs or transac
 
 If the execution of a business process is logged by an information system, the resulting event data is called \textit{event log}.
 Depending on the format of the event log, it can also contain additional data on case level.
-Typical formats for event logs, which are not part of an database, are comma-separated values (CSV) and eXtensible Event Stream (XES) \cite{DBLP:conf/caise/VerbeekBDA10a}.
-A table-based representation of an artificial event log can be seen in Table \ref{tab:event-log}.
+Typical formats for event logs, are comma-separated values (CSV) and eXtensible Event Stream (XES) \cite{DBLP:conf/caise/VerbeekBDA10a}, which can be extracted from databases.
+A table-based representation of an artificial event log about patient treatment in a hospital can be seen in Table \ref{tab:event-log}.
 
 Process mining is the discipline that covers all approaches aiming to generate value out of event data.
-As an umbrella term, Process Mining includes or utilizes concepts of Business Process Management, Data Mining, Business Process Intelligence, Big Data, Workflow Management, Business Process Monitoring \cite{DBLP:books/sp/Aalst16} as well as Machine Learning \cite{DBLP:conf/bpm/VeitGMHT17}.
+As an umbrella term, process mining includes or utilizes concepts of business process management, data mining, business process intelligence, big data, workflow management, business process monitoring \cite{DBLP:books/sp/Aalst16} as well as machine learning \cite{DBLP:conf/bpm/VeitGMHT17}.
 
-Process mining can be divided into a set of subdisciplines mainly process discovery, conformance checking, process enhancement and process analytics \cite{DBLP:conf/caise/EckLLA15}.
+Traditionally, process mining is divided into a set of subdisciplines mainly process discovery, conformance checking, process enhancement and process analytics \cite{DBLP:conf/caise/EckLLA15}.
 Process discovery aims to generate process models out of event data in order to understand a process and enable further analysis.
 Conformance checking is about comparing the intended and observed behavior of a process. 
-On top of these diagnostic approaches, process enhancement deals with the improvement of processes.
+On top of these diagnostic approaches, process enhancement deals with the improvement of processes regarding compliance, performance or complexity.
 
-Driven by the fast and ongoing development of quantitative prediction methods in data science and machine learning, prediction-based methods have been applied to event data leading to process prediction, a major subfield in process analytics.
-Forecasting the future of a running process instance is one of the main goals in process prediction and also the main topic of this thesis.
+Finally, process analytics focuses on metric and performance evaluation of processes. The term is closely related to business process monitoring, a rising subfield enabling the analysis of running business processes in real-time.
+Driven by the fast and ongoing development of quantitative prediction methods in data science and machine learning, also prediction-based methods have been applied to event data.
+These methods add the forward perspective to business process monitoring and deal with forecasting the future of a running process instance, which is also the main focus of this thesis.
 
 
-\section{Basic notations and Sequences}
+\section{Basic Notations and Sequences}
 
 The set $\mathbb{N}$ denotes the set of all natural numbers $\{1, 2, 3, \dots\}$ and $\mathbb{N}_0 = \mathbb{N} \cup \{0\}$ denotes the set of natural numbers including 0.
 The set of natural numbers up to $n$ is noted as $[n] = \{1, 2, \dots, n\} \subset \mathbb{N}$ with [0] = $\emptyset$.
@@ -92,7 +92,7 @@ f(\sigma) =
 
 
 
-\section{Events, Traces, Event logs}
+\section{Events, Traces, Event Logs}
 
 \begin{definition}[Event]
 An  \textit{event} is defined by tuple $e = (a,c,t,d_1,\dots, d_m) \in \mathcal{C} \times \mathcal{A}  \times \mathcal{T} \times \mathcal{D}_1 \times \dots \times \mathcal{D}_m =  \mathcal{E}$ where  $c \in \mathcal{C} $ is the case ID, $a \in \mathcal{A}$ is the executed activity and $t \in \mathcal{T}$ is the timestamp of the event.
@@ -100,7 +100,7 @@ Furthermore, each event contains a fixed number $m \in \mathbb{N}_0$ of addition
 In case that no additional attribute data is given ($m = 0$) the event space $\mathcal{E}$ (set of all possible events) is reduced to $\mathcal{C} \times \mathcal{A}  \times \mathcal{T}$.
 \end{definition}
 
-Each attribute $d \in \mathcal{D}$ of an event (including activity, timestamp and case ID) can be accessed by a projection function $\pi_D \in \mathcal{E} \rightarrow \mathcal{D}$.
+Each attribute $d \in \mathcal{D}$ of an event (including activity, timestamp and case ID) can be accessed by a projection function $\pi_D \colon \mathcal{E} \to \mathcal{D}$.
 For example, the activity $a$ of an event $e$ is retrieved by $\pi_\mathcal{A}(e) = a$.
 
 Throughout this thesis,  $\mathcal{C} = \mathbb{N}_0$, $|\mathcal{A}| < \infty$ and $ \mathcal{T} = \mathbb{R}$ is assumed, where $t \in \mathcal{T}$ is given in Unix time, precisely the number of seconds since 00:00:00 UTC on 1 January 1970 minus the applied leap seconds.
@@ -118,7 +118,7 @@ For example, $\pi_\mathcal{A}(\sigma)$ gives the sequence of the activities of t
 	An \textit{event log} $\eventlog = \{ \sigma_1, \sigma _2, \dots, \sigma_k \}$ is a set of traces, where each event of a trace is unique in the log and all events of a trace share a case IDs, which is unique per trace.
 \end{definition}
 
-\section{Text mining}
+\section{Text Mining}
 
 Text mining describes all techniques to generate value out of unstructured or semi-structured textual data.
 It combines concepts of natural language processing, machine learning and data mining \cite{DBLP:journals/coling/Mihalcea08}.
@@ -128,10 +128,13 @@ A collection of documents is called \textit{text corpus}, which forms the basis 
 
 In order to derive a mathematical representation of the text data that can be interpreted by a computer, a text model has to be build using the text corpus.
 Popular text models are Bag-of-words, Bag-of-n-gram, Paragraph vector (a.k.a. Doc2Vec) \cite{DBLP:conf/icml/LeM14} and Latent Dirichlet Allocation \cite{DBLP:journals/jmlr/BleiNJ03}.
-Most models require a text preprocessing step, where the text is cleaned from linguistic variation as well as meaningless words and symbols.
+Most models require a text normalization step, where the text is cleaned from linguistic variation as well as meaningless words and symbols \cite{DBLP:books/lib/JurafskyM09}.
+
+\section{Supervised Learning}
 
 
-\section{Long short-term memory networks}
+
+\section{Long Short-Term Memory Networks}
 
 Long short-term memory (LSMT) is an advanced recurrent neural network architecture for sequential data originally presented by \citeauthor{DBLP:journals/neco/HochreiterS97} in \citeyear{DBLP:journals/neco/HochreiterS97}  \cite{DBLP:journals/neco/HochreiterS97}.
 This approach addresses the well-known vanishing and exploding gradient problem \cite{DBLP:conf/icml/PascanuMB13}  of traditional recurrent neural networks by introducing more complex LSTM cells as hidden units.
@@ -162,19 +165,19 @@ The module uses as input the state $\bm{c}_{t-1}$ and the hidden output $\bm{h}_
 The input vector $\bm{x}_t$ is concatenated with the previous hidden output $\bm{h}_{t-1}$ and fed to four neural network layers, which are designed to decide what part of the cell state will remain (forget gate $\bm{f}_t$), how it is updated (update gate $\bm{i}_t$ and $\bm{\bar{c}}_t$) and what the output of the layer will be (output gate $\bm{o}_t$ leading to $\bm{h}_t$).
 The sublayer have pointwise $\text{sigmoid}(x) = \frac{1}{1+\mathrm{e}^{-x}}$ or $\tanh(x) = \frac{\mathrm{e}^{x} - \mathrm{e}^{-x}}{\mathrm{e}^{x} + \mathrm{e}^{-x}}$ activation functions, leading to the following equations:
 
-\begin{equation}\label{key}
+\begin{equation}
 	\bm{f}_t = \text{sigmoid}(\bm{W}_f \cdot (\bm{h}_{t-1}, \bm{x}_t) + \bm{b}_f)
 \end{equation}
 
-\begin{equation}\label{key}
+\begin{equation}
 	\bm{i}_t =  \text{sigmoid} (\bm{W}_i \cdot (\bm{h}_{t-1}, \bm{x}_t) + \bm{b}_i)
 \end{equation}
 
-\begin{equation}\label{key}
+\begin{equation}
 	\bm{\bar{c}}_t = \tanh (\bm{W}_c \cdot (\bm{h}_{t-1}, \bm{x}_t) + \bm{b}_c)
 \end{equation}
 
-\begin{equation}\label{key}
+\begin{equation}
 	\bm{o}_t =  \text{sigmoid} (\bm{W}_o \cdot (\bm{h}_{t-1}, \bm{x}_t) + \bm{b}_o)
 \end{equation}
 
@@ -182,13 +185,13 @@ $\bm{W}_f$, $\bm{W}_i$, $\bm{W}_c$ and $\bm{W}_o$ are the sublayer's learned wei
 
 The new cell state $\bm{c}_t$ is then a combination of the old cell state $\bm{c}_{t-1}$ and the result of the update gate $\bm{\bar{c}}_t$, where the layer computations $\bm{f}_t$ and $\bm{i}_t$ determine the proportions by a pointwise multiplication ($\odot$) with the cell states.
 
-\begin{equation}\label{key}
+\begin{equation}
 	\bm{c}_t = f_t \odot \bm{c}_{t-1} + \bm{i}_t \odot \bm{\bar{c}}_t
 \end{equation}
 
 The result of the output gate $\bm{o}_t$ is pointwise multiplied with the tanh-activated new cell state to calculate the hidden output $\bm{h}_t$ of the module.
 
-\begin{equation}\label{key}
+\begin{equation}
 	\bm{h}_t = \bm{o}_t \odot \tanh(\bm{c}_t )
 \end{equation}
 
