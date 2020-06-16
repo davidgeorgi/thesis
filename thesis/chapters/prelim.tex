@@ -54,7 +54,7 @@ Process discovery aims to generate process models out of event data in order to 
 Conformance checking is about comparing the intended and observed behavior of a process. 
 On top of these diagnostic approaches, process enhancement deals with the improvement of processes regarding compliance, performance or complexity.
 
-Finally, process analytics focuses on metric and performance evaluation of processes. The term is closely related to business process monitoring, a rising subfield enabling the analysis of running business processes in real-time.
+Finally, process analytics focuses on metric and performance evaluation of processes. Similar to conformance checking, this term is closely related to business process monitoring, a rising subfield enabling the analysis of running business processes in real-time.
 Driven by the fast and ongoing development of quantitative prediction methods in data science and machine learning, also prediction-based methods have been applied to event data.
 These methods add the forward perspective to business process monitoring and deal with forecasting the future of a running process instance, which is also the main focus of this thesis.
 
@@ -73,8 +73,8 @@ Given a set $A$, $A^n$ describes the set of all sequences $\langle a_1, a_2, \do
 The set $A^0$ is defined as $\{\langle \rangle\}$, the set that only contains the empty sequence.
 The set of all possible sequences over $A$ is given with $A^* = \bigcup\limits_{i\in \mathbb{N}_0} A^i$.
 
-Given sequences $\sigma_1$ and $\sigma_2$, the concatenation of both sequences is denoted $\sigma_1 \cdot \sigma_2$.
-Moreover, the $i$-th element of a sequence $\sigma = \langle a_1, a_2, \dots, a_n\rangle$ is accessed by $\sigma(i)= a_i$ for $1 \leq i \leq n$.
+Given sequences $\sigma_1$ and $\sigma_2$, the concatenation of both sequences is denoted by $\sigma_1 \cdot \sigma_2$.
+Moreover, the $i$-th element of a sequence $\sigma = \langle a_1, a_2, \dots, a_n\rangle$ is accessed using $\sigma(i)= a_i$ for $1 \leq i \leq n$.
 The length of a sequence is denoted by $|\sigma|$.
 For a sequence $\sigma=\langle a_1, a_2, \dots, a_n\rangle$, the function
 $hd^k(\sigma)= \langle a_1, a_2, \dots, a_k\rangle$ gives the prefix of length $k$ of $\sigma$ and $tl^k(\sigma)= \langle a_{k+1}, a_{k+2}, \dots, a_n\rangle$ the suffix of length $n-k$, for $0 \leq k \leq n$.
@@ -120,7 +120,7 @@ For example, $\pi_\mathcal{A}(\sigma)$ gives the sequence of the activities of t
 
 \section{Text Mining}
 
-Text mining describes all techniques to generate value out of unstructured or semi-structured textual data.
+\textit{Text mining} describes all techniques to generate value out of unstructured or semi-structured textual data.
 It combines concepts of natural language processing, machine learning and data mining \cite{DBLP:journals/coling/Mihalcea08}.
 The base object in text mining is a \textit{document} containing textual data.
 The text can be completed unstructured, i.e. it does not conform to a pre-defined data model, or semi-structured, like in an e-mail, where text information is assigned to sender, subject, message etc.
@@ -131,6 +131,22 @@ Popular text models are Bag-of-words, Bag-of-n-gram, Paragraph vector (a.k.a. Do
 Most models require a text normalization step, where the text is cleaned from linguistic variation as well as meaningless words and symbols \cite{DBLP:books/lib/JurafskyM09}.
 
 \section{Supervised Learning}
+
+In \textit{supervised learning} an unknown function is learned (i.e. approximated) from a set of example input-output pairs \cite{DBLP:books/daglib/0023820}.
+An input instance is usually described by a set of feature variables $X$ and the output is defined by a target variable $y$.
+If the target variable $y$ is continuous, we refer to this as a regression problem, if however it is discrete variable with a finite range of values, the learning problem is called classification problem.
+Given a \textit{training set} of input-output pairs $\{(X_1, y_1), (X_2, y_2), \dots, (X_m,y_m)\}$, that were generated from an unknown function $y = f(X)$, the goal is to approximate a hypothesis function $h(X)$, which is close to f(X), i.e. $h(X) \approx f(X)$.
+
+The challenge in supervised learning is to generalize from the training set of input-output pairs in such a way, that the learned hypothesis function $h(x)$ can also successfully predict the target variable for unseen problem instances.
+In order to evaluate a hypothesis, the function is tested on a separate \textit{test set} of input-output pairs, which has not been used for the construction of $h(X)$.
+
+A hypothesis generalizes well, if its prediction performance is high on the training set as well as on test set.
+However, if the prediction performance is high on the training set, but not reliable on unseen data, the hypothesis \textit{over fits} the training data.
+In this cases the model complexity is usually too high. 
+In contrast, if the model is too simple to fit any data from $f(x)$, the hypothesis is \textit{underfitting}.
+In many real-world applications, the true function $f(X)$ is stochastic, i.e. we need to estimate a conditional probability function $P(Y | X)$ (classification problem) or a conditional expectation $E(Y | X)$ (regression problem).
+Therefore, the prediction accuracy is limited by the variance of the true function $f(X)$.
+
 
 
 
