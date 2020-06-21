@@ -77,8 +77,8 @@ Given sequences $\sigma_1$ and $\sigma_2$, the concatenation of both sequences i
 Moreover, the $i$-th element of a sequence $\sigma = \langle a_1, a_2, \dots, a_n\rangle$ is accessed using $\sigma(i)= a_i$ for $1 \leq i \leq n$.
 The length of a sequence is denoted by $|\sigma|$.
 For a sequence $\sigma=\langle a_1, a_2, \dots, a_n\rangle$, the function
-$hd^k(\sigma)= \langle a_1, a_2, \dots, a_k\rangle$ gives the prefix of length $k$ of $\sigma$ and $tl^k(\sigma)= \langle a_{k+1}, a_{k+2}, \dots, a_n\rangle$ the suffix of length $n-k$, for $0 \leq k \leq n$.
-Note that $\sigma = hd^k(\sigma) \cdot tl^k(\sigma)$ for corresponding $k$.
+$hd^k(\sigma)= \langle a_1, a_2, \dots, a_k\rangle$ gives the prefix of length $k$ of $\sigma$ and $tl^k(\sigma)= \langle a_{n-k+1}, a_{n-k+2}, \dots, a_n\rangle$ the suffix of length $k$ for $1 \leq k \leq n$.
+%Note that $\sigma = hd^k(\sigma) \cdot tl^{n-k+1}(\sigma)$ for corresponding $k$.
 %If an element $a_i \in A$ appears in a sequence $\sigma$, we also write $a_i \in \sigma$.
 
 A function $f \colon A \to B$ can be lifted element-wise to sequences over $A$, precisely:
@@ -141,11 +141,12 @@ The challenge in supervised learning is to generalize from the training set of i
 In order to evaluate a hypothesis, the function is tested on a separate \textit{test set} of input-output pairs, which has not been used for the construction of $h(X)$.
 
 A hypothesis generalizes well, if its prediction performance is high on the training set as well as on test set.
-However, if the prediction performance is high on the training set, but not reliable on unseen data, the hypothesis \textit{over fits} the training data.
-In this cases the model complexity is usually too high. 
-In contrast, if the model is too simple to fit any data from $f(x)$, the hypothesis is \textit{underfitting}.
+However, if the prediction performance is high on the training set, but not reliable on unseen data, the hypothesis \textit{overfits} the training data.
+In this case, the model complexity, i.e. the number of parameters is higher than justified by the true function. 
+In contrast, if the model is too simple to fit any data from $f(X)$, the hypothesis is \textit{underfitting}.
+
 In many real-world applications, the true function $f(X)$ is stochastic, i.e. we need to estimate a conditional probability function $P(Y | X)$ (classification problem) or a conditional expectation $E(Y | X)$ (regression problem).
-Therefore, the prediction accuracy is limited by the variance of the true function $f(X)$.
+Therefore, the prediction accuracy is always limited by the variation of the true distribution.
 
 
 
