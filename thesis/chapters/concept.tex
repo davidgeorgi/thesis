@@ -50,12 +50,12 @@ $y_\mathrm{outcome} = \mathds{1}(hd^1(tl^k(\pi_\mathcal{T}(\sigma))))$
 $y_\mathrm{cycle} =  \pi_\mathcal{T}(\sigma(|\sigma|))-  \pi_\mathcal{T}(\sigma(1))$
 
 \begin{equation}
-	\bm{x}=(
-	\bm{a},
-	\bm{t},
-	\bm{d}_1^\mathrm{num}, \dots,\bm{d}_r^\mathrm{num},
-	\bm{d}_1^\mathrm{cat}, \dots,\bm{d}_s^\mathrm{cat},
-	\bm{d}_1^\mathrm{text}, \dots, \bm{d}_u^\mathrm{text})
+	\vec{x}=(
+	\vec{a},
+	\vec{t},
+	\vec{d}_1^\mathrm{num}, \dots,\vec{d}_r^\mathrm{num},
+	\vec{d}_1^\mathrm{cat}, \dots,\vec{d}_s^\mathrm{cat},
+	\vec{d}_1^\mathrm{text}, \dots, \vec{d}_u^\mathrm{text})
 \end{equation}
 
 
@@ -65,11 +65,11 @@ $y_\mathrm{cycle} =  \pi_\mathcal{T}(\sigma(|\sigma|))-  \pi_\mathcal{T}(\sigma(
 	\toprule
 	 \textbf{Feature} \newline \textbf{Vector} & \textbf{Construction} &\textbf{Dimension} &  \textbf{Description} \\
 	 \midrule
-	 	$\bm{a}$ &$\mathds{1}(\pi_\mathcal{A}(e))$& $|\mathcal{A}|$& One-hot encoding of the activity. \\
-	 	$\bm{t}$ & See Section \ref{sec:time} &6 & Time-based feature vector.\\
-	 	$\bm{d}_i^\mathrm{num}$ &  $norm(\pi_{{\mathcal{D}_i}^\mathrm{num}}(e)) $ &1 & Normalized value of the $i$-th numerical attribute\\
-	 	$\bm{d}_i^\mathrm{cat}$ & $\mathds{1}(\pi_{{\mathcal{D}_i}^\mathrm{cat}}(e))$&$|\mathcal{D}_i|$ & One-hot encoding of the $i$-th categorical attribute.\\
-	 	$\bm{d}_i^\mathrm{text}$ & See Section \ref{sec:text} & $z_i$& Fixed-length vectorization of the $i$-th text attribute.\\
+	 	$\vec{a}$ &$\mathds{1}(\pi_\mathcal{A}(e))$& $|\mathcal{A}|$& One-hot encoding of the activity. \\
+	 	$\vec{t}$ & See Section \ref{sec:time} &6 & Time-based feature vector.\\
+	 	$\vec{d}_i^\mathrm{num}$ &  $norm(\pi_{{\mathcal{D}_i}^\mathrm{num}}(e)) $ &1 & Normalized value of the $i$-th numerical attribute\\
+	 	$\vec{d}_i^\mathrm{cat}$ & $\mathds{1}(\pi_{{\mathcal{D}_i}^\mathrm{cat}}(e))$&$|\mathcal{D}_i|$ & One-hot encoding of the $i$-th categorical attribute.\\
+	 	$\vec{d}_i^\mathrm{text}$ & See Section \ref{sec:text} & $z_i$& Fixed-length vectorization of the $i$-th text attribute.\\
 	\bottomrule
 \end{tabularx}
 	\caption{Feature vectors for event encoding.}
@@ -77,7 +77,7 @@ $y_\mathrm{cycle} =  \pi_\mathcal{T}(\sigma(|\sigma|))-  \pi_\mathcal{T}(\sigma(
 \end{table}
 
 \begin{equation}
-	|\bm{x}|= |\mathcal{A}| + r + \sum_{i=1}^{s} |\mathcal{D}_i| + \sum_{j=1}^{u} z_j + 6
+	|\vec{x}|= |\mathcal{A}| + r + \sum_{i=1}^{s} |\mathcal{D}_i| + \sum_{j=1}^{u} z_j + 6
 \end{equation}
 
 

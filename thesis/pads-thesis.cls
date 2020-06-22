@@ -245,7 +245,7 @@
 \RequirePackage{listings}
 \RequirePackage[noend]{algpseudocode}
 \RequirePackage{multirow}
-%\setlength{\parindent}{0pt} % removes paragraph indentation
+\setlength{\parindent}{0pt} % removes paragraph indentation
 
 % Additional Packages
 \RequirePackage{booktabs}

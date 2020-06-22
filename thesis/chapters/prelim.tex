@@ -169,7 +169,7 @@ Recurrent neural networks extend traditional feed forward networks with backfeed
 This enables the network to keep a state across inputs and allows the neural network to process arbitrarily long sequences of input data while learning temporal dependencies.
 
 In LTSM networks the layers are replaced by more complex LSTM modules, where each module contains four different sublayers.
-The module uses as input the state $\bm{c}_{t-1}$ and the hidden output $\bm{h}_{t-1}$ of the module in the previous time step as well as the output of the previous layer $\bm{x}_t$ to compute a new cell state $\bm{c}_{t}$ and a (hidden) output $\bm{h}_{t}$.
+The module uses as input the state $\vec{c}_{t-1}$ and the hidden output $\vec{h}_{t-1}$ of the module in the previous time step as well as the output of the previous layer $\vec{x}_t$ to compute a new cell state $\vec{c}_{t}$ and a (hidden) output $\vec{h}_{t}$.
 
 \begin{figure}[htbp!]
 	\centering
@@ -179,37 +179,37 @@ The module uses as input the state $\bm{c}_{t-1}$ and the hidden output $\bm{h}_
 \end{figure}
 
 
-The input vector $\bm{x}_t$ is concatenated with the previous hidden output $\bm{h}_{t-1}$ and fed to four neural network layers, which are designed to decide what part of the cell state will remain (forget gate $\bm{f}_t$), how it is updated (update gate $\bm{i}_t$ and $\bm{\bar{c}}_t$) and what the output of the layer will be (output gate $\bm{o}_t$ leading to $\bm{h}_t$).
+The input vector $\vec{x}_t$ is concatenated with the previous hidden output $\vec{h}_{t-1}$ and fed to four neural network layers, which are designed to decide what part of the cell state will remain (forget gate $\vec{f}_t$), how it is updated (update gate $\vec{i}_t$ and $\vec{\bar{c}}_t$) and what the output of the layer will be (output gate $\vec{o}_t$ leading to $\vec{h}_t$).
 The sublayer have pointwise $\text{sigmoid}(x) = \frac{1}{1+\mathrm{e}^{-x}}$ or $\tanh(x) = \frac{\mathrm{e}^{x} - \mathrm{e}^{-x}}{\mathrm{e}^{x} + \mathrm{e}^{-x}}$ activation functions, leading to the following equations:
 
 \begin{equation}
-	\bm{f}_t = \text{sigmoid}(\bm{W}_f \cdot (\bm{h}_{t-1}, \bm{x}_t) + \bm{b}_f)
+	\vec{f}_t = \text{sigmoid}(\vec{W}_f \cdot (\vec{h}_{t-1}, \vec{x}_t) + \vec{b}_f)
 \end{equation}
 
 \begin{equation}
-	\bm{i}_t =  \text{sigmoid} (\bm{W}_i \cdot (\bm{h}_{t-1}, \bm{x}_t) + \bm{b}_i)
+	\vec{i}_t =  \text{sigmoid} (\vec{W}_i \cdot (\vec{h}_{t-1}, \vec{x}_t) + \vec{b}_i)
 \end{equation}
 
 \begin{equation}
-	\bm{\bar{c}}_t = \tanh (\bm{W}_c \cdot (\bm{h}_{t-1}, \bm{x}_t) + \bm{b}_c)
+	\vec{\bar{c}}_t = \tanh (\vec{W}_c \cdot (\vec{h}_{t-1}, \vec{x}_t) + \vec{b}_c)
 \end{equation}
 
 \begin{equation}
-	\bm{o}_t =  \text{sigmoid} (\bm{W}_o \cdot (\bm{h}_{t-1}, \bm{x}_t) + \bm{b}_o)
+	\vec{o}_t =  \text{sigmoid} (\vec{W}_o \cdot (\vec{h}_{t-1}, \vec{x}_t) + \vec{b}_o)
 \end{equation}
 
-$\bm{W}_f$, $\bm{W}_i$, $\bm{W}_c$ and $\bm{W}_o$ are the sublayer's learned weights and $\bm{b}_f$, $\bm{b}_i$, $\bm{b}_c$ and $\bm{b}_o$ are the corresponding biases.
+$\vec{W}_f$, $\vec{W}_i$, $\vec{W}_c$ and $\vec{W}_o$ are the sublayer's learned weights and $\vec{b}_f$, $\vec{b}_i$, $\vec{b}_c$ and $\vec{b}_o$ are the corresponding biases.
 
-The new cell state $\bm{c}_t$ is then a combination of the old cell state $\bm{c}_{t-1}$ and the result of the update gate $\bm{\bar{c}}_t$, where the layer computations $\bm{f}_t$ and $\bm{i}_t$ determine the proportions by a pointwise multiplication ($\odot$) with the cell states.
+The new cell state $\vec{c}_t$ is then a combination of the old cell state $\vec{c}_{t-1}$ and the result of the update gate $\vec{\bar{c}}_t$, where the layer computations $\vec{f}_t$ and $\vec{i}_t$ determine the proportions by a pointwise multiplication ($\odot$) with the cell states.
 
 \begin{equation}
-	\bm{c}_t = f_t \odot \bm{c}_{t-1} + \bm{i}_t \odot \bm{\bar{c}}_t
+	\vec{c}_t = f_t \odot \vec{c}_{t-1} + \vec{i}_t \odot \vec{\bar{c}}_t
 \end{equation}
 
-The result of the output gate $\bm{o}_t$ is pointwise multiplied with the tanh-activated new cell state to calculate the hidden output $\bm{h}_t$ of the module.
+The result of the output gate $\vec{o}_t$ is pointwise multiplied with the tanh-activated new cell state to calculate the hidden output $\vec{h}_t$ of the module.
 
 \begin{equation}
-	\bm{h}_t = \bm{o}_t \odot \tanh(\bm{c}_t )
+	\vec{h}_t = \vec{o}_t \odot \tanh(\vec{c}_t )
 \end{equation}
 
 LSTM networks are able to backpropagate a more stable error with this gating mechanism, such that these networks are much more capable of learning complex functions for sequences compared to standard recurrent neural networks.
