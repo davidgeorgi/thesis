@@ -124,19 +124,21 @@ Extracting the meaning of textual information remains a challenge even for human
 Many words are ambiguous, for example the word "apple" might denote a fruit or a global technology company.
 In addition, grammatical variations and the importance of context in language makes extracting the semantic meaning even more difficult for computers.
 
-
-In our setting, the text vectorization is realized in a 2-step procedure.
+In our setting, the text vectorization for textual attributes is realized in a two step procedure.
 First, all text data associated with the events in the corresponding textual attribute is collected in a so called \textit{text corpus}.
 Each document in the text corpus is then preprocessed in order to filter out linguistic noise or useless information.
-Finally, the text corpus is used to build up a vocabulary and a text vectorization technique is applied to encode the text attribute to a fixed of vector.
+This step is called \textit{text normalization}.
+Finally, the text corpus is used to build up a \textit{vocabulary} and a text vectorization technique is applied to encode the text attribute into a fixed-length vector.
+The vocabulary of a text corpus is a set $V$ of all the (relevant) words that appear in the corpus and is usually indexed by an bijective index function $index_V \colon V \to \{1, 2, \dots, |V|\}$.
+As text vectorization technique we consider  
 
 \subsection{Text Normalization}
 
-In the preprocessing step each document is transformed by a processing pipeline which consists of the following four steps:
+In the text normalization step each document is transformed by a preprocessing pipeline which consists of the following four steps:
 
 \begin{enumerate} 
 	\item Letters are converted to lowercase
-	\item Document is tokenized by word
+	\item Document is tokenized (i.e. splitted) by word
 	\item Each word is lemmatized
 	\item Stop words are filtered out
 \end{enumerate}
@@ -145,14 +147,14 @@ In the tokenenization step a document is split up in a list of words.
 Each word is then lemmatized, i.e. it is converted to its canonical form.
 The idea is to unify words that have a very similar meaning and filter out grammatical variations.
 For example, the words  "go", "going", "goes", "gone" and "went" are all transformed to the basic form "go".
+
 Ultimately, all stop words are filtered out of each document.
 Stop words are words with low information value like "the", "a", "of" or "here".
-
 Stop word lists are language dependent and can be more or less aggressive at filtering.
 Usually they contains articles, auxiliary verbs, prepositions and generic verbs like "be" and "have".
 In addition, punctuation marks or numerical information are excluded.
 
-\begin{table}[]
+\begin{table}[!htbp]
 	\begin{tabularx}{\textwidth}{l l p{9.8cm}}
 		\toprule
 		\textbf{Step} & \textbf{Transformation} & \textbf{Document}                                                       \\ \midrule
@@ -167,34 +169,57 @@ In addition, punctuation marks or numerical information are excluded.
 \end{table}
 
 
+\subsection{Bag of Words}
 
-
-
-
-
-\subsection{Bag-of-Words}
-
-The \textit{bag-of-words} (BoW) Model is a simple text model, which represents documents based on the \textit{term frequencies} of its words \cite{harris1954distributional}.
+The \textit{Bag of Words} (BoW) Model is a simple text model, which represents documents based on the \textit{term frequencies} of its words \cite{harris1954distributional}.
 Given the learned vocabulary $V$ a document is represented by a vector of size $|V|$, where the $i$-th component gives the number of occurrences of the word indexed with $i$ in the document.
 
-Since this approach does not reflect the prior distributions of words in the corpus, i.e. how likely certain words appear in a document, the term frequencies are usually normalized by the so-called \textit{inverse document frequency} of a word.
+Since this approach does not reflect the prior distributions of words in the corpus, i.e. how likely certain words appear in a document, the term frequencies are usually normalized by the so-called \textit{inverse document frequency} (idf) of a word.
 The inverse document frequency indicates the specificity of a word in the corpus and is computed by dividing the total number of documents by the number of documents that contain the specific word and scaling that value logarithmically.
+The resulting score is the tfidf score of a word in a document.
 
-The bag-of-words model is easy to build and effective for certain applications, but limited in several ways.
+
+The Bag of Words model is easy to build and effective for certain applications, but limited in several ways.
 First, the model completely ignores the order of words, which is often crucial for understanding the semantic meaning. For example, the sentences "The patient's health state went from stable to critical." and "The patient's health state went from critical to stable." would result in the same vector representation, while the meaning is clearly inverted.
 Second, the vector representations are sparse and of high dimensionality since they depend of the size of the vocabulary.
-However, the dimension can be reduced by limiting the size of the vocabulary. For example, this can be realized for exampand omit certain words.
+However, the dimension can be reduced by limiting the size of the vocabulary. For example, words with low tfidf scores can excluded from the vocabulary.
 
-\subsection{Bag-of-N-Grams}
 
-The \textit{bag-of-n-grams} model is a generalization of the Bag-of-Words model, which addresses the missing word order awareness of the latter.
+\subsection{Bag of N-Grams}
+
+The \textit{Bag of N-Grams} model is a generalization of the Bag-of-Words model, which addresses the missing word order awareness of the latter.
 Instead of single words, the vocabulary consists of $n$-tuples of words, that appear consecutive in the corpus.
 The unigram model ($n=1$) is equivalent to the BoW model.
+For the bigram model ($n=2$), the vocabulary consists of pairs of words that appear next to each other in the documents.
+For example, for our preprocessed document ["patient", "diagnose", "high", "blood", "pressure"], the pairs ("patient", "diagnose"), ("diagnose", "high"), ("high", "blood") and ("blood", "pressure") are taken into the vocabulary.
+For $n>2$ n-tuples are generated accordingly.
+The feature vector is constructed by computing the tfidf score for each vocabulary entry like in the BoW model.
+
+Compared to the BoW model, n-grams also take the order of words into account, which is beneficent in many scenarios.
+However, the vocabulary size is usually even higher than in the BoW model.
+In order to generate more compact vectors, distributed text representations are needed for larger text corpora and vocabularies.
 
 
 \subsection{Paragraph Vector}
 
-The \textit{Paragraph Vector} also known as \textit{Doc2Vec}, originally presented by \citeauthor{DBLP:conf/icml/LeM14}, is an unsupervised algorithm that learns distributed fixed length vector representations for documents \cite{DBLP:conf/icml/LeM14}.
+The \textit{Paragraph Vector} also known as \textit{Doc2Vec}, originally presented by \citeauthor{DBLP:conf/icml/LeM14}, is an unsupervised algorithm that learns distributed fixed length vector representations for documents of variable length \cite{DBLP:conf/icml/LeM14}.
+The idea is inspired by the word embedding model presented by \citeauthor{DBLP:journals/jmlr/BengioDVJ03} \cite{DBLP:journals/jmlr/BengioDVJ03}, which can learn distributed fixed-length vector representations for words.
+In this model words are mapped to vectors, that are trained to predict words from its context, i.e. words that appear before or after the target word in the training documents.
+Several variants of this approach exits, notably the \textit{Continuous Bag of Words} model, which ignores the order of the words in the context and the \textit{Continuous Skip-gram} models, which predicts the skip-gram context for a word vector (also known as \textit{Word2Vec})\cite{DBLP:journals/corr/abs-1301-3781}.
+
+The core idea of the paragraph vector model is to extend the model in \cite{DBLP:journals/jmlr/BengioDVJ03} in a way, that an additional document or paragraph vector, that is unique per document is trained together with the word vectors.
+
+Given a training set $T$ of documents and vocabulary 
+
+\begin{figure}[!htbp]
+	\centering
+	\includegraphics[width=\textwidth]{figures/paragraph-vector}
+	\caption{A Paragraph Vector model that is designed to predict a word $w_t$ from its context and can derive fixed-length representation of documents and words via the learned matrices $\vec{D}$ and $\vec{W}$.}
+	\label{fig:paragraph-vector}
+\end{figure}
+
+
+
 
 
 \subsection{Latent Dirichlet Allocation}
