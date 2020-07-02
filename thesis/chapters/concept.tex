@@ -103,7 +103,7 @@ Given an event log $\eventlog$ an event $e_i$ from a trace $\sigma = \langle e_1
 Using the time features a set of time-dependent trends can be captured and utilized for prediction.
 The features $t_1$ and $t_2$ give information about the time between events and the time of the event in the case.
 Using $t_3$ the absolute time position of an event in the data can be determined.
-This is important to detect concept drift in the process.
+This is important to detect concept drift in the process \cite{DBLP:journals/tnn/BoseAZP14}.
 The features $t_4, t_5$ and $t_6$ are used to capture daily, weekly or seasonal trends.
 For example, some activities might only be executed during office hours, before the weekend, during summer.
 
@@ -225,5 +225,10 @@ Given a training set $T$ of documents and vocabulary
 \subsection{Latent Dirichlet Allocation}
 
 \section{Network Architecture and Training}
+
+The LSTM network is designed to be trained with all prediction targets (next activity, next event time, outcome and case duration) at once, in order to benefit from correlations between these.
+The network consists of an input layer, $n$ shared LSTM layer, $m$ specialized LSTM layer for each output, and an fully connected output layer for each output. Furthermore, we add an layer normalization layer after each LSTM layer, that standardize the hidden output in order to speed up the training convergence.
+
+
 
 \section{Online Prediction}
