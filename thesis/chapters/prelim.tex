@@ -133,6 +133,7 @@ Most models require a text normalization step, where the text is cleaned from li
 \section{Supervised Learning}
 
 In \textit{supervised learning} an unknown function is learned (i.e. approximated) from a set of example input-output pairs \cite{DBLP:books/daglib/0023820}.
+In contrast, \textit{unsupervised learning} does not require examples pattern and is about finding pattern in the data. 
 An input instance is usually described by a set of feature variables $X$ and the output is defined by a target variable $y$.
 If the target variable $y$ is continuous, we refer to this as a regression problem, if however it is discrete variable with a finite range of values, the learning problem is called classification problem.
 Given a \textit{training set} of input-output pairs $\{(X_1, y_1), (X_2, y_2), \dots, (X_m,y_m)\}$, that were generated from an unknown function $y = f(X)$, the goal is to approximate a hypothesis function $h(X)$, which is close to f(X), i.e. $h(X) \approx f(X)$.
@@ -143,9 +144,9 @@ In order to evaluate a hypothesis, the function is tested on a separate \textit{
 A hypothesis generalizes well, if its prediction performance is high on the training set as well as on test set.
 However, if the prediction performance is high on the training set, but not reliable on unseen data, the hypothesis \textit{overfits} the training data.
 In this case, the model complexity, i.e. the number of parameters is higher than justified by the true function. 
-In contrast, if the model is too simple to fit any data from $f(X)$, the hypothesis is \textit{underfitting}.
+In contrast, if the model is too simple to fit any data from training set, the hypothesis is \textit{underfitting}.
 
-In many real-world applications, the true function $f(X)$ is stochastic, i.e. we need to estimate a conditional probability function $P(Y | X)$ (classification problem) or a conditional expectation $E(Y | X)$ (regression problem).
+In many real-world applications, the true function $f(X)$ is stochastic, i.e. we need to estimate a conditional probability function $P(Y | X)$ (classification problem) or a conditional expectation $E(Y | X)$ (regression problem) for prediction.
 Therefore, the prediction accuracy is always limited by the variation of the true distribution.
 
 
