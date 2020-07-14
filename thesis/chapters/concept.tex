@@ -226,9 +226,37 @@ Given a training set $T$ of documents and vocabulary
 
 \section{Network Architecture and Training}
 
-The LSTM network is designed to be trained with all prediction targets (next activity, next event time, outcome and case duration) at once, in order to benefit from correlations between these.
-The network consists of an input layer, $n$ shared LSTM layer, $m$ specialized LSTM layer for each output, and an fully connected output layer for each output. Furthermore, we add an layer normalization layer after each LSTM layer, that standardize the hidden output in order to speed up the training convergence.
+The LSTM network is designed to be trained with all prediction targets (next activity, next event time, case outcome and case cycle time) at once, in order to benefit from correlations between these.
+The network consists of an input layer, an shared LSTM layer, an a specialized LSTM layer for each target, and an fully connected output layer for each target.
+Furthermore, layer normalization \cite{DBLP:journals/corr/BaKH16} is applied after each LSTM layer, which standardizes the hidden output in order to speed up the training convergence.
+
+\begin{figure}[!htbp]
+	\centering
+	\includegraphics[width=\textwidth]{figures/network}
+	\caption{LSTM model to simultaneously predict the next activity $(\vec{y_a})$, next event time$(y_t)$, case outcome $(\vec{y_o})$ and case cylce time $(y_c)$ for an encoded prefix trace $\vec{x_1}, \vec{x_2}, \dots, \vec{x_n}$.}
+	\label{fig:network}
+\end{figure}
+
+The fully connected output layer uses a softmax activation function for the next activity and case outcome prediction to estimate the probability for each target value.
+The function normalizes a vector of real numbers into another vector of same dimension such that all component are in the interval (0,1) and the sum of all component is equal to 1.
+Hence, the transformed vector can be interpreted as a probability distribution, while keeping the proportions of the original vector.
+The softmax function is described with
+\begin{equation*}\label{key}
+	\text{Softmax}(\vec{x})_i = \frac{\exp(x_i)}{\sum_{j=1}^{n} \exp(x_j)}  \; \text{for} \, i = 1, \dots, n \text{ and } \vec{x}=(x_1, \dots, x_n) \in \mathbb{R}^n.
+\end{equation*}
+The training set of encoded prefix traces is represented by an 3-dimensional matrix of real values, where the three dimensions specify the prefix traces, the events per prefix trace and the features per event.
+Since the prefix traces have different length, shorter traces are pre-padded \cite{DBLP:journals/corr/abs-1903-07288} with zeros vectors.
+Hence, a prefix trace of encoded events $,\vec{x_1}, \vec{x_2}, \dots, \vec{x_n})$  is represented in the training set by a 2-dimensional matrix $(\mathbf{0}, \dots, \mathbf{0},\vec{x_1}, \vec{x_2}, \dots, \vec{x_n})$, such that the zero vectors fill up shorter traces to the length of the longest trace in the training set.
+All prefix traces together form the 3-dimensional training matrix.
+
+The training is realized by a backpropagation through time (BPTT) algorithm that updates the weights of the network using the update rules of the Adam optimizer with Nesterov momentum \cite{dozat2016incorporating}.
+The loss for numerical prediction values $\hat{y}$ and the true value $y$ is computed using the absolute error $\text{AE}(\hat{y},y)=|\hat{y} - y|$, while the loss for categorical prediction values is the categorical cross entropy error $\text{CE} = - \sum_{i=1}^{k} y_i \cdot \log \hat{y}_i$.
+
+During online business process monitoring, predictions are realized by a forward-pass of the encoded running cases through the LSTM model.
+The component with the highest value of the softmax outputs for the next activity $(\vec{y_a})$ and the case outcome $(\vec{y_o})$ indicates the categorical prediction.
+The output values for the next event time $(y_t)$ and case duration  $(y_c)$ are clipped to 0 for negative outputs and the normalization is reverted, in order to compute the final prediction value.
 
 
+\section{Predictive Business Processing Monitoring}
 
-\section{Online Prediction}
+
