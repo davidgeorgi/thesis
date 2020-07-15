@@ -138,8 +138,8 @@
 								\makecell[l]{ \gExaminer} \\
 								
 								\rule{0pt}{15ex} 
-								\emph{Registration date :}  & \gRegDate \\
-								\rule{0pt}{4ex}  
+								%\emph{Registration date :}  & \gRegDate \\
+								%\rule{0pt}{4ex}  
 								\emph{Submission date :}    & \gSubDate
 							
 							\end{tabular}

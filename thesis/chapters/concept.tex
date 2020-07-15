@@ -124,13 +124,14 @@ Extracting the meaning of textual information remains a challenge even for human
 Many words are ambiguous, for example the word "apple" might denote a fruit or a global technology company.
 In addition, grammatical variations and the importance of context in language makes extracting the semantic meaning even more difficult for computers.
 
-In our setting, the text vectorization for textual attributes is realized in a two step procedure.
+In our setting, the text vectorization for textual attributes is realized in a two step procedure by text encoding component.
 First, all text data associated with the events in the corresponding textual attribute is collected in a so called \textit{text corpus}.
 Each document in the text corpus is then preprocessed in order to filter out linguistic noise or useless information.
 This step is called \textit{text normalization}.
 Finally, the text corpus is used to build up a \textit{vocabulary} and a text vectorization technique is applied to encode the text attribute into a fixed-length vector.
-The vocabulary of a text corpus is a set $V$ of all the (relevant) words that appear in the corpus and is usually indexed by an bijective index function $index_V \colon V \to \{1, 2, \dots, |V|\}$.
-As text vectorization technique we consider  
+As text vectorization techniques, the Bag of Words, Bag of N-Grams, Paragraph Vector and Latent Dirichlet Allocation are considered.
+The vocabulary of a text corpus is a set $V$ of all relevant words that appear in the corpus and is usually indexed by an bijective index function $index_V \colon V \to \{1, 2, \dots, |V|\}$.
+
 
 \subsection{Text Normalization}
 
@@ -157,14 +158,14 @@ In addition, punctuation marks or numerical information are excluded.
 \begin{table}[!htbp]
 	\begin{tabularx}{\textwidth}{l l p{9.8cm}}
 		\toprule
-		\textbf{Step} & \textbf{Transformation} & \textbf{Document}                                                       \\ \midrule
+		\textbf{Step} & \textbf{Transformation} & \textbf{Example Document}                                                       \\ \midrule
 		0             & Original       & "The patient has been diagnosed with high blood pressure." \\
 		1             & Lowercase               & "the patient has been diagnosed with high blood pressure." \\
 		2 & Tokenization  & {[}"the", "patient", "has", "been", "diagnosed", "with", "high", "blood", "pressure", "."{]} \\
 		3 & Lemmatization & {[}"the", "patient", "have", "be", "diagnose", "with", "high", "blood", "pressure", "."{]}   \\
 		4             & Stop word filtering     & {[}"patient", "diagnose", "high", "blood", "pressure"{]} \\ \bottomrule
 	\end{tabularx}
-	\caption{Preprocessing transformation of an example document.}
+	\caption{Preprocessing transformation of an example document containing a single sentence.}
 	\label{tab:text-preprocessing}
 \end{table}
 
@@ -172,7 +173,7 @@ In addition, punctuation marks or numerical information are excluded.
 \subsection{Bag of Words}
 
 The \textit{Bag of Words} (BoW) Model is a simple text model, which represents documents based on the \textit{term frequencies} of its words \cite{harris1954distributional}.
-Given the learned vocabulary $V$ a document is represented by a vector of size $|V|$, where the $i$-th component gives the number of occurrences of the word indexed with $i$ in the document.
+Given the learned vocabulary $V$ a document is represented by a vector of size $|V|$, where the $i$-th component gives the number of occurrences of the word in the document indexed with $i$ it.
 
 Since this approach does not reflect the prior distributions of words in the corpus, i.e. how likely certain words appear in a document, the term frequencies are usually normalized by the so-called \textit{inverse document frequency} (idf) of a word.
 The inverse document frequency indicates the specificity of a word in the corpus and is computed by dividing the total number of documents by the number of documents that contain the specific word and scaling that value logarithmically.
@@ -205,20 +206,26 @@ In order to generate more compact vectors, distributed text representations are 
 The \textit{Paragraph Vector} also known as \textit{Doc2Vec}, originally presented by \citeauthor{DBLP:conf/icml/LeM14}, is an unsupervised algorithm that learns distributed fixed length vector representations for documents of variable length \cite{DBLP:conf/icml/LeM14}.
 The idea is inspired by the word embedding model presented by \citeauthor{DBLP:journals/jmlr/BengioDVJ03} \cite{DBLP:journals/jmlr/BengioDVJ03}, which can learn distributed fixed-length vector representations for words.
 In this model words are mapped to vectors, that are trained to predict words from its context, i.e. words that appear before or after the target word in the training documents.
-Several variants of this approach exits, notably the \textit{Continuous Bag of Words} model, which ignores the order of the words in the context and the \textit{Continuous Skip-gram} models, which predicts the skip-gram context for a word vector (also known as \textit{Word2Vec})\cite{DBLP:journals/corr/abs-1301-3781}.
-
-The core idea of the paragraph vector model is to extend the model in \cite{DBLP:journals/jmlr/BengioDVJ03} in a way, that an additional document or paragraph vector, that is unique per document is trained together with the word vectors.
-
-Given a training set $T$ of documents and vocabulary 
+Several variants of this approach exits, notably the \textit{Continuous Bag of Words} model, which ignores the order of the words in the context and the \textit{Continuous Skip-gram} model, which predicts the skip-gram context for a word vector (also known as \textit{Word2Vec})\cite{DBLP:journals/corr/abs-1301-3781}.
 
 \begin{figure}[!htbp]
 	\centering
 	\includegraphics[width=\textwidth]{figures/paragraph-vector}
-	\caption{A Paragraph Vector model that is designed to predict a word $w_t$ from its context and can derive fixed-length representation of documents and words via the learned matrices $\vec{D}$ and $\vec{W}$.}
+	\caption{The distributed memory Paragraph Vector model (PV-DM) is designed to predict a word $w_t$ from its context and derives fixed-length representation of documents and words via the learned matrices $\vec{D}$ and $\vec{W}$.}
 	\label{fig:paragraph-vector}
 \end{figure}
 
+The core idea of the Paragraph Vector model is to extend the model in \cite{DBLP:journals/jmlr/BengioDVJ03} in a way, that an additional document or paragraph vector, that is unique per document is trained together with the word vectors.
+Fig. \ref{fig:paragraph-vector} show the architecture of the distributed memory variant of the Paragraph Vector model (PV-DM).
+Its is realized by a neural network, that takes one-hot encoded words and a one-hot encoded document IDs as input.
+These are mapped to vector representation via weight matrices $\vec{D}$ and $\vec{W}$, which are learned during training with gradient descent.
+The distributed representations are then averaged or concatenated to a vector in order to predict the one-hot encoded target word using another mapping via $\vec{W'}$ and a softmax activation function.
+The training set is constructed using a sliding window over every document, such that the input is the context of the target word and the document ID.
+After training, each column in $\vec{D}$ represents the distributed encoding of the corresponding document.
 
+The network is also able to learn a representation for new unseen documents by an inference step.
+In this phase, the word matrix $\vec{W}$ and the prediction matrix $\vec{W'}$ are fixed and only the document vector is trained.
+The Paragraph Vector model tends to perform better than non-distributed models, however since new documents are vectorized via inference, a bigger training corpus of documents is usually required.
 
 
 
@@ -246,17 +253,15 @@ The softmax function is described with
 \end{equation*}
 The training set of encoded prefix traces is represented by an 3-dimensional matrix of real values, where the three dimensions specify the prefix traces, the events per prefix trace and the features per event.
 Since the prefix traces have different length, shorter traces are pre-padded \cite{DBLP:journals/corr/abs-1903-07288} with zeros vectors.
-Hence, a prefix trace of encoded events $,\vec{x_1}, \vec{x_2}, \dots, \vec{x_n})$  is represented in the training set by a 2-dimensional matrix $(\mathbf{0}, \dots, \mathbf{0},\vec{x_1}, \vec{x_2}, \dots, \vec{x_n})$, such that the zero vectors fill up shorter traces to the length of the longest trace in the training set.
+Hence, a prefix trace of encoded events $\vec{x_1}, \vec{x_2}, \dots, \vec{x_n}$  is represented in the training set by a 2-dimensional matrix $(\mathbf{0}, \dots, \mathbf{0},\vec{x_1}, \vec{x_2}, \dots, \vec{x_n})$, such that the zero vectors fill up shorter traces to the length of the longest trace in the training set.
 All prefix traces together form the 3-dimensional training matrix.
 
 The training is realized by a backpropagation through time (BPTT) algorithm that updates the weights of the network using the update rules of the Adam optimizer with Nesterov momentum \cite{dozat2016incorporating}.
-The loss for numerical prediction values $\hat{y}$ and the true value $y$ is computed using the absolute error $\text{AE}(\hat{y},y)=|\hat{y} - y|$, while the loss for categorical prediction values is the categorical cross entropy error $\text{CE} = - \sum_{i=1}^{k} y_i \cdot \log \hat{y}_i$.
-
-During online business process monitoring, predictions are realized by a forward-pass of the encoded running cases through the LSTM model.
-The component with the highest value of the softmax outputs for the next activity $(\vec{y_a})$ and the case outcome $(\vec{y_o})$ indicates the categorical prediction.
-The output values for the next event time $(y_t)$ and case duration  $(y_c)$ are clipped to 0 for negative outputs and the normalization is reverted, in order to compute the final prediction value.
+The loss for numerical prediction values $\hat{y}$ and the true value $y$ is the absolute error $\text{AE}(\hat{y},y)=|\hat{y} - y|$, while the loss for categorical prediction values is computed using the categorical cross entropy error $\text{CE} = - \sum_{i=1}^{k} y_i \cdot \log \hat{y}_i$.
 
 
 \section{Predictive Business Processing Monitoring}
 
-
+During online business process monitoring, predictions are realized by a forward-pass of the encoded running cases through the LSTM model.
+The component with the highest value of the softmax outputs for the next activity $(\vec{y_a})$ and the case outcome $(\vec{y_o})$ indicates the categorical prediction.
+The output values for the next event time $(y_t)$ and case duration  $(y_c)$ are clipped to 0 for negative outputs and the normalization is reverted, in order to compute the final prediction value.
