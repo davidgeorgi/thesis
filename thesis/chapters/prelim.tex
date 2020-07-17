@@ -1,4 +1,4 @@
-In this chapter the basic concepts of process mining, text mining, supervised learning, long short-term memory networks are presented. Furthermore, formal definitions and notations are introduced.
+In this chapter the basic concepts of process mining, text mining, supervised learning, long short-term memory networks are presented. Furthermore, necessary formal definitions and notations that are introduced.
 
 
 %\begin{figure}
@@ -13,7 +13,7 @@ In this chapter the basic concepts of process mining, text mining, supervised le
 A \textit{business process} is a collection of activities that are performed in a specific order to archive a goal \cite{DBLP:conf/bpm/AalstAM11}.
 A single execution of a process is a \textit{case} or \textit{process instance}, which is identified by a case ID.
 Each performed activity belongs to specific case and is completed at a certain time.
-For example, a case can be a patient in a hospital, a customer journey or an online order. The time on which an activity for a certain case is performed is specified by a timestamp.
+A case can be for example a patient in a hospital, a customer journey or an online order. The time on which an activity for a certain case is performed is specified by a timestamp.
 The trinity of case, activity and timestamp is called \textit{event}.
 An event can have more attributes, for example resource, costs or transactional information.
 
@@ -51,12 +51,12 @@ As an umbrella term, process mining includes or utilizes concepts of business pr
 
 Traditionally, process mining is divided into a set of subdisciplines mainly process discovery, conformance checking, process enhancement and process analytics \cite{DBLP:conf/caise/EckLLA15}.
 Process discovery aims to generate process models out of event data in order to understand a process and enable further analysis.
-Conformance checking is about comparing the intended and observed behavior of a process. 
+Conformance checking is about comparing the intended and observed behavior of a process and identifying deviations.
 On top of these diagnostic approaches, process enhancement deals with the improvement of processes regarding compliance, performance or complexity.
 
 Finally, process analytics focuses on metric and performance evaluation of processes. Similar to conformance checking, this term is closely related to business process monitoring, a rising subfield enabling the analysis of running business processes in real-time.
 Driven by the fast and ongoing development of quantitative prediction methods in data science and machine learning, also prediction-based methods have been applied to event data.
-These methods add the forward perspective to business process monitoring and deal with forecasting the future of a running process instance, which is also the main focus of this thesis.
+These methods add the forward perspective to business process monitoring and deal with forecasting the future of a running process instance, which is also the main focus in this work.
 
 
 \section{Basic Notations and Sequences}
@@ -77,7 +77,7 @@ Given sequences $\sigma_1$ and $\sigma_2$, the concatenation of both sequences i
 Moreover, the $i$-th element of a sequence $\sigma = \langle a_1, a_2, \dots, a_n\rangle$ is accessed using $\sigma(i)= a_i$ for $1 \leq i \leq n$.
 The length of a sequence is denoted by $|\sigma|$.
 For a sequence $\sigma=\langle a_1, a_2, \dots, a_n\rangle$, the function
-$hd^k(\sigma)= \langle a_1, a_2, \dots, a_k\rangle$ gives the prefix of length $k$ of $\sigma$ and $tl^k(\sigma)= \langle a_{n-k+1}, a_{n-k+2}, \dots, a_n\rangle$ the suffix of length $k$ for $1 \leq k \leq n$.
+$hd^k(\sigma)= \langle a_1, a_2, \dots, a_k\rangle$ gives the prefix of length $k$ of $\sigma$ and $tl^k(\sigma)= \langle a_{k+1}, a_{k+2}, \dots, a_n\rangle$ the suffix of length $n-k$ for $1 \leq k \leq n$.
 %Note that $\sigma = hd^k(\sigma) \cdot tl^{n-k+1}(\sigma)$ for corresponding $k$.
 %If an element $a_i \in A$ appears in a sequence $\sigma$, we also write $a_i \in \sigma$.
 
@@ -147,7 +147,7 @@ In this case, the model complexity, i.e. the number of parameters is higher than
 In contrast, if the model is too simple to fit any data from training set, the hypothesis is \textit{underfitting}.
 
 In many real-world applications, the true function $f(X)$ is stochastic, i.e. we need to estimate a conditional probability function $P(Y | X)$ (classification problem) or a conditional expectation $E(Y | X)$ (regression problem) for prediction.
-Therefore, the prediction accuracy is always limited by the variation of the true distribution.
+Therefore, the prediction accuracy is always limited by the randomness of the true distribution.
 
 
 

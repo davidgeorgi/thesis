@@ -1,30 +1,33 @@
 Text-aware process prediction aims to utilize unstructured text information in event data to improve predictions for unfinished cases.
 While many prediction methods have been applied to event data, almost none of them are able to handle textual data.
+Nevertheless, a lot of textual information in the context of processes is available, for example in form of business emails or notes by employees or customers.
 A first approach has been presented in \cite{DBLP:conf/bpm/TeinemaaDMF16}, where traces with text data are encoded as vectors and a random forest classifier is learned for each prefix length.
 
-In this chapter a novel approach for text-aware process prediction is presented that considers control flow, additional numerical, categorical and textual data, captures temporal dependencies between events, seasonal variability and concept drifts using an event-wise encoding and a sequential LSTM prediction model.
+In this chapter a novel approach for text-aware process prediction is presented that considers control flow and additional numerical, categorical and textual data.
+The model is able to captures temporal dependencies between events, seasonal variability and concept drifts using an event-wise encoding and a sequential LSTM prediction model.
+The main application scenario for the model is inside of real-time business process monitoring software, where prediction capabilities for current processes give an competitive advantage.
 
 \section{Overview}
 
 The proposed framework consists of a preprocessing, encoding and prediction model component, which operate in an offline and online phase.
-In the offline phase a historical event log with completed traces of a business process is used to fit the encoding and prediction component.
+In the offline phase, a historical event log with completed traces of a business process is used to fit the encoding and prediction component.
 Given an event log $\eventlog = \{\sigma_1, \dots, \sigma_l\}$ with historical traces, the set of all prefix traces $\eventlog_\mathrm{prefix} = \{ hd^k(\sigma) \mid  \sigma \in \eventlog, 1 \leq k \leq |\sigma|\}$ is computed and encoded as a sequence of event vectors.
-The encoding component distinguish between categorical or numerical data that can be encoded directly and textual data, which is encoded based on an textual model.
-Each encoded prefix sequence with its desired target values corresponds to one training example for an LSTM network.
+The encoding component distinguish between categorical or numerical data that can be encoded directly and textual data, that is encoded based on a textual model.
+The text model is an exchangeable component and is fit to the text corpus, that is extracted from the text data in the event log.
 
-The target values of a prefix sequence are the activity and timestamp (relative to case start) of the next event as well as the outcome and cycle time (time between first and last event).
-For completed cases the next activity is an artificial "<Process End>" activity with the same timestamp as the final event.
-
-The total number of training examples that can be generated out of the log is $\sum_{\sigma \in \eventlog}|\sigma|$, which is exactly the number of events in the log.
-
-
-
-
-\begin{figure}
+\begin{figure}[!htbp]
 	\includegraphics[width=\textwidth]{figures/framework}
-	\caption{Framework}
+	\caption{Overview of the prediction framework.}
 	\label{fig:framework}
 \end{figure}
+
+Each encoded prefix sequence with its desired prediction target values corresponds to one training example for an LSTM network, that realizes the predictions. 
+The target values of a prefix sequence are the activity and timestamp (relative to the case start) of the next event as well as the case outcome and case cycle time (time between first and last event).
+The case outcome can be for example a binary label, ie. a label telling if the case is successful or has failed, if it has approved or declined.
+In some applications the case outcome is defined by the final event of a case.
+For completed cases the next activity is an artificial "Process end" activity with the same timestamp as the final event.
+The total number of training examples that can be generated out of the log is $\sum_{\sigma \in \eventlog}|\sigma|$, which is exactly the number of events in the log.
+In the online phase, the model can be used to predict the next event, outcome and cycle time of new unseen and unfinished cases, that are currently monitored.
 
 
 \section{Event Encoding}
@@ -178,7 +181,7 @@ Given the learned vocabulary $V$ a document is represented by a vector of size $
 Since this approach does not reflect the prior distributions of words in the corpus, i.e. how likely certain words appear in a document, the term frequencies are usually normalized by the so-called \textit{inverse document frequency} (idf) of a word.
 The inverse document frequency indicates the specificity of a word in the corpus and is computed by dividing the total number of documents by the number of documents that contain the specific word and scaling that value logarithmically.
 The resulting score is the tfidf score of a word in a document.
-
+ consul
 
 The Bag of Words model is easy to build and effective for certain applications, but limited in several ways.
 First, the model completely ignores the order of words, which is often crucial for understanding the semantic meaning. For example, the sentences "The patient's health state went from stable to critical." and "The patient's health state went from critical to stable." would result in the same vector representation, while the meaning is clearly inverted.
