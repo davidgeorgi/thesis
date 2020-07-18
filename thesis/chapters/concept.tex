@@ -9,6 +9,22 @@ The main application scenario for the model is inside of real-time business proc
 
 \section{Overview}
 
+The goal of the framework is to learn prediction functions $f_\mathrm{a}, f_\mathrm{t}, f_\mathrm{o}$ and $f_\mathrm{c}$, that predict the next activity, timestamp, case outcome and case cycle time (time between first and last event) given any prefix $hd^k(\sigma)$ trace of a case.
+Precisely, the prediction functions should approximate the true future of the case, such that
+\begin{align*}
+f_\mathrm{a}(hd^k(\sigma)) &= 
+\begin{cases}
+\text{PROCESS END}& \text{if $|\sigma| = k$} \\
+\pi_\mathcal{A}(\sigma(k+1)) & \text{else} 
+\end{cases}\\
+f_\mathrm{t}(hd^k(\sigma)) &=
+\begin{cases}
+\pi_\mathcal{T}(\sigma(k))& \text{if $|\sigma| = k$} \\
+\pi_\mathcal{T}(\sigma(k+1)) & \text{else} 
+\end{cases}\\
+f_\mathrm{o}(hd^k(\sigma)) &= \pi_\mathcal{A}(\sigma(|\sigma|))\\
+f_\mathrm{c}(hd^k(\sigma)) &=  \pi_\mathcal{T}(\sigma(|\sigma|))-  \pi_\mathcal{T}(\sigma(1)).
+\end{align*}
 The proposed framework consists of a preprocessing, encoding and prediction model component, which operate in an offline and online phase.
 In the offline phase, a historical event log with completed traces of a business process is used to fit the encoding and prediction component.
 Given an event log $\eventlog = \{\sigma_1, \dots, \sigma_l\}$ with historical traces, the set of all prefix traces $\eventlog_\mathrm{prefix} = \{ hd^k(\sigma) \mid  \sigma \in \eventlog, 1 \leq k \leq |\sigma|\}$ is computed and encoded as a sequence of event vectors.
@@ -22,10 +38,10 @@ The text model is an exchangeable component and is fit to the text corpus, that 
 \end{figure}
 
 Each encoded prefix sequence with its desired prediction target values corresponds to one training example for an LSTM network, that realizes the predictions. 
-The target values of a prefix sequence are the activity and timestamp (relative to the case start) of the next event as well as the case outcome and case cycle time (time between first and last event).
+The target values of a prefix sequence are the activity and timestamp (relative to the case start) of the next event as well as the case outcome and case cycle time.
 The case outcome can be for example a binary label, ie. a label telling if the case is successful or has failed, if it has approved or declined.
 In some applications the case outcome is defined by the final event of a case.
-For completed cases the next activity is an artificial "Process end" activity with the same timestamp as the final event.
+For completed cases the next activity is an artificial "PROCESS END" activity with the same timestamp as the final event.
 The total number of training examples that can be generated out of the log is $\sum_{\sigma \in \eventlog}|\sigma|$, which is exactly the number of events in the log.
 In the online phase, the model can be used to predict the next event, outcome and cycle time of new unseen and unfinished cases, that are currently monitored.
 
@@ -33,16 +49,18 @@ In the online phase, the model can be used to predict the next event, outcome an
 \section{Event Encoding}
 
 In the offline training phase as well as during online prediction, traces are encoded as sequences of event vectors.
-Strictly speaking, a set of encoding functions  $enc_k \colon \mathcal{E}^k \to (\mathbb{R}^n)^k$ are realized by the encoding component, that encodes (prefix-)traces of length $k$ to vector sequences of the same size.
+Strictly speaking, a set of encoding functions  $enc_k \colon \mathcal{E}^k \to (\mathbb{R}^n)^k$ is realized by the encoding component, that encodes (prefix-)traces of length $k$ to vector sequences of the same size, i.e. $enc_k(\sigma) = \langle \vec{x_1}, \vec{x_2}, \dots, \vec{x_k}\rangle$ with $\sigma = \langle e_1, e_2, \dots, e_k\rangle$.
 Each event is encoded as a fixed-length vector using the activity, timestamp and additional categorical, numerical and textual data.
-Each encoded event vector is the concatenation of set of feature vectors, which are constructed from the event data.
+Each encoded event vector $\vec{x_i}$ is the concatenation of set of feature vectors, which are constructed from the event data.
 
-The activity of an event is represented using \textit{one-hot encoding}.
+The activity of an event is represented by vector $\vec{a}$ using \textit{one-hot encoding}.
 Given the set of possible activities $\mathcal{A}$, an arbitrary but fixed ordering over is introduced with a bijective index function $index_\mathcal{A} \colon \mathcal{A} \to \{1, \dots, |\mathcal{A}|\}$.
 Using this function, the activity is encoded as a vector of size $|\mathcal{A}|$, where the component $index_\mathcal{A}(\pi_\mathcal{A}(e))$ has value 1 and all the other components have value 0.
-We write $\mathds{1}$
+We write $\mathds{1}_\mathcal{A}$ to describe the function that realizes such an one-hot-encoding transformation.
+The timestamp of an event is used to compute a vector $\vec{t}$ of time-related features, which is explained in detail in Section \ref*{sec:time}.
 
-The timestamp of an event is used to compute a set of time-related features, which is 
+Additional attributes of the events are separated by their type, i.e. if they are numerical, categorical or textual.
+The corresponding 
 
 $y_\mathrm{a} = \mathds{1}(hd^1(tl^k(\pi_\mathcal{A}(\sigma))))$
 
@@ -53,7 +71,7 @@ $y_\mathrm{outcome} = \mathds{1}(hd^1(tl^k(\pi_\mathcal{T}(\sigma))))$
 $y_\mathrm{cycle} =  \pi_\mathcal{T}(\sigma(|\sigma|))-  \pi_\mathcal{T}(\sigma(1))$
 
 \begin{equation}
-	\vec{x}=(
+	\vec{x_i}=(
 	\vec{a},
 	\vec{t},
 	\vec{d}_1^\mathrm{num}, \dots,\vec{d}_r^\mathrm{num},
@@ -68,7 +86,7 @@ $y_\mathrm{cycle} =  \pi_\mathcal{T}(\sigma(|\sigma|))-  \pi_\mathcal{T}(\sigma(
 	\toprule
 	 \textbf{Feature} \newline \textbf{Vector} & \textbf{Construction} &\textbf{Dimension} &  \textbf{Description} \\
 	 \midrule
-	 	$\vec{a}$ &$\mathds{1}(\pi_\mathcal{A}(e))$& $|\mathcal{A}|$& One-hot encoding of the activity. \\
+	 	$\vec{a}$ &$\mathds{1}_\mathcal{A}(\pi_\mathcal{A}(e))$& $|\mathcal{A}|$& One-hot encoding of the activity. \\
 	 	$\vec{t}$ & See Section \ref{sec:time} &6 & Time-based feature vector.\\
 	 	$\vec{d}_i^\mathrm{num}$ &  $norm(\pi_{{\mathcal{D}_i}^\mathrm{num}}(e)) $ &1 & Normalized value of the $i$-th numerical attribute\\
 	 	$\vec{d}_i^\mathrm{cat}$ & $\mathds{1}(\pi_{{\mathcal{D}_i}^\mathrm{cat}}(e))$&$|\mathcal{D}_i|$ & One-hot encoding of the $i$-th categorical attribute.\\
@@ -80,7 +98,7 @@ $y_\mathrm{cycle} =  \pi_\mathcal{T}(\sigma(|\sigma|))-  \pi_\mathcal{T}(\sigma(
 \end{table}
 
 \begin{equation}
-	|\vec{x}|= |\mathcal{A}| + r + \sum_{i=1}^{s} |\mathcal{D}_i| + \sum_{j=1}^{u} z_j + 6
+	|\vec{x_i}|= |\mathcal{A}| + r + \sum_{i=1}^{s} |\mathcal{D}_i| + \sum_{j=1}^{u} z_j + 6
 \end{equation}
 
 
