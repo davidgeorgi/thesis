@@ -77,20 +77,18 @@ Given sequences $\sigma_1$ and $\sigma_2$, the concatenation of both sequences i
 Moreover, the $i$-th element of a sequence $\sigma = \langle a_1, a_2, \dots, a_n\rangle$ is accessed using $\sigma(i)= a_i$ for $1 \leq i \leq n$.
 The length of a sequence is denoted by $|\sigma|$.
 For a sequence $\sigma=\langle a_1, a_2, \dots, a_n\rangle$, the function
-$hd^k(\sigma)= \langle a_1, a_2, \dots, a_k\rangle$ gives the prefix of length $k$ of $\sigma$ and $tl^k(\sigma)= \langle a_{k+1}, a_{k+2}, \dots, a_n\rangle$ the suffix of length $n-k$ for $1 \leq k \leq n$.
+$hd^k(\sigma)= \langle a_1, a_2, \dots, a_k\rangle$ gives the prefix of length $k$ of $\sigma$ and $tl^k(\sigma)= \langle a_{k+1}, a_{k+2}, \dots, a_n\rangle$ the suffix of length $n-k$ for $0 < k < n$.
 %Note that $\sigma = hd^k(\sigma) \cdot tl^{n-k+1}(\sigma)$ for corresponding $k$.
 %If an element $a_i \in A$ appears in a sequence $\sigma$, we also write $a_i \in \sigma$.
 
 A function $f \colon A \to B$ can be lifted element-wise to sequences over $A$, precisely:
-\[
+\begin{equation*}
 f(\sigma) =
 \begin{cases}
 \langle \rangle & \text{if $\sigma = \langle \rangle$} \\
 \langle f(a_1), f(a_2), \dots, f(a_n)\rangle & \text{else} 
 \end{cases}
-\]
-
-
+\end{equation*}
 
 \section{Events, Traces, Event Logs}
 

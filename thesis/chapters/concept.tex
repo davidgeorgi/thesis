@@ -39,7 +39,7 @@ The text model is an exchangeable component and is fit to the text corpus, that 
 
 Each encoded prefix sequence with its desired prediction target values corresponds to one training example for an LSTM network, that realizes the predictions. 
 The target values of a prefix sequence are the activity and timestamp (relative to the case start) of the next event as well as the case outcome and case cycle time.
-The case outcome can be for example a binary label, ie. a label telling if the case is successful or has failed, if it has approved or declined.
+The case outcome can be for example a binary label, ie. a label telling if the case is successful or has failed or if it has been approved or declined.
 In some applications the case outcome is defined by the final event of a case.
 For completed cases the next activity is an artificial "PROCESS END" activity with the same timestamp as the final event.
 The total number of training examples that can be generated out of the log is $\sum_{\sigma \in \eventlog}|\sigma|$, which is exactly the number of events in the log.
@@ -50,17 +50,33 @@ In the online phase, the model can be used to predict the next event, outcome an
 
 In the offline training phase as well as during online prediction, traces are encoded as sequences of event vectors.
 Strictly speaking, a set of encoding functions  $enc_k \colon \mathcal{E}^k \to (\mathbb{R}^n)^k$ is realized by the encoding component, that encodes (prefix-)traces of length $k$ to vector sequences of the same size, i.e. $enc_k(\sigma) = \langle \vec{x_1}, \vec{x_2}, \dots, \vec{x_k}\rangle$ with $\sigma = \langle e_1, e_2, \dots, e_k\rangle$.
-Each event is encoded as a fixed-length vector using the activity, timestamp and additional categorical, numerical and textual data.
+Each event $e_i$ is encoded as a fixed-length vector using the activity, timestamp and additional categorical, numerical and textual data.
 Each encoded event vector $\vec{x_i}$ is the concatenation of set of feature vectors, which are constructed from the event data.
-
-The activity of an event is represented by vector $\vec{a}$ using \textit{one-hot encoding}.
+\begin{equation*}
+\vec{x_i}=(
+\vec{a_i},
+\vec{t_i},
+\vec{d}_{i1}^\mathrm{num}, \dots,\vec{d}_{ir}^\mathrm{num},
+\vec{d}_{i1}^\mathrm{cat}, \dots,\vec{d}_{is}^\mathrm{cat},
+\vec{d}_{i1}^\mathrm{text}, \dots, \vec{d}_{iu}^\mathrm{text})
+\end{equation*}
+The activity of the event is represented by vector $\vec{a_i}$ using \textit{one-hot encoding}.
 Given the set of possible activities $\mathcal{A}$, an arbitrary but fixed ordering over is introduced with a bijective index function $index_\mathcal{A} \colon \mathcal{A} \to \{1, \dots, |\mathcal{A}|\}$.
 Using this function, the activity is encoded as a vector of size $|\mathcal{A}|$, where the component $index_\mathcal{A}(\pi_\mathcal{A}(e))$ has value 1 and all the other components have value 0.
-We write $\mathds{1}_\mathcal{A}$ to describe the function that realizes such an one-hot-encoding transformation.
-The timestamp of an event is used to compute a vector $\vec{t}$ of time-related features, which is explained in detail in Section \ref*{sec:time}.
+We write $\mathds{1}_\mathcal{A}\colon \mathcal{A} \to \{0,1\}^\mathcal{A}$ to describe the function that realizes such an one-hot-encoding transformation.
+The timestamp of the event is used to compute a vector $\vec{t_i}$ of time-related features, which is explained in detail in Section \ref*{sec:time}.
 
-Additional attributes of the events are separated by their type, i.e. if they are numerical, categorical or textual.
-The corresponding 
+Additional attributes of the events are encoded based on their type, i.e. if they are numerical, categorical or textual.
+All additional numerical attributes $\pi_{{\mathcal{D}_i}^\mathrm{num}(e_i)}$ are scaled to the interval $ [0, 1]$ to improve learning efficiency using min-max normalizing.
+The scaling for a numerical feature $x$ is realized with the transformation
+
+$$\hat{x} = \dfrac{x-\min(x)}{\max(x) - \min(x)},$$
+
+where $\min(x)$ is the lowest and $\max(x)$ is the highest value $x$ can take.
+If the limits are not bounded conceptually, the lowest or highest value of $x$ in the event log is used for scaling.
+
+Categorical attributes are encoded using one-hot-encoding in the same way as the activity, i.e. $d_{ij} = \mathds{1}_{\mathcal{D}_j^{\mathrm{cat}}}$
+Textual attributes are vectorized via a dedicated text model 
 
 $y_\mathrm{a} = \mathds{1}(hd^1(tl^k(\pi_\mathcal{A}(\sigma))))$
 
@@ -70,14 +86,7 @@ $y_\mathrm{outcome} = \mathds{1}(hd^1(tl^k(\pi_\mathcal{T}(\sigma))))$
 
 $y_\mathrm{cycle} =  \pi_\mathcal{T}(\sigma(|\sigma|))-  \pi_\mathcal{T}(\sigma(1))$
 
-\begin{equation}
-	\vec{x_i}=(
-	\vec{a},
-	\vec{t},
-	\vec{d}_1^\mathrm{num}, \dots,\vec{d}_r^\mathrm{num},
-	\vec{d}_1^\mathrm{cat}, \dots,\vec{d}_s^\mathrm{cat},
-	\vec{d}_1^\mathrm{text}, \dots, \vec{d}_u^\mathrm{text})
-\end{equation}
+
 
 
 \begin{table}[!htbp]
@@ -128,13 +137,7 @@ This is important to detect concept drift in the process \cite{DBLP:journals/tnn
 The features $t_4, t_5$ and $t_6$ are used to capture daily, weekly or seasonal trends.
 For example, some activities might only be executed during office hours, before the weekend, during summer.
 
-Each feature $t_1, \dots t_6$ as well as all additional numerical attributes $d_i$ are scaled to the interval $ [0, 1]$ to improve learning efficiency using min-max normalizing.
-The scaling for a numerical feature $x$ is realized with the transformation
-
-$$\hat{x} = \dfrac{x-\min(x)}{\max(x) - \min(x)},$$
-
-where $\min(x)$ is the lowest and $\max(x)$ is the highest value $x$ can take.
-If the limits are not bounded conceptually, the lowest or highest value of $x$ in the event log is used for scaling.
+Each feature $t_1, \dots t_6$ as well as 
 
 \section{Text Vectorization}\label{sec:text}
 
