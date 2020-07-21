@@ -56,7 +56,7 @@ On top of these diagnostic approaches, process enhancement deals with the improv
 
 Finally, process analytics focuses on metric and performance evaluation of processes. Similar to conformance checking, this term is closely related to business process monitoring, a rising subfield enabling the analysis of running business processes in real-time.
 Driven by the fast and ongoing development of quantitative prediction methods in data science and machine learning, also prediction-based methods have been applied to event data.
-These methods add the forward perspective to business process monitoring and deal with forecasting the future of a running process instance, which is also the main focus in this work.
+These methods add the forward perspective to business process monitoring and deal with forecasting the future of a running process instance, which is also the main focus of this work.
 
 
 \section{Basic Notations and Sequences}
@@ -102,7 +102,7 @@ Each attribute $d \in \mathcal{D}$ of an event (including activity, timestamp an
 For example, the activity $a$ of an event $e$ is retrieved by $\pi_\mathcal{A}(e) = a$.
 
 Throughout this thesis,  $\mathcal{C} = \mathbb{N}_0$, $|\mathcal{A}| < \infty$ and $ \mathcal{T} = \mathbb{R}$ is assumed, where $t \in \mathcal{T}$ is given in Unix time, precisely the number of seconds since 00:00:00 UTC on 1 January 1970 minus the applied leap seconds.
-Each additional attribute is assumed to be numerical, categorical or textual, i.e. $\mathcal{D}_i = \mathbb{R}$, $|\mathcal{D}_i| < \infty$ or $\mathcal{D}_i = \Sigma^\ast$  for $1 \leq i \leq m$ and some fixed Alphabet $\Sigma$.
+Each additional attribute is assumed to be numerical, categorical or textual, i.e. $\mathcal{D}_i = \mathbb{R}$, $|\mathcal{D}_i| < \infty$ or $\mathcal{D}_i = V^\ast$  for $1 \leq i \leq m$ and some fixed vocabulary $V$.
 
 \begin{definition}[Trace]
 	A \textit{trace} is a finite and non-empty sequence of events $\sigma = \langle e_1, e_2, \dots\rangle \in  \mathcal{E}^\ast$ with increasing timestamps, i.e. $\pi_\mathcal{T} (e_i) < \pi_\mathcal{T} (e_j) $ for $1 \leq i < j \leq |\sigma|$.
@@ -121,12 +121,13 @@ For example, $\pi_\mathcal{A}(\sigma)$ gives the sequence of the activities of t
 \textit{Text mining} describes all techniques to generate value out of unstructured or semi-structured textual data.
 It combines concepts of natural language processing, machine learning and data mining \cite{DBLP:journals/coling/Mihalcea08}.
 The base object in text mining is a \textit{document} containing textual data.
-The text can be completed unstructured, i.e. it does not conform to a pre-defined data model, or semi-structured, like in an e-mail, where text information is assigned to sender, subject, message etc.
+The textual data can be completed unstructured, i.e. it does not conform to a pre-defined data model, or semi-structured, like in an e-mail, where text information is assigned to sender, subject, message etc.
+In our setting, a document $d \in V^*$ (i.e. textual data) is always a sequence of words from a fixed vocabulary $V$.
 A collection of documents is called \textit{text corpus}, which forms the basis for many text mining techniques.
 
 In order to derive a mathematical representation of the text data that can be interpreted by a computer, a text model has to be build using the text corpus.
 Popular text models are Bag-of-words, Bag-of-n-gram, Paragraph vector (a.k.a. Doc2Vec) \cite{DBLP:conf/icml/LeM14} and Latent Dirichlet Allocation \cite{DBLP:journals/jmlr/BleiNJ03}.
-Most models require a text normalization step, where the text is cleaned from linguistic variation as well as meaningless words and symbols \cite{DBLP:books/lib/JurafskyM09}.
+Most models do not work with the raw text data, but require a text normalization step, where the text is cleaned from linguistic variation as well as meaningless words and symbols \cite{DBLP:books/lib/JurafskyM09}.
 
 \section{Supervised Learning}
 

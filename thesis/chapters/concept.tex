@@ -63,8 +63,25 @@ Each encoded event vector $\vec{x_i}$ is the concatenation of set of feature vec
 The activity of the event is represented by vector $\vec{a_i}$ using \textit{one-hot encoding}.
 Given the set of possible activities $\mathcal{A}$, an arbitrary but fixed ordering over is introduced with a bijective index function $index_\mathcal{A} \colon \mathcal{A} \to \{1, \dots, |\mathcal{A}|\}$.
 Using this function, the activity is encoded as a vector of size $|\mathcal{A}|$, where the component $index_\mathcal{A}(\pi_\mathcal{A}(e))$ has value 1 and all the other components have value 0.
-We write $\mathds{1}_\mathcal{A}\colon \mathcal{A} \to \{0,1\}^\mathcal{A}$ to describe the function that realizes such an one-hot-encoding transformation.
+We write $\mathds{1}_\mathcal{A}\colon \mathcal{A} \to \{0,1\}^\mathcal{A}$ to describe the function that realizes such an one-hot encoding transformation for the set of all activities $\mathcal{A}$.
 The timestamp of the event is used to compute a vector $\vec{t_i}$ of time-related features, which is explained in detail in Section \ref*{sec:time}.
+
+\begin{table}[!htbp]
+	\renewcommand{\arraystretch}{1.2}
+	\begin{tabularx}{\textwidth}{p{2cm} l l p{6.8cm} }
+		\toprule
+		\textbf{Feature} \newline \textbf{Vector} & \textbf{Construction} &\textbf{Dimension} &  \textbf{Description} \\
+		\midrule
+		$\vec{a}$ &$\mathds{1}_\mathcal{A}(\pi_\mathcal{A}(e))$& $|\mathcal{A}|$& One-hot encoding of the activity. \\
+		$\vec{t}$ & See Section \ref{sec:time} &6 & Time-based feature vector.\\
+		$\vec{d}_i^\mathrm{num}$ &  $norm(\pi_{{\mathcal{D}_i}^\mathrm{num}}(e)) $ &1 & Normalized value of the $i$-th numerical attribute\\
+		$\vec{d}_i^\mathrm{cat}$ & $\mathds{1}(\pi_{{\mathcal{D}_i}^\mathrm{cat}}(e))$&$|\mathcal{D}_i|$ & One-hot encoding of the $i$-th categorical attribute.\\
+		$\vec{d}_i^\mathrm{text}$ & See Section \ref{sec:text} & $z_i$& Fixed-length vectorization of the $i$-th text attribute.\\
+		\bottomrule
+	\end{tabularx}
+	\caption{Feature vectors for event encoding.}
+	\label{tab:features}
+\end{table}
 
 Additional attributes of the events are encoded based on their type, i.e. if they are numerical, categorical or textual.
 All additional numerical attributes $\pi_{{\mathcal{D}_i}^\mathrm{num}(e_i)}$ are scaled to the interval $ [0, 1]$ to improve learning efficiency using min-max normalizing.
@@ -75,40 +92,13 @@ $$\hat{x} = \dfrac{x-\min(x)}{\max(x) - \min(x)},$$
 where $\min(x)$ is the lowest and $\max(x)$ is the highest value $x$ can take.
 If the limits are not bounded conceptually, the lowest or highest value of $x$ in the event log is used for scaling.
 
-Categorical attributes are encoded using one-hot-encoding in the same way as the activity, i.e. $d_{ij} = \mathds{1}_{\mathcal{D}_j^{\mathrm{cat}}}$
-Textual attributes are vectorized via a dedicated text model 
+Categorical attributes are encoded using one-hot-encoding in the same way as the activity, i.e. $d_{ij} = \mathds{1}_{\mathcal{D}_j^{\mathrm{cat}}}$.
+Textual attributes are vectorized via a dedicated text model, that is explained in Section \ref{sec:text}.
 
-$y_\mathrm{a} = \mathds{1}(hd^1(tl^k(\pi_\mathcal{A}(\sigma))))$
-
-$y_\mathrm{t} = \mathds{1}(hd^1(tl^k(\pi_\mathcal{T}(\sigma))))$
-
-$y_\mathrm{outcome} = \mathds{1}(hd^1(tl^k(\pi_\mathcal{T}(\sigma))))$
-
-$y_\mathrm{cycle} =  \pi_\mathcal{T}(\sigma(|\sigma|))-  \pi_\mathcal{T}(\sigma(1))$
-
-
-
-
-\begin{table}[!htbp]
-\renewcommand{\arraystretch}{1.2}
-\begin{tabularx}{\textwidth}{p{2cm} l l p{6.8cm} }
-	\toprule
-	 \textbf{Feature} \newline \textbf{Vector} & \textbf{Construction} &\textbf{Dimension} &  \textbf{Description} \\
-	 \midrule
-	 	$\vec{a}$ &$\mathds{1}_\mathcal{A}(\pi_\mathcal{A}(e))$& $|\mathcal{A}|$& One-hot encoding of the activity. \\
-	 	$\vec{t}$ & See Section \ref{sec:time} &6 & Time-based feature vector.\\
-	 	$\vec{d}_i^\mathrm{num}$ &  $norm(\pi_{{\mathcal{D}_i}^\mathrm{num}}(e)) $ &1 & Normalized value of the $i$-th numerical attribute\\
-	 	$\vec{d}_i^\mathrm{cat}$ & $\mathds{1}(\pi_{{\mathcal{D}_i}^\mathrm{cat}}(e))$&$|\mathcal{D}_i|$ & One-hot encoding of the $i$-th categorical attribute.\\
-	 	$\vec{d}_i^\mathrm{text}$ & See Section \ref{sec:text} & $z_i$& Fixed-length vectorization of the $i$-th text attribute.\\
-	\bottomrule
-\end{tabularx}
-	\caption{Feature vectors for event encoding.}
-	\label{tab:features}
-\end{table}
-
-\begin{equation}
-	|\vec{x_i}|= |\mathcal{A}| + r + \sum_{i=1}^{s} |\mathcal{D}_i| + \sum_{j=1}^{u} z_j + 6
-\end{equation}
+All in all, the encoding results in vector of size
+\begin{equation*}
+|\vec{x_i}|= |\mathcal{A}| + r + \sum_{i=1}^{s} |\mathcal{D}_i| + \sum_{j=1}^{u} z_j + 6.
+\end{equation*}
 
 
 \section{Capturing Temporal Dependencies}\label{sec:time}
@@ -119,14 +109,16 @@ Given an event log $\eventlog$ an event $e_i$ from a trace $\sigma = \langle e_1
 
 \begin{center}
 \begin{tabularx}{\textwidth}{l l}
-	\centering
+	\toprule
 	 \textbf{Feature} & \textbf{Description} \\
+	 \midrule
 	$t_1 = \pi_\mathcal{T}(e_i) - \pi_\mathcal{T}(e_{i-1})$ & Seconds since previous event \\
 	$t_2 = \pi_\mathcal{T}(e_i) - \pi_\mathcal{T}(e_1)$ & Seconds since case start \\
 	$t_3 = \pi_\mathcal{T}(e_i) - \min\{\pi_\mathcal{T}(e_{j}) \mid  e_j \in \sigma_k, \sigma_k \in \eventlog\}$ & Seconds since first recorded event \\
 	$t_4$ & Seconds since midnight \\
 	$t_5$ & Seconds since last Monday \\
-	$t_6$ & Seconds since last January 1 00:00
+	$t_6$ & Seconds since last January 1 00:00 \\
+	\bottomrule
 \end{tabularx}
 \end{center}
 
@@ -185,9 +177,9 @@ In addition, punctuation marks or numerical information are excluded.
 		\textbf{Step} & \textbf{Transformation} & \textbf{Example Document}                                                       \\ \midrule
 		0             & Original       & "The patient has been diagnosed with high blood pressure." \\
 		1             & Lowercase               & "the patient has been diagnosed with high blood pressure." \\
-		2 & Tokenization  & {[}"the", "patient", "has", "been", "diagnosed", "with", "high", "blood", "pressure", "."{]} \\
-		3 & Lemmatization & {[}"the", "patient", "have", "be", "diagnose", "with", "high", "blood", "pressure", "."{]}   \\
-		4             & Stop word filtering     & {[}"patient", "diagnose", "high", "blood", "pressure"{]} \\ \bottomrule
+		2 & Tokenization  & $\langle$"the", "patient", "has", "been", "diagnosed", "with", "high", "blood", "pressure", "."$\rangle$ \\
+		3 & Lemmatization & $\langle$"the", "patient", "have", "be", "diagnose", "with", "high", "blood", "pressure", "."$\rangle$  \\
+		4             & Stop word filtering     & $\langle$"patient", "diagnose", "high", "blood", "pressure"$\rangle$ \\ \bottomrule
 	\end{tabularx}
 	\caption{Preprocessing transformation of an example document containing a single sentence.}
 	\label{tab:text-preprocessing}
@@ -196,10 +188,10 @@ In addition, punctuation marks or numerical information are excluded.
 
 \subsection{Bag of Words}
 
-The \textit{Bag of Words} (BoW) Model is a simple text model, which represents documents based on the \textit{term frequencies} of its words \cite{harris1954distributional}.
+The \textit{Bag of Words} (BoW) Model is a simple text model, which represents documents based on the \textit{term frequencies} of its words, while ignoring their order \cite{harris1954distributional}.
 Given the learned vocabulary $V$ a document is represented by a vector of size $|V|$, where the $i$-th component gives the number of occurrences of the word in the document indexed with $i$ it.
 
-Since this approach does not reflect the prior distributions of words in the corpus, i.e. how likely certain words appear in a document, the term frequencies are usually normalized by the so-called \textit{inverse document frequency} (idf) of a word.
+Since this approach does not reflect the prior distributions of words in the corpus, i.e. how likely certain words appear in a document in general, the term frequencies are usually normalized by the so-called \textit{inverse document frequency} (idf) of a word.
 The inverse document frequency indicates the specificity of a word in the corpus and is computed by dividing the total number of documents by the number of documents that contain the specific word and scaling that value logarithmically.
 The resulting score is the tfidf score of a word in a document.
  consul
@@ -216,7 +208,7 @@ The \textit{Bag of N-Grams} model is a generalization of the Bag-of-Words model,
 Instead of single words, the vocabulary consists of $n$-tuples of words, that appear consecutive in the corpus.
 The unigram model ($n=1$) is equivalent to the BoW model.
 For the bigram model ($n=2$), the vocabulary consists of pairs of words that appear next to each other in the documents.
-For example, for our preprocessed document ["patient", "diagnose", "high", "blood", "pressure"], the pairs ("patient", "diagnose"), ("diagnose", "high"), ("high", "blood") and ("blood", "pressure") are taken into the vocabulary.
+For example, for the preprocessed document $\langle$"patient", "diagnose", "high", "blood", "pressure"$\rangle$, the pairs ("patient", "diagnose"), ("diagnose", "high"), ("high", "blood") and ("blood", "pressure") are taken into the vocabulary.
 For $n>2$ n-tuples are generated accordingly.
 The feature vector is constructed by computing the tfidf score for each vocabulary entry like in the BoW model.
 
@@ -224,10 +216,15 @@ Compared to the BoW model, n-grams also take the order of words into account, wh
 However, the vocabulary size is usually even higher than in the BoW model.
 In order to generate more compact vectors, distributed text representations are needed for larger text corpora and vocabularies.
 
+\subsection{Latent Dirichlet Allocation}
+
+The Latent Dirichlet Allocation presented by \citeauthor{DBLP:journals/jmlr/BleiNJ03} in \citeyear{DBLP:journals/jmlr/BleiNJ03} \cite{DBLP:journals/jmlr/BleiNJ03} is generative statistical text model, that represents documents as a mixture of a fixed number of topics, depending on the words of the document.
+Therefore, a document is encoded as a vector whose dimension is equal to the number of chosen topics and each component indicates the degree of affiliation between the document and the corresponding topic.
+The topics are are not generated manually, but by the model itself.
 
 \subsection{Paragraph Vector}
 
-The \textit{Paragraph Vector} also known as \textit{Doc2Vec}, originally presented by \citeauthor{DBLP:conf/icml/LeM14}, is an unsupervised algorithm that learns distributed fixed length vector representations for documents of variable length \cite{DBLP:conf/icml/LeM14}.
+The \textit{Paragraph Vector} also known as \textit{Doc2Vec}, originally presented by \citeauthor{DBLP:conf/icml/LeM14} in \citeyear{DBLP:conf/icml/LeM14}, is an unsupervised algorithm that learns distributed fixed length vector representations for documents of variable length \cite{DBLP:conf/icml/LeM14}.
 The idea is inspired by the word embedding model presented by \citeauthor{DBLP:journals/jmlr/BengioDVJ03} \cite{DBLP:journals/jmlr/BengioDVJ03}, which can learn distributed fixed-length vector representations for words.
 In this model words are mapped to vectors, that are trained to predict words from its context, i.e. words that appear before or after the target word in the training documents.
 Several variants of this approach exits, notably the \textit{Continuous Bag of Words} model, which ignores the order of the words in the context and the \textit{Continuous Skip-gram} model, which predicts the skip-gram context for a word vector (also known as \textit{Word2Vec})\cite{DBLP:journals/corr/abs-1301-3781}.
@@ -250,10 +247,6 @@ After training, each column in $\vec{D}$ represents the distributed encoding of 
 The network is also able to learn a representation for new unseen documents by an inference step.
 In this phase, the word matrix $\vec{W}$ and the prediction matrix $\vec{W'}$ are fixed and only the document vector is trained.
 The Paragraph Vector model tends to perform better than non-distributed models, however since new documents are vectorized via inference, a bigger training corpus of documents is usually required.
-
-
-
-\subsection{Latent Dirichlet Allocation}
 
 \section{Network Architecture and Training}
 
