@@ -103,33 +103,40 @@ All in all, the encoding results in vector of size
 
 \section{Capturing Temporal Dependencies}\label{sec:time}
 
+A set of time-based features is computed from the timestamp data in the event log in order to profit from time-related pattern in the process.
+As part of the complete encoding $\vec{x}_i$ for an event $e_i$ in a (prefix-)trace $\sigma = \langle e_1, \dots, e_k \rangle$ a time vector $\vec{t_i} = (t_i^1, t_i^2,t_i^3,t_i^4,t_i^5,t_i^6)$ of dimension 6 is computed.
 
-For timestamp prediction of the next and final event of running process instance a set of time-based features is computed from the timestamp data in the event log.
-Given an event log $\eventlog$ an event $e_i$ from a trace $\sigma = \langle e_1, \dots, e_n \rangle$ the following time features are computed for the encoding of $e_i$: 
-
-\begin{center}
-\begin{tabularx}{\textwidth}{l l}
-	\toprule
-	 \textbf{Feature} & \textbf{Description} \\
-	 \midrule
-	$t_1 = \pi_\mathcal{T}(e_i) - \pi_\mathcal{T}(e_{i-1})$ & Seconds since previous event \\
-	$t_2 = \pi_\mathcal{T}(e_i) - \pi_\mathcal{T}(e_1)$ & Seconds since case start \\
-	$t_3 = \pi_\mathcal{T}(e_i) - \min\{\pi_\mathcal{T}(e_{j}) \mid  e_j \in \sigma_k, \sigma_k \in \eventlog\}$ & Seconds since first recorded event \\
-	$t_4$ & Seconds since midnight \\
-	$t_5$ & Seconds since last Monday \\
-	$t_6$ & Seconds since last January 1 00:00 \\
-	\bottomrule
-\end{tabularx}
-\end{center}
+\begin{table}[!htbp]
+	\centering
+	\begin{tabularx}{0.6\textwidth}{l l}
+		\toprule
+		 \textbf{Feature} & \textbf{Description} \\
+		 \midrule
+		$t_i^1$ & Time since previous event \\
+		$t_i^2$ & Time since case start \\
+		$t_i^3$ & Time since first recorded event \\
+		$t_i^4$ & Time since midnight \\
+		$t_i^5$ & Time since last Monday \\
+		$t_i^6$ & Time since last January 1 00:00 \\
+		\bottomrule
+	\end{tabularx}
+	\caption{Time-based features as part of event encoding for an event $e_i$.}
+	\label{tab:time-features}
+\end{table}
 
 Using the time features a set of time-dependent trends can be captured and utilized for prediction.
-The features $t_1$ and $t_2$ give information about the time between events and the time of the event in the case.
-Using $t_3$ the absolute time position of an event in the data can be determined.
-This is important to detect concept drift in the process \cite{DBLP:journals/tnn/BoseAZP14}.
-The features $t_4, t_5$ and $t_6$ are used to capture daily, weekly or seasonal trends.
-For example, some activities might only be executed during office hours, before the weekend, during summer.
+The feature $t_i^1$ describes the time difference between the current event $e_i$ and previous event $e_{i-1}$, while $t_i^2$ gives the time difference between the current event and the first event of the case $e_1$, i.e. the time since the start of the case.
+Furthermore, $t_i^3$ is the time difference between the current event and the first event that is recorded in the log. This feature indicates the absolute time position of an event in the data.
+This information is important to detect concept drift in the process \cite{DBLP:journals/tnn/BoseAZP14}.
+Most real-life processes are not static, i.e. the behavior of the process changes over time.
+For example, in earlier process executions customers might have been informed by a letter, whereas in more recent cases customers are messaged using email or app notifications.
+Therefore, the knowledge about the absolute time of the events can be used to relate cases in similar periods of time.
 
-Each feature $t_1, \dots t_6$ as well as 
+The features $t_i^4, t_i^5$ and $t_i^6$ capture the time difference between the current event and midnight, the current event and the most recent monday and the current event and the beginning of the year. They are used to capture daily, weekly and seasonal trends.
+For example, some activities might only be executed during office hours or before the weekend.
+Also, many businesses expect seasonally fluctuating demand, for example a booking platform usually has much more customers in summer, which can affect the process execution in many ways.
+Each feature $t_i^1, \dots, t_i^6$ is min-max normalized such that $t_i^j \in [0,1]$ for $j \in [6]$.
+A summary of all time-related features can be seen in Table \ref{tab:time-features}.
 
 \section{Text Vectorization}\label{sec:text}
 
@@ -144,14 +151,13 @@ In our setting, the text vectorization for textual attributes is realized in a t
 First, all text data associated with the events in the corresponding textual attribute is collected in a so called \textit{text corpus}.
 Each document in the text corpus is then preprocessed in order to filter out linguistic noise or useless information.
 This step is called \textit{text normalization}.
-Finally, the text corpus is used to build up a \textit{vocabulary} and a text vectorization technique is applied to encode the text attribute into a fixed-length vector.
-As text vectorization techniques, the Bag of Words, Bag of N-Grams, Paragraph Vector and Latent Dirichlet Allocation are considered.
-The vocabulary of a text corpus is a set $V$ of all relevant words that appear in the corpus and is usually indexed by an bijective index function $index_V \colon V \to \{1, 2, \dots, |V|\}$.
-
+Finally, the normalized text corpus is used to build up a \textit{vocabulary} and a text vectorization technique is applied to encode the text of the attribute into a fixed-length vector.
+The vocabulary of a text corpus is a set $V$ of all relevant words that appear in the corpus and is indexed by an bijective index function $index_V \colon V \to \{1, 2, \dots, |V|\}$.
+As text vectorization techniques rely on the Bag of Words, Bag of N-Grams, Paragraph Vector or Latent Dirichlet Allocation as a text model.
 
 \subsection{Text Normalization}
 
-In the text normalization step each document is transformed by a preprocessing pipeline which consists of the following four steps:
+In the text normalization step each document of the text corpus is transformed by a preprocessing pipeline which consists of the following four steps:
 
 \begin{enumerate} 
 	\item Letters are converted to lowercase
@@ -160,7 +166,8 @@ In the text normalization step each document is transformed by a preprocessing p
 	\item Stop words are filtered out
 \end{enumerate}
 
-In the tokenenization step a document is split up in a list of words.
+The first step eliminates all capital letters in the text.
+In the tokenenization step a document is split up in a sequence of words.
 Each word is then lemmatized, i.e. it is converted to its canonical form.
 The idea is to unify words that have a very similar meaning and filter out grammatical variations.
 For example, the words  "go", "going", "goes", "gone" and "went" are all transformed to the basic form "go".
@@ -169,7 +176,7 @@ Ultimately, all stop words are filtered out of each document.
 Stop words are words with low information value like "the", "a", "of" or "here".
 Stop word lists are language dependent and can be more or less aggressive at filtering.
 Usually they contains articles, auxiliary verbs, prepositions and generic verbs like "be" and "have".
-In addition, punctuation marks or numerical information are excluded.
+In addition, punctuation marks and numerical information are excluded.
 
 \begin{table}[!htbp]
 	\begin{tabularx}{\textwidth}{l l p{9.8cm}}
