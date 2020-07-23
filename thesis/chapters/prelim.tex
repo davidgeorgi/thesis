@@ -77,7 +77,7 @@ Given sequences $\sigma_1$ and $\sigma_2$, the concatenation of both sequences i
 Moreover, the $i$-th element of a sequence $\sigma = \langle a_1, a_2, \dots, a_n\rangle$ is accessed using $\sigma(i)= a_i$ for $1 \leq i \leq n$.
 The length of a sequence is denoted by $|\sigma|$.
 For a sequence $\sigma=\langle a_1, a_2, \dots, a_n\rangle$, the function
-$hd^k(\sigma)= \langle a_1, a_2, \dots, a_k\rangle$ gives the prefix of length $k$ of $\sigma$ and $tl^k(\sigma)= \langle a_{k+1}, a_{k+2}, \dots, a_n\rangle$ the suffix of length $n-k$ for $0 < k < n$.
+$hd^k(\sigma)= \langle a_1, a_2, \dots, a_k\rangle$ gives the prefix of length $k$ of $\sigma$ and $tl^k(\sigma)= \langle a_{k+1}, a_{k+2}, \dots, a_n\rangle$ the suffix of length $n-k$ for $0 \leq k \leq n$.
 %Note that $\sigma = hd^k(\sigma) \cdot tl^{n-k+1}(\sigma)$ for corresponding $k$.
 %If an element $a_i \in A$ appears in a sequence $\sigma$, we also write $a_i \in \sigma$.
 
@@ -113,7 +113,7 @@ By lifting the projection functions to sequences a trace can be transformed into
 For example, $\pi_\mathcal{A}(\sigma)$ gives the sequence of the activities of the events in $\sigma$.
 
 \begin{definition}[Event log]
-	An \textit{event log} $\eventlog = \{ \sigma_1, \sigma _2, \dots, \sigma_k \}$ is a set of traces, where each event of a trace is unique in the log and all events of a trace share a case IDs, which is unique per trace.
+	An \textit{event log} or \textit{trace log} $\eventlog = \{ \sigma_1, \sigma _2, \dots, \sigma_k \}$ is a set of traces, where each event of a trace is unique in the log and all events of a trace share a case IDs, which is unique per trace.
 \end{definition}
 
 \section{Text Mining}
@@ -133,7 +133,7 @@ Most models do not work with the raw text data, but require a text normalization
 
 In \textit{supervised learning} an unknown function is learned (i.e. approximated) from a set of example input-output pairs \cite{DBLP:books/daglib/0023820}.
 In contrast, \textit{unsupervised learning} does not require examples pattern and is about finding pattern in the data. 
-An input instance is usually described by a set of feature variables $X$ and the output is defined by a target variable $y$.
+An input instance is usually described by a set of \textit{feature variables} $X$ and the output is defined by a \textit{target variable} $y$.
 If the target variable $y$ is continuous, we refer to this as a regression problem, if however it is discrete variable with a finite range of values, the learning problem is called classification problem.
 Given a \textit{training set} of input-output pairs $\{(X_1, y_1), (X_2, y_2), \dots, (X_m,y_m)\}$, that were generated from an unknown function $y = f(X)$, the goal is to approximate a hypothesis function $h(X)$, which is close to f(X), i.e. $h(X) \approx f(X)$.
 
@@ -141,15 +141,12 @@ The challenge in supervised learning is to generalize from the training set of i
 In order to evaluate a hypothesis, the function is tested on a separate \textit{test set} of input-output pairs, which has not been used for the construction of $h(X)$.
 
 A hypothesis generalizes well, if its prediction performance is high on the training set as well as on test set.
-However, if the prediction performance is high on the training set, but not reliable on unseen data, the hypothesis \textit{overfits} the training data.
+However, if the prediction performance is high on the training set, but not reliable on unseen data, the hypothesis usually \textit{overfits} the training data.
 In this case, the model complexity, i.e. the number of parameters is higher than justified by the true function. 
 In contrast, if the model is too simple to fit any data from training set, the hypothesis is \textit{underfitting}.
 
 In many real-world applications, the true function $f(X)$ is stochastic, i.e. we need to estimate a conditional probability function $P(Y | X)$ (classification problem) or a conditional expectation $E(Y | X)$ (regression problem) for prediction.
 Therefore, the prediction accuracy is always limited by the randomness of the true distribution.
-
-
-
 
 \section{Long Short-Term Memory Networks}
 

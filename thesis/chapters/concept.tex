@@ -49,8 +49,10 @@ In the online phase, the model can be used to predict the next event, outcome an
 \section{Event Encoding}
 
 In the offline training phase as well as during online prediction, traces are encoded as sequences of event vectors.
+The prefix log $\eventlog_\mathrm{prefix}$ is encoded as training set in the offline phase, while in the online phase, running cases are encoded for prediction.
 Strictly speaking, a set of encoding functions  $enc_k \colon \mathcal{E}^k \to (\mathbb{R}^n)^k$ is realized by the encoding component, that encodes (prefix-)traces of length $k$ to vector sequences of the same size, i.e. $enc_k(\sigma) = \langle \vec{x_1}, \vec{x_2}, \dots, \vec{x_k}\rangle$ with $\sigma = \langle e_1, e_2, \dots, e_k\rangle$.
-Each event $e_i$ is encoded as a fixed-length vector using the activity, timestamp and additional categorical, numerical and textual data.
+Each event $e_i$ is encoded as a fixed-length vector using the activity, timestamp and additional categorical, numerical and textual data, that is associated with each event.
+We assume to have $r \in \mathbb{N}_0$ numerical, $s \in \mathbb{N}_0$ categorical and $u \in \mathbb{N}_0$ textual attributes, i.e. $e_i \in \mathcal{C} \times \mathcal{A}  \times \mathcal{T} \times \mathcal{D}_1^\mathrm{num} \times \dots \times \mathcal{D}_r^\mathrm{num}   \times \mathcal{D}_1^\mathrm{cat}  \times  \dots  \times \mathcal{D}_s^\mathrm{cat}   \times \mathcal{D}_1^\mathrm{text}   \times \dots  \times \mathcal{D}_u^\mathrm{text}$.
 Each encoded event vector $\vec{x_i}$ is the concatenation of set of feature vectors, which are constructed from the event data.
 \begin{equation*}
 \vec{x_i}=(
@@ -195,7 +197,7 @@ In addition, punctuation marks and numerical information are excluded.
 
 \subsection{Bag of Words}
 
-The \textit{Bag of Words} (BoW) Model is a simple text model, which represents documents based on the \textit{term frequencies} of its words, while ignoring their order \cite{harris1954distributional}.
+The \textit{Bag of Words} (BoW) model is a simple text model, which represents documents based on the \textit{term frequencies} of its words, while ignoring their order \cite{harris1954distributional}.
 Given the learned vocabulary $V$ a document is represented by a vector of size $|V|$, where the $i$-th component gives the number of occurrences of the word in the document indexed with $i$ it.
 
 Since this approach does not reflect the prior distributions of words in the corpus, i.e. how likely certain words appear in a document in general, the term frequencies are usually normalized by the so-called \textit{inverse document frequency} (idf) of a word.
