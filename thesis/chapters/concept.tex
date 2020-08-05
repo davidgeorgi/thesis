@@ -74,19 +74,19 @@ The timestamp of the event is used to compute a vector $\vec{t_i}$ of time-relat
 		\toprule
 		\textbf{Feature} \newline \textbf{Vector} & \textbf{Construction} &\textbf{Dimension} &  \textbf{Description} \\
 		\midrule
-		$\vec{a}$ &$\mathds{1}_\mathcal{A}(\pi_\mathcal{A}(e))$& $|\mathcal{A}|$& One-hot encoding of the activity. \\
-		$\vec{t}$ & See Section \ref{sec:time} &6 & Time-based feature vector.\\
-		$\vec{d}_i^\mathrm{num}$ &  $norm(\pi_{{\mathcal{D}_i}^\mathrm{num}}(e)) $ &1 & Normalized value of the $i$-th numerical attribute\\
-		$\vec{d}_i^\mathrm{cat}$ & $\mathds{1}(\pi_{{\mathcal{D}_i}^\mathrm{cat}}(e))$&$|\mathcal{D}_i|$ & One-hot encoding of the $i$-th categorical attribute.\\
-		$\vec{d}_i^\mathrm{text}$ & See Section \ref{sec:text} & $z_i$& Fixed-length vectorization of the $i$-th text attribute.\\
+		$\vec{a_i}$ &$\mathds{1}_\mathcal{A}(\pi_\mathcal{A}(e_i))$& $|\mathcal{A}|$& One-hot encoding of the activity. \\
+		$\vec{t_i}$ & See Section \ref{sec:time} &6 & Time-based feature vector.\\
+		$\vec{d}_i^\mathrm{num}$ &  $norm(\pi_{\mathcal{D}_j^\mathrm{num}}(e_i)) $ &1 & Normalized value of the $j$-th numerical attribute\\
+		$\vec{d}_i^\mathrm{cat}$ & $\mathds{1}(\pi_{\mathcal{D}_j^\mathrm{cat}}(e_i))$&$|\mathcal{D}_j^\mathrm{cat}|$ & One-hot encoding of the $j$-th categorical attribute.\\
+		$\vec{d}_i^\mathrm{text}$ & See Section \ref{sec:text} & $z_i$& Fixed-length vectorization of the $j$-th text attribute.\\
 		\bottomrule
 	\end{tabularx}
-	\caption{Feature vectors for event encoding.}
+	\caption{Feature vectors as part of the event encoding $\vec{x_i}$.}
 	\label{tab:features}
 \end{table}
 
 Additional attributes of the events are encoded based on their type, i.e. if they are numerical, categorical or textual.
-All additional numerical attributes $\pi_{{\mathcal{D}_i}^\mathrm{num}(e_i)}$ are scaled to the interval $ [0, 1]$ to improve learning efficiency using min-max normalizing.
+All additional numerical attributes $\pi_{\mathcal{D}_i^\mathrm{num}} (e_i)$ are scaled to the interval $ [0, 1]$ to improve learning efficiency using min-max normalizing.
 The scaling for a numerical feature $x$ is realized with the transformation
 
 $$\hat{x} = \dfrac{x-\min(x)}{\max(x) - \min(x)},$$
