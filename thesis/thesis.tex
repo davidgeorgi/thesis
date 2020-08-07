@@ -1,4 +1,9 @@
-\documentclass[a4paper,11pt,twoside]{pads-thesis}
+\documentclass[a4paper,
+11pt,
+openright,
+cleardoublepage=empty,
+twoside
+]{pads-thesis}
 
 
 \renewcommand{\gTitle}{Text-Aware Predictive Monitoring of Business Processes with LSTM Neural Networks}
@@ -6,7 +11,7 @@
 \renewcommand{\gHeader}{Master's Thesis}
 \renewcommand{\gSupervisor}{Dr.-Ing. M. Seran Uysal \\
 	M. Sc. Marco Pegoraro}
-\renewcommand{\gExaminer}{Prof. Dr. ir. Wil van der Aalst \\ 
+\renewcommand{\gExaminer}{Prof. h. c. Dr. h. c. Dr. ir. Wil van der Aalst \\ 
 	Prof. Dr.-Ing. Ulrik Schroeder}
 \renewcommand{\gInstitution}{i9 Process and Data Science (PADS) Chair, RWTH Aachen University}
 %\renewcommand{\gRegDate}{YYYY-MM-DD}
@@ -18,20 +23,30 @@
 \newcommand{\xmark}{\text{\ding{55}}}
 \renewcommand{\vec}[1]{\bm{#1}}
 
+
 \begin{document}
 %%% Title page
 \pagenumbering{roman}
+
 
 \gTitlePage
 %\pagestyle{plain}
 %%% TOC
 
+\chapter*{Acknowledgments}\addcontentsline{toc}{chapter}{Acknowledgements}
+\input{chapters/acknowledgements.tex}
+
 %\begin{abstract}
 \chapter*{Abstract} \addcontentsline{toc}{chapter}{Abstract}
 \input{chapters/abstract.tex}
 %\end{abstract}
-
+\pagestyle{plain}
 \tableofcontents
+
+\listoffigures
+
+\listoftables
+
 
 %\setcounter{page}{1}
 \cleardoublepage
@@ -64,8 +79,6 @@
 
 \bibliography{references} \addcontentsline{toc}{chapter}{Bibliography}
 
-\chapter*{Acknowledgments}\addcontentsline{toc}{chapter}{Acknowledgement}
 
-\input{chapters/acknowledgements.tex}
 
 \end{document}

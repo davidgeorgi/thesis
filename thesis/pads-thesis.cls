@@ -21,13 +21,18 @@
 	left = 35mm,
 	right = 25mm,
 	top = 34mm,
-	bottom = 34mm
+	bottom = 34mm,
+	asymmetric,
 }
 
 %%% FancyHDR setup
 \usepackage{fancyhdr} 
-\fancyhead[L]{}
-\fancyhead[R]{\nouppercase{\leftmark}}
+%\fancyhead[L]{}
+%\fancyhead[R]{\nouppercase{\leftmark}}
+\fancyhead{}
+\fancyhead[LE]{\leftmark}
+\fancyhead[RO]{\rightmark}
+\fancyhead[LO,RE]{}
 %\setlength{\headheight}{14pt}
 %%% TiKZ setup
 \RequirePackage{tikz}
@@ -37,7 +42,9 @@
 %$ introduce separate theorem-like environments 
 %using a shared counter tied to the section numbering
 \RequirePackage{textcomp}
-\RequirePackage{hyperref}
+\RequirePackage[pdftitle={Text-Aware Predictive Monitoring of Business Processes with LSTM Neural Networks},
+pdfauthor={David Benedikt Georgi},
+pdfkeywords={Master's Thesis, David Benedikt Georgi},]{hyperref}
 \RequirePackage{amsmath, amsthm, amssymb,mathrsfs, array}
 \RequirePackage[capitalize]{cleveref}
 
@@ -101,7 +108,7 @@
 
 \newcommand{\gTitlePage}{ 
 						\begin{titlepage}
-							\sffamily
+							%\sffamily
 						    \begin{tikzpicture}[remember picture,overlay]
                             \node[anchor=north east,inner sep=0pt] at (current page.north east) {\includegraphics[scale=.225]{figures/logo/pads_logo_text.jpg}};
                             \end{tikzpicture}
@@ -253,3 +260,4 @@
 \RequirePackage{bm}
 \RequirePackage{dsfont}
 \RequirePackage{pifont}
+\RequirePackage{emptypage}
