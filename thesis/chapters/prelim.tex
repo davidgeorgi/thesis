@@ -10,27 +10,32 @@ A case can be for example a patient in a hospital, a customer journey or an onli
 The trinity of case, activity and timestamp is called \textit{event}.
 An event can have more attributes, for example resource, costs or transactional information.
 
-\begin{table}[]
-	\begin{tabularx}{\textwidth}{@{}lllllll@{}}
+\begin{table}[htbp!]
+	\small
+	\setlength\tabcolsep{3pt}
+	\begin{tabularx}{\textwidth}{lllllp{4.7cm}l}
 		\toprule
-		\textbf{ID} & \textbf{Activity}          & \textbf{Timestamp} & \textbf{Resource} & \textbf{Cost} & \textbf{Comment}                                                                                                & \textbf{...} \\ \midrule
-		0                & Register patient           & 01.02.2020:14.12   & SYSTEM            & 0             & -                                                                                                               & ...          \\
-		& Consultation               & 01.02.2020:14.34   & John Brown, MD    & 24.32         & \begin{tabular}[c]{@{}l@{}}The patient reports persistent\\ nausea.\end{tabular}                                & ...          \\
-		& Blood test                 & 01.02.2020:15.12   & Kim Smith         & 14.23         & Tests: Complete blood count                                                                                     & ...          \\
-		& Evaluate test result       & 01.02.2020:16.35   & John Brown, MD    & 38.67         & \begin{tabular}[c]{@{}l@{}}No abnormalities in the complete\\ blood count.\end{tabular}                         & ...          \\
-		& Release patient            & 01.02.2020:17.24   & SYSTEM            & 0             & -                                                                                                               & ...          \\
-		&                            &                    &                   &               &                                                                                                                 &              \\
-		1                & Register patient           & 02.02.2020:08.20   & SYSTEM            & 0             & -                                                                                                               & ...          \\
-		& Consultation               & 02.02.2020:14.12   & Jana Simpson, MD  & 24.32         & \begin{tabular}[c]{@{}l@{}}Noticeable tachycardia. No chronic pre-existing conditions\\ are known.\end{tabular} & ...          \\
-		& MRI & 02.02.2020:14.12   & Sara Taylor, MD   & 352.87        & -                                                                                                               & ...          \\
-		& Release patient            & 02.02.2020:14.12   & SYSTEM            & 0             & -                                                                                                               & ...          \\
-		&                            &                    &                   &               &                                                                                                                 &              \\
-		2                & Register patient           & 02.02.2020:09.08   & SYSTEM            & 0             & -                                                                                                               & ...          \\
-		& Consultation               & 02.02.2020:09.14   & Jana Simpson, MD  & 24.32         & \begin{tabular}[c]{@{}l@{}}The patient has severe leg injuries\\ due to a motorcycle accident.\end{tabular}     & ...          \\
-		& Patient hospitalized       & 02.02.2020:09.20   & Mike Johnson      & 130.37        & -                                                                                                               & ...          \\
-		...              & ...                        & ...                & ...               & ...           & ...                                                                                                             & ...          \\ \bottomrule
+		\textbf{ID} & \textbf{Activity}          & \textbf{Timestamp} & \textbf{Resource} & \textbf{Cost} & \textbf{Comment}  \\
+		\midrule
+		0                & Register patient           & 01.02.2020:14.12   & SYSTEM            & 0             & -     \\
+		& Consultation               & 01.02.2020:14.34   & J. Brown, MD    & 24.32         & The patient reports persistent nausea.   \\
+		& Blood test                 & 01.02.2020:15.12   & K. Smith         & 14.23         & Tests: Complete blood count    \\
+		& Evaluate test  & 01.02.2020:16.35   & J. Brown, MD    & 38.67         &No abnormalities in the complete blood count.   \\
+		& Release patient            & 01.02.2020:17.24   & SYSTEM            & 0             & -  \\
+		&                            &                    &                   &               &     \\
+		\midrule
+		1                & Register patient           & 02.02.2020:08.20   & SYSTEM            & 0             & -  \\
+		& Consultation               & 02.02.2020:14.12   & J. Simpson, MD  & 24.32         & Noticeable tachycardia. No chronic pre-existing conditions are known.    \\
+		& MRI & 02.02.2020:14.12   & Sara Taylor, MD   & 352.87        & -    \\
+		& Release patient            & 02.02.2020:14.12   & SYSTEM            & 0             & -   \\
+		&                            &                    &                   &               &     \\
+		\midrule
+		2                & Register patient           & 02.02.2020:09.08   & SYSTEM            & 0             & -    \\
+		& Consultation               & 02.02.2020:09.14   & J. Simpson, MD  & 24.32         & The patient has severe leg injuries due to a motorcycle accident.  \\
+		& Hospitalization       & 02.02.2020:09.20   & M. Johnson      & 130.37        & -     \\
+		...              & ...                        & ...                & ...               & ...           & ...     \\ \bottomrule
 	\end{tabularx}
-	\caption{An artificial event log of patient treatments in a hospital. The events are grouped by their case ID, which represents a single patient.}
+	\caption[Artificial event log of patient treatments in a hospital]{Artificial event log of patient treatments in a hospital. Each line corresponds to one event. The events are grouped by their case IDs, that each represent a single patient.}
 	\label{tab:event-log}
 \end{table}
 
@@ -38,6 +43,7 @@ If the execution of a business process is logged by an information system, the r
 Depending on the format of the event log, it can also contain additional data on case level.
 Typical formats for event logs, are comma-separated values (CSV) and eXtensible Event Stream (XES) \cite{DBLP:conf/caise/VerbeekBDA10a}, which can be extracted from databases.
 A table-based representation of an artificial event log about patient treatment in a hospital can be seen in Table \ref{tab:event-log}.
+Besides the case ID, activity and timestamp, the event log also contains information about the identity executing the activity, the costs of the activity and a text comment in form of a categorical, numerical and textual attribute.
 
 Process mining is the discipline that covers all approaches aiming to generate value out of event data.
 As an umbrella term, process mining includes or utilizes concepts of business process management, data mining, business process intelligence, big data, workflow management, business process monitoring \cite{DBLP:books/sp/Aalst16} as well as machine learning \cite{DBLP:conf/bpm/VeitGMHT17}.
@@ -140,7 +146,7 @@ In contrast, if the model is too simple to fit any data from training set, the h
 
 In many real-world applications, the true function $f(X)$ is stochastic, i.e. we need to estimate a conditional probability function $P(Y | X)$ (classification problem) or a conditional expectation $E(Y | X)$ (regression problem) for prediction.
 Therefore, the prediction accuracy is always limited by the randomness of the true distribution.
-Typical supervised learning algorithms are linear regression, Support Vector Machines, decision trees or neural networks including long short-term memory networks.
+Typical supervised learning algorithms are linear regression, support vector machines, decision trees or neural networks including long short-term memory networks.
 \section{Long Short-Term Memory Networks}
 
 Long short-term memory (LSMT) is an advanced recurrent neural network architecture for sequential data originally presented by \citeauthor{DBLP:journals/neco/HochreiterS97} in \citeyear{DBLP:journals/neco/HochreiterS97}  \cite{DBLP:journals/neco/HochreiterS97}.
@@ -163,8 +169,8 @@ The module uses as input the state $\vec{c}_{t-1}$ and the hidden output $\vec{h
 
 \begin{figure}[htbp!]
 	\centering
-	\includegraphics[width=0.8\textwidth]{figures/lstm-module}
-	\caption{An LSTM module with four sublayers that manipulate the cell state and compute the module's output. Graphic adapted from \cite{lstm-blog}.}
+	\includegraphics[width=0.9\textwidth]{figures/lstm-module}
+	\caption[Structure of an LSTM module]{LSTM module with four sublayers that manipulate the cell state and compute the module's output. Graphic adapted from \cite{lstm-blog}.}
 	\label{fig:lstm-module}
 \end{figure}
 

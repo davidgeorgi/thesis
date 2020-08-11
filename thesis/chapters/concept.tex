@@ -33,7 +33,7 @@ The text model is an exchangeable component and is fit to the text corpus, that 
 
 \begin{figure}[!htbp]
 	\includegraphics[width=\textwidth]{figures/framework}
-	\caption{Overview of the prediction framework.}
+	\caption[Overview of the text-aware process prediction framework]{Overview of the text-aware process prediction framework.}
 	\label{fig:framework}
 \end{figure}
 
@@ -70,6 +70,7 @@ The timestamp of the event is used to compute a vector $\vec{t_i}$ of time-relat
 
 \begin{table}[!htbp]
 	\renewcommand{\arraystretch}{1.2}
+	\setlength\tabcolsep{5pt}
 	\begin{tabularx}{\textwidth}{p{2cm} l l p{6.8cm} }
 		\toprule
 		\textbf{Feature} \newline \textbf{Vector} & \textbf{Construction} &\textbf{Dimension} &  \textbf{Description} \\
@@ -81,7 +82,7 @@ The timestamp of the event is used to compute a vector $\vec{t_i}$ of time-relat
 		$\vec{d}_i^\mathrm{text}$ & See Section \ref{sec:text} & $z_i$& Fixed-length vectorization of the $j$-th text attribute.\\
 		\bottomrule
 	\end{tabularx}
-	\caption{Feature vectors as part of the event encoding $\vec{x_i}$.}
+	\caption[Feature vectors as part of the event encoding]{Feature vectors as part of the event encoding $\vec{x_i}$.}
 	\label{tab:features}
 \end{table}
 
@@ -122,7 +123,7 @@ As part of the complete encoding $\vec{x}_i$ for an event $e_i$ in a (prefix-)tr
 		$t_i^6$ & Time since last January 1 00:00 \\
 		\bottomrule
 	\end{tabularx}
-	\caption{Time-based features as part of event encoding for an event $e_i$.}
+	\caption[Time-based features as part of the event encoding]{Time-based features as part of event encoding $\vec{x_i}$.}
 	\label{tab:time-features}
 \end{table}
 
@@ -190,7 +191,7 @@ In addition, punctuation marks and numerical information are excluded.
 		3 & Lemmatization & $\langle$"the", "patient", "have", "be", "diagnose", "with", "high", "blood", "pressure", "."$\rangle$  \\
 		4             & Stop word filtering     & $\langle$"patient", "diagnose", "high", "blood", "pressure"$\rangle$ \\ \bottomrule
 	\end{tabularx}
-	\caption{Preprocessing transformation of an example document containing a single sentence.}
+	\caption[Preprocessing transformation of an example document]{Preprocessing transformation of an example document containing a single sentence.}
 	\label{tab:text-preprocessing}
 \end{table}
 
@@ -241,12 +242,12 @@ Several variants of this approach exits, notably the \textit{Continuous Bag of W
 \begin{figure}[!htbp]
 	\centering
 	\includegraphics[width=\textwidth]{figures/paragraph-vector}
-	\caption{The distributed memory Paragraph Vector model (PV-DM) is designed to predict a word $w_t$ from its context and derives fixed-length representation of documents and words via the learned matrices $\vec{D}$ and $\vec{W}$.}
+	\caption[Distributed memory paragraph vector model]{The distributed memory paragraph vector model (PV-DM) is designed to predict a word $w_t$ from its context and derives fixed-length representation of documents and words via the learned matrices $\vec{D}$ and $\vec{W}$.}
 	\label{fig:paragraph-vector}
 \end{figure}
 
-The core idea of the Paragraph Vector model is to extend the model in \cite{DBLP:journals/jmlr/BengioDVJ03} in a way, that an additional document or paragraph vector, that is unique per document is trained together with the word vectors.
-Fig. \ref{fig:paragraph-vector} show the architecture of the distributed memory variant of the Paragraph Vector model (PV-DM).
+The core idea of the paragraph vector model is to extend the model in \cite{DBLP:journals/jmlr/BengioDVJ03} in a way, that an additional document or paragraph vector, that is unique per document is trained together with the word vectors.
+Fig. \ref{fig:paragraph-vector} show the architecture of the distributed memory variant of the paragraph vector model (PV-DM).
 Its is realized by a neural network, that takes one-hot encoded words and a one-hot encoded document IDs as input.
 These are mapped to vector representation via weight matrices $\vec{D}$ and $\vec{W}$, which are learned during training with gradient descent.
 The distributed representations are then averaged or concatenated to a vector in order to predict the one-hot encoded target word using another mapping via $\vec{W'}$ and a softmax activation function.
@@ -255,7 +256,7 @@ After training, each column in $\vec{D}$ represents the distributed encoding of 
 
 The network is also able to learn a representation for new unseen documents by an inference step.
 In this phase, the word matrix $\vec{W}$ and the prediction matrix $\vec{W'}$ are fixed and only the document vector is trained.
-The Paragraph Vector model tends to perform better than non-distributed models, however since new documents are vectorized via inference, a bigger training corpus of documents is usually required.
+The paragraph vector model tends to perform better than non-distributed models, however since new documents are vectorized via inference, a bigger training corpus of documents is usually required.
 
 \section{Network Architecture and Training}
 
@@ -266,7 +267,7 @@ Furthermore, layer normalization \cite{DBLP:journals/corr/BaKH16} is applied aft
 \begin{figure}[!htbp]
 	\centering
 	\includegraphics[width=\textwidth]{figures/network}
-	\caption{LSTM model to simultaneously predict the next activity $(\vec{y_a})$, next event time$(y_t)$, case outcome $(\vec{y_o})$ and case cylce time $(y_c)$ for an encoded prefix trace $\vec{x_1}, \vec{x_2}, \dots, \vec{x_n}$.}
+	\caption[LSTM model for text-aware process prediction]{LSTM model to simultaneously predict the next activity $(\vec{y_a})$, next event time$(y_t)$, case outcome $(\vec{y_o})$ and case cylce time $(y_c)$ for an encoded prefix trace $\vec{x_1}, \vec{x_2}, \dots, \vec{x_n}$.}
 	\label{fig:network}
 \end{figure}
 
