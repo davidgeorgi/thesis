@@ -34,7 +34,18 @@ NTLK is used to realize the tokenization and word lemmatization, whereas the imp
 
 \section{Model Implementation}
 
-The interface of the text-aware process prediction model is realized through a class \texttt{TappModel}, which implements the functions \texttt{fit()},  \texttt{predict()} and  \texttt{evaluate()}, that can be used to fit the model to an event log with historical data, 
+The interface of the text-aware process prediction model is realized through a class \texttt{TappModel}, which implements the functions \texttt{fit()},  \texttt{predict()} and  \texttt{evaluate()}, that can be used to fit the model to an event log with historical data, compute prediction for an event log with uncompleted traces and evaluate the performance of the prediction model.
+The \texttt{TappModel} is configured 
+
+The encoding of traces as described in Section \ref{sec:event}, \ref{sec:time} and \ref{sec:text} is computed in the \texttt{LogEncoder} module.
+The \texttt{LogEncoder} is also fitted to the historical log and can transform (prefix) traces to the encoded matrix format via functions \texttt{fit()} and \texttt{transform}.
+It is configured with one out of four text encoding models ( \texttt{BowTextEncoder},  \texttt{BongTextEncoder},  \texttt{LDATextEncoder} and  \texttt{PVTextEncoder}) that realizes the vectorization of textual data.
+Just like the \texttt{LogEncoder}, the text encoding models offers the functions \texttt{fit()} and \texttt{transform}.
+During the fitting phase all possible values for categorical attribute are indexed and the parameter for the normalization of numerical attributes are computed.
+With regard to the text encoding model, the indexed vocabulary of all words in the historical event log is built during fitting.
+In case of the Paragraph Vector model, the network is trained with the training corpus.
+
+
 
 \begin{figure}[htbp!]
 	\centering
