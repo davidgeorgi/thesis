@@ -9,7 +9,7 @@ from tensorflow.keras.callbacks import EarlyStopping, ReduceLROnPlateau, ModelCh
 from prediction_model import PredictionModel
 
 
-class LSTMModel(PredictionModel):
+class TappModel(PredictionModel):
 
     def __init__(self, log_encoder=None, num_shared_layer=1, num_specialized_layer=1, neurons_per_layer=100):
         self.log_encoder = log_encoder
@@ -107,6 +107,9 @@ class LSTMModel(PredictionModel):
         x = self.log_encoder.transform(log, for_training=False)
         prediction = self.model.predict(x)
         return prediction[3].flatten() * self.log_encoder.time_scaling_divisor[0]
+
+    def predict_suffix(self, log):
+        return
 
     def predict(self, log):
         x = self.log_encoder.transform(log, for_training=False)

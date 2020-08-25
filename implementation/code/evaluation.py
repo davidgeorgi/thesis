@@ -1,6 +1,6 @@
 from pm4py.objects.log.importer.xes import factory as xes_import_factory
-from lstm_model import LSTMModel
-from log_encoder import LSTMLogEncoder
+from lstm_model import TappModel
+from log_encoder import LogEncoder
 from text_encoder import BoNGTextEncoder
 
 
@@ -12,8 +12,8 @@ log = xes_import_factory.apply(path, variant="nonstandard", parameters={"timesta
 
 # Choose encoding and model
 text_encoder = BoNGTextEncoder(n=2, encoding_length=50, language="english")
-log_encoder = LSTMLogEncoder(text_encoder=text_encoder)
-model = LSTMModel(log_encoder=log_encoder, num_shared_layer=1, num_specialized_layer=1, neurons_per_layer=100)
+log_encoder = LogEncoder(text_encoder=text_encoder)
+model = TappModel(log_encoder=log_encoder, num_shared_layer=1, num_specialized_layer=1, neurons_per_layer=100)
 
 # Build and train model
 history = model.fit(log, data_attributes=[], text_attribute=None)
