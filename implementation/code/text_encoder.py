@@ -31,7 +31,7 @@ class TextEncoder(ABC):
 
 class BoWTextEncoder(TextEncoder):
 
-    def __init__(self, language="english", encoding_length=50):
+    def __init__(self, language="english", encoding_length=100):
         self.vectorizer = None
         super().__init__(language=language, encoding_length=encoding_length)
 
@@ -46,7 +46,7 @@ class BoWTextEncoder(TextEncoder):
 
 class BoNGTextEncoder(TextEncoder):
 
-    def __init__(self, language="english", encoding_length=50, n=2):
+    def __init__(self, language="english", encoding_length=100, n=2):
         self.n = n
         self.vectorizer = None
         super().__init__(language=language, encoding_length=encoding_length)
@@ -62,7 +62,7 @@ class BoNGTextEncoder(TextEncoder):
 
 class PVTextEncoder(TextEncoder):
 
-    def __init__(self,  language="english", encoding_length=50, epochs=10, min_count=2):
+    def __init__(self,  language="english", encoding_length=20, epochs=15, min_count=2):
         self.epochs = epochs
         self.min_count = min_count
         self.workers = multiprocessing.cpu_count()
@@ -87,9 +87,9 @@ class PVTextEncoder(TextEncoder):
 
 class LDATextEncoder(TextEncoder):
 
-    def __init__(self, language="english", encoding_length=50, num_topics=10):
+    def __init__(self, language="english", encoding_length=20):
         self.model = None
-        self.num_topics = num_topics
+        self.num_topics = encoding_length
         self.dictionary = None
         super().__init__(language=language, encoding_length=encoding_length)
 

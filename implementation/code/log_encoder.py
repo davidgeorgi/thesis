@@ -2,7 +2,7 @@ import numpy as np
 from abc import ABC, abstractmethod
 
 
-class LogEncoder(ABC):
+class Encoder(ABC):
 
     def __init__(self):
         super().__init__()
@@ -16,7 +16,7 @@ class LogEncoder(ABC):
         pass
 
 
-class LSTMLogEncoder(LogEncoder):
+class LogEncoder(Encoder):
     
     def __init__(self, text_encoder=None):
         self.text_encoder = text_encoder
