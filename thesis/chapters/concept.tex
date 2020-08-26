@@ -46,7 +46,7 @@ The total number of training examples that can be generated out of the log is $\
 In the online phase, the model can be used to predict the next event, outcome and cycle time of new unseen and unfinished cases, that are currently monitored.
 
 
-\section{Event Encoding}
+\section{Event Encoding}\label{sec:event}
 
 In the offline training phase as well as during online prediction, traces are encoded as sequences of event vectors.
 The prefix log $\eventlog_\mathrm{prefix}$ is encoded as training set in the offline phase, while in the online phase, running cases are encoded for prediction.
@@ -226,11 +226,7 @@ Compared to the BoW model, n-grams also take the order of words into account, wh
 However, the vocabulary size is usually even higher than in the BoW model.
 In order to generate more compact vectors, distributed text representations are needed for larger text corpora and vocabularies.
 
-\subsection{Latent Dirichlet Allocation}
 
-The Latent Dirichlet Allocation presented by \citeauthor{DBLP:journals/jmlr/BleiNJ03} in \citeyear{DBLP:journals/jmlr/BleiNJ03} \cite{DBLP:journals/jmlr/BleiNJ03} is generative statistical text model, that represents documents as a mixture of a fixed number of topics, depending on the words of the document.
-Therefore, a document is encoded as a vector whose dimension is equal to the number of chosen topics and each component indicates the degree of affiliation between the document and the corresponding topic.
-The topics are are not generated manually, but by the model itself.
 
 \subsection{Paragraph Vector}
 
@@ -257,6 +253,12 @@ After training, each column in $\vec{D}$ represents the distributed encoding of 
 The network is also able to learn a representation for new unseen documents by an inference step.
 In this phase, the word matrix $\vec{W}$ and the prediction matrix $\vec{W'}$ are fixed and only the document vector is trained.
 The paragraph vector model tends to perform better than non-distributed models, however since new documents are vectorized via inference, a bigger training corpus of documents is usually required.
+
+\subsection{Latent Dirichlet Allocation}
+
+The Latent Dirichlet Allocation presented by \citeauthor{DBLP:journals/jmlr/BleiNJ03} in \citeyear{DBLP:journals/jmlr/BleiNJ03} \cite{DBLP:journals/jmlr/BleiNJ03} is generative statistical text model, that represents documents as a mixture of a fixed number of topics, depending on the words of the document.
+Therefore, a document is encoded as a vector whose dimension is equal to the number of chosen topics and each component indicates the degree of affiliation between the document and the corresponding topic.
+The topics are are not generated manually, but by the model itself.
 
 \section{Network Architecture and Training}
 
