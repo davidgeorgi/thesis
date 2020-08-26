@@ -30,8 +30,8 @@
 %\fancyhead[L]{}
 %\fancyhead[R]{\nouppercase{\leftmark}}
 \fancyhead{}
-\fancyhead[LE]{\leftmark}
-\fancyhead[RO]{\rightmark}
+\fancyhead[LE]{\nouppercase{\leftmark}}
+\fancyhead[RO]{\nouppercase{\rightmark}}
 \fancyhead[LO,RE]{}
 %\setlength{\headheight}{14pt}
 %%% TiKZ setup
