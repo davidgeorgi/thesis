@@ -25,11 +25,31 @@ First, the data sets and evaluation method are described. Then, the performance 
 
 \section{Evaluation Method}
 
+Each event log is evaluated in a consistent procedure.
+In the first step, the event log is separated into a training and test log. 
+The training log consists of the first 2/3 chronologically ordered traces and is used to fit the prediction model to the historical data.
+The remaining 1/3 of traces are used to measure the prediction performance.
+For each trace $\sigma$ in the test log, all prefixes $hd^k(\sigma)$ of length $1 \leq k \leq |\sigma| - 1$ are considered as instances for prediction.
+During the training of the LSTM model, 20\% of the training log is used for validation, i.e. the training is stopped, if the error on the validation log is not decreasing anymore, in order to avoid overfitting.
 
-Accuracy
-Brier score \cite{Brier1950VERIFICATIONOF}
-MAE
+For classification (i.e. categorical prediction) task, like next event and outcome prediction, the accuracy and Brier score \cite{Brier1950VERIFICATIONOF} are utilized as metric.
+The accuracy is computed as the number of correct predictions $t$ divided by the total number of predictions $n$, i.e. 
+\begin{equation*}
+	\textrm{accuracy} = \dfrac{t}{n} = \dfrac{\textrm{\# correct predictions}}{\textrm{\# total predictions}}.
+\end{equation*}
+The Brier score uses the softmax output vector  $\vec{\hat{y}}$ of the prediction model and is calculated as the mean squared error of the predicted likelihoods over each possible outcome, precisely
+\begin{equation*}
+	\textrm{Brier score} = \dfrac{1}{n} \sum_{i=1}^{n}\sum_{j=1}^{p}(\hat{y}_{ij}-y_{ij})^2,
+\end{equation*}
+where $n$ is total number of prediction instances, $p$ is the number of possible outcomes and $\vec{y}$ is the vector indicating the true outcome.
+The Brier score also considers the confidence of the prediction model, unlike the accuracy score, which only considers the final prediction choice of the model .
+An accuracy value of 1 and a Brier score of 0 are the most desirable scores.
 
+For regression tasks, like the next event time and the case cycle time predictions, the mean absolute error (MAE) is computed to measure the prediction performance. The mean absolute error indicates the average absolute difference between the predicted value $\hat{y}$ and the true value $y$,  i.e.
+\begin{equation*}
+	\textrm{MAE} = \dfrac{1}{n}\sum_{i=1}^{n}|\hat{y_i} - y_i|.
+\end{equation*}
+This error metric gives a more intuitive interpretation and is less sensitive to outliers compared to similar metrics like the mean squared error (MSE).
 
 \section{Next Event Prediction}
 
