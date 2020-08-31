@@ -6,7 +6,8 @@ twoside
 ]{pads-thesis}
 
 
-\renewcommand{\gTitle}{Text-Aware Predictive Monitoring of Business Processes with LSTM Neural Networks}
+
+\renewcommand{\gTitle}{Text-Aware Predictive Monitoring\\ of Business Processes\\ with LSTM Neural Networks\\}
 \renewcommand{\gAuthor}{David Benedikt Georgi}
 \renewcommand{\gHeader}{Master's Thesis}
 \renewcommand{\gSupervisor}{Dr.-Ing. M. Seran Uysal \\
@@ -23,7 +24,6 @@ twoside
 \newcommand{\xmark}{\text{\ding{55}}}
 \renewcommand{\vec}[1]{\bm{#1}}
 
-
 \begin{document}
 %%% Title page
 \pagenumbering{roman}
@@ -33,19 +33,18 @@ twoside
 %\pagestyle{plain}
 %%% TOC
 
-\chapter*{Acknowledgments}\addcontentsline{toc}{chapter}{Acknowledgements}
+\chapter*{Acknowledgments} %\addcontentsline{toc}{chapter}{Acknowledgements}
 \input{chapters/acknowledgements.tex}
 
-%\begin{abstract}
-\chapter*{Abstract} \addcontentsline{toc}{chapter}{Abstract}
+\chapter*{Abstract}% \addcontentsline{toc}{chapter}{Abstract}
 \input{chapters/abstract.tex}
-%\end{abstract}
+
 \pagestyle{plain}
 \tableofcontents
 
-\listoffigures
+\listoffigures \addcontentsline{toc}{chapter}{List of Figures}
 
-\listoftables
+\listoftables \addcontentsline{toc}{chapter}{List of Tables}
 
 
 %\setcounter{page}{1}
