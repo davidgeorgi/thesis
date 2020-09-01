@@ -30,6 +30,7 @@ class PredictionModel(ABC):
     def predict(selfself, log):
         pass
 
+    @abstractmethod
     def predict_suffix(self, log):
         pass
 

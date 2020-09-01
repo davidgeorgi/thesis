@@ -18,7 +18,7 @@ class Encoder(ABC):
 
 class LogEncoder(Encoder):
     
-    def __init__(self, text_encoder=None):
+    def __init__(self, text_encoder=None, advanced_time_attributes=True):
         self.text_encoder = text_encoder
         self.activities = []
         self.data_attributes = []
@@ -28,6 +28,7 @@ class LogEncoder(Encoder):
         self.numerical_attributes = []
         self.event_dim = 0
         self.feature_dim = 0
+        self.advanced_time_attributes = advanced_time_attributes
         self.time_scaling_divisor = [1, 1, 1, 1, 1, 1]
         self.process_start_time = 0
         super().__init__()
@@ -40,7 +41,7 @@ class LogEncoder(Encoder):
         self.categorical_attributes = list(filter(lambda attribute: not _is_numerical_attribute(log, attribute), self.data_attributes))
         self.categorical_attributes_values = [_get_event_labels(log, attribute) for attribute in self.categorical_attributes]
         self.numerical_attributes = list(filter(lambda attribute: _is_numerical_attribute(log, attribute), self.data_attributes))
-        self.process_start_time = log[0][0]["time:timestamp"].timestamp()
+        self.process_start_time = np.min([event["time:timestamp"].timestamp() for case in log for event in case])
 
         # Scaling divisors for time related features to achieve values between 0 and 1
         cycle_time_max = np.max(
@@ -48,7 +49,7 @@ class LogEncoder(Encoder):
         time_between_events_max = np.max(
             [event["time:timestamp"].timestamp() - case[event_index - 1]["time:timestamp"].timestamp() for case in
              log for event_index, event in enumerate(case) if event_index > 0])
-        log_time = np.max([event["time:timestamp"].timestamp() for case in log for event in case]) - log[0][0]["time:timestamp"].timestamp()
+        log_time = np.max([event["time:timestamp"].timestamp() for case in log for event in case]) - self.process_start_time
         self.time_scaling_divisor = [cycle_time_max, time_between_events_max, 86400, 604800, 31536000, log_time]
 
         # Event dimension: Maximum number of events in a case
@@ -56,10 +57,10 @@ class LogEncoder(Encoder):
 
         # Feature dimension: Encoding size of an event
         activity_encoding_length = len(self.activities)
-        time_encoding_length = 6
+        time_encoding_length = 6 if self.advanced_time_attributes else 2
         categorical_attributes_encoding_length = sum([len(values) for values in self.categorical_attributes_values])
         numerical_attributes_encoding_length = len(self.numerical_attributes)
-        text_encoding_length = self.text_encoder.encoding_length if self.text_encoder else 0
+        text_encoding_length = self.text_encoder.encoding_length if self.text_encoder is not None and self.text_attribute is not None else 0
         self.feature_dim = self.feature_dim = activity_encoding_length + time_encoding_length + categorical_attributes_encoding_length + numerical_attributes_encoding_length + text_encoding_length
 
         # Train text encoder
@@ -93,7 +94,8 @@ class LogEncoder(Encoder):
 
                     if event_index <= prefix_length - 1:
                         # Encode activity
-                        x[trace_dim_index][padding+event_index][self.activities.index(event["concept:name"])] = 1
+                        if event["concept:name"] in self.activities:
+                            x[trace_dim_index][padding+event_index][self.activities.index(event["concept:name"])] = 1
                         offset = len(self.activities)
 
                         # Encode time attributes
@@ -102,22 +104,27 @@ class LogEncoder(Encoder):
                         x[trace_dim_index][padding+event_index][offset] = (event_time.timestamp() - case_start_time)/self.time_scaling_divisor[0]
                         # Seconds since previous event
                         x[trace_dim_index][padding+event_index][offset + 1] = (event_time.timestamp() - previous_event_time)/self.time_scaling_divisor[1]
-                        # Seconds since midnight
-                        x[trace_dim_index][padding+event_index][offset + 2] = (event_time.timestamp() - event_time.replace(hour=0, minute=0, second=0, microsecond=0).timestamp())/self.time_scaling_divisor[2]
-                        # Seconds since last Monday
-                        x[trace_dim_index][padding+event_index][offset + 3] = (event_time.weekday() * 86400 + event_time.hour * 3600 + event_time.second)/self.time_scaling_divisor[3]
-                        # Seconds since last Januar 1
-                        x[trace_dim_index][padding+event_index][offset + 4] = (event_time.timestamp() - event_time.replace(month=1, day=1, hour=0, minute=0, second=0, microsecond=0).timestamp())/self.time_scaling_divisor[4]
-                        # Seconds since process start
-                        x[trace_dim_index][padding+event_index][offset + 5] = (event_time.timestamp() - self.process_start_time)/self.time_scaling_divisor[5]
+                        # Encode additional time attributes if option is chosen
+                        if self.advanced_time_attributes:
+                            # Seconds since midnight
+                            x[trace_dim_index][padding+event_index][offset + 2] = (event_time.hour * 3600 + event_time.second)/self.time_scaling_divisor[2]
+                            # Seconds since last Monday
+                            x[trace_dim_index][padding+event_index][offset + 3] = (event_time.weekday() * 86400 + event_time.hour * 3600 + event_time.second)/self.time_scaling_divisor[3]
+                            # Seconds since last Januar 1
+                            x[trace_dim_index][padding+event_index][offset + 4] = ((event_time.month - 1) * 2628000 + (event_time.day - 1) * 86400 + event_time.hour * 3600 + event_time.second)/self.time_scaling_divisor[4]
+                            # Seconds since process start
+                            x[trace_dim_index][padding+event_index][offset + 5] = (event_time.timestamp() - self.process_start_time)/self.time_scaling_divisor[5]
+
+                            offset += 6
+                        else:
+                            offset += 2
 
                         previous_event_time = event_time.timestamp()
-                        offset += 6
 
                         # Encode categorical attributes
                         for attribute_index, attribute in enumerate(self.categorical_attributes):
-                            x[trace_dim_index][padding+event_index][
-                                offset + self.categorical_attributes_values[attribute_index].index(event[attribute])] = 1
+                            if event[attribute] in self.categorical_attributes_values[attribute_index]:
+                                x[trace_dim_index][padding+event_index][offset + self.categorical_attributes_values[attribute_index].index(event[attribute])] = 1
                             offset += len(self.categorical_attributes_values[attribute_index])
 
                         # Encode numerical attributes
@@ -136,11 +143,11 @@ class LogEncoder(Encoder):
                     if prefix_length == len(case):
                         # Case 1: Set <Process end> as next activity target
                         y_next_act[trace_dim_index][len(self.activities)] = 1
-                        y_next_time[trace_dim_index] = (case[-1]["time:timestamp"].timestamp() - case_start_time) / self.time_scaling_divisor[0]
+                        y_next_time[trace_dim_index] = 0
                     else:
                         # Case 2: Set next activity as target
                         y_next_act[trace_dim_index][self.activities.index(case[prefix_length]["concept:name"])] = 1
-                        y_next_time[trace_dim_index] = (case[prefix_length]["time:timestamp"].timestamp() - case_start_time) / self.time_scaling_divisor[0]
+                        y_next_time[trace_dim_index] = (case[prefix_length]["time:timestamp"].timestamp() - case[prefix_length - 1]["time:timestamp"].timestamp()) / self.time_scaling_divisor[1]
                     # Set final activity and case cycle time as target
                     y_final_act[trace_dim_index][self.activities.index(case[-1]["concept:name"])] = 1
                     y_final_time[trace_dim_index] = (case[-1]["time:timestamp"].timestamp() - case_start_time) / self.time_scaling_divisor[0]

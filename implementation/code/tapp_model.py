@@ -6,6 +6,7 @@ import os
 from tensorflow.keras import metrics
 from tensorflow.keras import layers
 from tensorflow.keras.callbacks import EarlyStopping, ReduceLROnPlateau, ModelCheckpoint
+from tensorflow.keras.losses import mean_absolute_error
 from prediction_model import PredictionModel
 
 
@@ -39,7 +40,7 @@ class TappModel(PredictionModel):
         previous_layer_final_timestamp = previous_layer
         for layer in range(self.num_specialized_layer):
             # Do not return sequences in the last LSTM layer
-            return_sequences = False if layer == self.num_specialized_layer-1 else True
+            return_sequences = False if layer == self.num_specialized_layer - 1 else True
             next_activity_lstm_layer = layers.LSTM(self.neurons_per_layer, implementation=2, kernel_initializer="glorot_uniform", return_sequences=return_sequences, dropout=0.2)(previous_layer_next_activity)
             final_activity_lstm_layer = layers.LSTM(self.neurons_per_layer, implementation=2, kernel_initializer="glorot_uniform", return_sequences=return_sequences, dropout=0.2)(previous_layer_final_activity)
             next_timestamp_lstm_layer = layers.LSTM(self.neurons_per_layer, implementation=2, kernel_initializer="glorot_uniform", return_sequences=return_sequences, dropout=0.2)(previous_layer_next_timestamp)
@@ -80,9 +81,9 @@ class TappModel(PredictionModel):
         self._build_model()
 
         # Reduce learning rate if metrics do not improve anymore
-        reduce_lr = ReduceLROnPlateau(monitor="val_loss", factor=0.1, patience=8, min_lr=0.0001)
+        reduce_lr = ReduceLROnPlateau(monitor="val_loss", factor=0.1, patience=5, min_lr=0.0001)
         # Stop early if metrics do not improve for longer time
-        early_stopping = EarlyStopping(monitor="val_loss", patience=20)
+        early_stopping = EarlyStopping(monitor="val_loss", patience=10)
         # Save model
         model_checkpoint = ModelCheckpoint("../models/model_{epoch:02d}-{val_loss:.2f}.h5", monitor="val_loss", verbose=0, save_best_only=True, save_weights_only=False, mode="auto")
         # Fit the model to data
@@ -101,7 +102,7 @@ class TappModel(PredictionModel):
     def predict_next_time(self, log):
         x = self.log_encoder.transform(log, for_training=False)
         prediction = self.model.predict(x)
-        return prediction[2].flatten() * self.log_encoder.time_scaling_divisor[0]
+        return prediction[2].flatten() * self.log_encoder.time_scaling_divisor[1]
 
     def predict_final_time(self, log):
         x = self.log_encoder.transform(log, for_training=False)
@@ -114,14 +115,11 @@ class TappModel(PredictionModel):
     def predict(self, log):
         x = self.log_encoder.transform(log, for_training=False)
         prediction = self.model.predict(x)
-        prediction[2] = prediction[2].flatten() * self.log_encoder.time_scaling_divisor[0]
+        prediction[2] = prediction[2].flatten() * self.log_encoder.time_scaling_divisor[1]
         prediction[3] = prediction[3].flatten() * self.log_encoder.time_scaling_divisor[0]
         return prediction
 
-    def evaluate(self, log):
-        folder_path = "../results/lstm-" + datetime.now().strftime("%Y-%m-%d-%H-%M-%S")
-        os.mkdir(folder_path)
-
+    def _evaluate_raw(self, log):
         # Make predictions
         predictions = []
         for case in log:
@@ -129,10 +127,10 @@ class TappModel(PredictionModel):
             for prefix_length in range(1, len(case) + 1):
                 prediction = self.predict([case[0:prefix_length]])
 
-                true_next_activity = len(self.activities) if prefix_length == len(case) else self.activities.index(case[prefix_length]["concept:name"])
-                true_case_outcome = self.activities.index(case[-1]["concept:name"])
-                true_next_time = (case[-1]["time:timestamp"].timestamp() - case[prefix_length - 1]["time:timestamp"].timestamp())/86400 if prefix_length == len(case) else (case[prefix_length]["time:timestamp"].timestamp() - case[prefix_length - 1]["time:timestamp"].timestamp())/86400
-                true_cycle_time = (case[-1]["time:timestamp"].timestamp() - case[0]["time:timestamp"].timestamp())/86400
+                true_next_activity = len(self.activities) if prefix_length == len(case) else self.activities.index(case[prefix_length]["concept:name"]) if case[prefix_length]["concept:name"] in self.activities else -1
+                true_case_outcome = self.activities.index(case[-1]["concept:name"]) if case[-1]["concept:name"] in self.activities else -1
+                true_next_time = 0 if prefix_length == len(case) else (case[prefix_length]["time:timestamp"].timestamp() - case[prefix_length - 1]["time:timestamp"].timestamp()) / 86400
+                true_cycle_time = (case[-1]["time:timestamp"].timestamp() - case[0]["time:timestamp"].timestamp()) / 86400
 
                 predicted_next_activity = np.argmax(prediction[0][0])
                 predicted_case_outcome = np.argmax(prediction[1][0])
@@ -142,9 +140,27 @@ class TappModel(PredictionModel):
                 predictions.append([caseID, prefix_length, true_next_activity, predicted_next_activity, true_case_outcome, predicted_case_outcome, true_next_time, predicted_next_time, true_cycle_time, predicted_cycle_time])
 
         # Save predictions in csv file
-        columns = ["CaseID", "Prefix length", "True next activity", "Predicted next activity", "True case outcome", "Predicted case outcome", "True next time", "Predicted next time", "True cycle time", "Predicted cylce time"]
-        df = pd.DataFrame(predictions, columns=columns)
-        df.to_csv(folder_path + "/predictions.csv", encoding='utf-8', sep=',', index=False)
+        columns = ["caseID", "prefix-length", "true-next-activity", "pred-next-activity", "true-outcome", "pred-outcome", "true-next-time", "pred-next-time", "true-cycle-time", "pred-cylce-time"]
+        return pd.DataFrame(predictions, columns=columns)
+
+    def evaluate(self, log):
+        raw = self._evaluate_raw(log)
+
+        next_activity_acc = len(raw[raw["pred-next-activity"] == raw["true-next-activity"]]) / len(raw)
+        next_time_mae = mean_absolute_error(raw["true-next-time"].astype(float).to_numpy(), raw["pred-next-time"].astype(float).to_numpy()).numpy()
+        outcome_acc = len(raw[raw["pred-outcome"] == raw["true-outcome"]]) / len(raw)
+        cycle_time_mae = mean_absolute_error(raw["true-cycle-time"].astype(float).to_numpy(), raw["pred-cylce-time"].astype(float).to_numpy()).numpy()
+
+        path = os.path.join("..", "results", "results.csv")
+        columns = ["model", "timestamp", "num_layer", "num_shared_layer", "hidden_neurons", "advanced_time_attributes", "text_encoding", "text_dim", "next_activity_acc", "next_time_mae", "outcome_acc", "cycle_time_mae"]
+        if not os.path.exists(path):
+            df = pd.DataFrame(columns=columns)
+            df.to_csv(path, encoding="utf-8", sep=",", index=False)
+        df = pd.read_csv(path, sep=",")
+
+        df.loc[len(df)] = ["lstm", datetime.now().strftime("%Y-%m-%d-%H-%M-%S"), self.num_shared_layer + self.num_specialized_layer, self.num_shared_layer, self.neurons_per_layer, self.log_encoder.advanced_time_attributes, self.log_encoder.text_encoder.name if self.log_encoder.text_encoder is not None else "-",
+            self.log_encoder.text_encoder.encoding_length if self.log_encoder.text_encoder is not None else 0, next_activity_acc, next_time_mae, outcome_acc, cycle_time_mae]
+        df.to_csv(path, encoding="utf-8", sep=",", index=False)
         return df
 
     def _get_activity_label(self, index):

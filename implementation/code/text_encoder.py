@@ -16,6 +16,7 @@ from abc import ABC, abstractmethod
 class TextEncoder(ABC):
 
     def __init__(self, language="english", encoding_length=50):
+        self.name = "TextModel"
         self.language = language
         self.encoding_length = encoding_length
         super().__init__()
@@ -32,6 +33,7 @@ class TextEncoder(ABC):
 class BoWTextEncoder(TextEncoder):
 
     def __init__(self, language="english", encoding_length=100):
+        self.name = "BoW"
         self.vectorizer = None
         super().__init__(language=language, encoding_length=encoding_length)
 
@@ -47,6 +49,7 @@ class BoWTextEncoder(TextEncoder):
 class BoNGTextEncoder(TextEncoder):
 
     def __init__(self, language="english", encoding_length=100, n=2):
+        self.name = "BoNG"
         self.n = n
         self.vectorizer = None
         super().__init__(language=language, encoding_length=encoding_length)
@@ -63,6 +66,7 @@ class BoNGTextEncoder(TextEncoder):
 class PVTextEncoder(TextEncoder):
 
     def __init__(self,  language="english", encoding_length=20, epochs=15, min_count=2):
+        self.name = "PV"
         self.epochs = epochs
         self.min_count = min_count
         self.workers = multiprocessing.cpu_count()
@@ -88,6 +92,7 @@ class PVTextEncoder(TextEncoder):
 class LDATextEncoder(TextEncoder):
 
     def __init__(self, language="english", encoding_length=20):
+        self.name = "LDA"
         self.model = None
         self.num_topics = encoding_length
         self.dictionary = None
