@@ -1,14 +1,16 @@
 In this chapter the basic concepts of process mining, text mining, supervised learning and long short-term memory networks are presented. Furthermore, necessary formal definitions and notations are introduced.
 
-
 \section{Processes and Process Mining}
 
-A \textit{business process} is a collection of activities that are performed in a specific order to archive a goal \cite{DBLP:conf/bpm/AalstAM11}.
-A single execution of a process is a \textit{case} or \textit{process instance}, which is identified by a case ID.
+\begin{definition}[Business Process]
+	A \textit{business process} is a collection of activities that are performed in a specific order to archive a goal \cite{DBLP:conf/bpm/AalstAM11}.
+	A single execution of a process is a \textit{case} or \textit{process instance}, which is identified by a case ID.
+\end{definition}
+
 Each performed activity belongs to specific case and is completed at a certain time.
-A case can be for example a patient in a hospital, a customer journey or an online order. The time on which an activity for a certain case is performed is specified by a timestamp.
+For example, a case can be a patient treated in a hospital, a customer journey or an online order. The time on which an activity for a certain case is performed is specified by a timestamp.
 The trinity of case, activity and timestamp is called \textit{event}.
-An event can have more attributes, for example resource, costs or transactional information.
+An event can have additional attributes, describing for example the resource, costs or transaction information associated with the event.
 
 \begin{table}[htbp!]
 	\small
@@ -35,21 +37,23 @@ An event can have more attributes, for example resource, costs or transactional 
 		& Hospitalization       & 02.02.2020:09.20   & M. Johnson      & 130.37        & -     \\
 		...              & ...                        & ...                & ...               & ...           & ...     \\ \bottomrule
 	\end{tabularx}
-	\caption[Artificial event log of patient treatments in a hospital]{Artificial event log of patient treatments in a hospital. Each line corresponds to one event. The events are grouped by their case IDs, that each represent a single patient.}
+	\caption[Artificial event log of patient treatments in a hospital]{An artificial event log of patient treatments in a hospital. Each line corresponds to one event. The events are grouped by their case IDs, that each represent a single patient.}
 	\label{tab:event-log}
 \end{table}
 
 If the execution of a business process is logged by an information system, the resulting event data is called \textit{event log}.
 Depending on the format of the event log, it can also contain additional data on case level.
-Typical formats for event logs, are comma-separated values (CSV) and eXtensible Event Stream (XES) \cite{DBLP:conf/caise/VerbeekBDA10a}, which can be extracted from databases.
-A table-based representation of an artificial event log about patient treatment in a hospital can be seen in Table \ref{tab:event-log}.
-Besides the case ID, activity and timestamp, the event log also contains information about the identity executing the activity, the costs of the activity and a text comment in form of a categorical, numerical and textual attribute.
+Typical formats for event logs, are comma-separated values (CSV) and eXtensible Event Stream (XES) \cite{DBLP:conf/caise/VerbeekBDA10a}, which can be extracted from databases of process-aware information systems.
+A table-based representation of an artificial event log describing patient treatments in a hospital can be seen in Table \ref{tab:event-log}.
+Besides the case ID, activity and timestamp, the event log also contains information about the identity executing the activity, the costs of the activity and a text comment as an example for a categorical, numerical and textual attribute.
 
-Process mining is the discipline that covers all approaches aiming to generate value out of event data.
-As an umbrella term, process mining includes or utilizes concepts of business process management, data mining, business process intelligence, big data, workflow management, business process monitoring \cite{DBLP:books/sp/Aalst16} as well as machine learning \cite{DBLP:conf/bpm/VeitGMHT17}.
+\begin{definition}[Process Mining]
+	\textit{Process mining} is the discipline that covers all approaches aiming to generate value out of event data.
+	As an umbrella term, process mining includes or utilizes concepts of business process management, data mining, business process intelligence, big data, workflow management, business process monitoring \cite{DBLP:books/sp/Aalst16} as well as machine learning \cite{DBLP:conf/bpm/VeitGMHT17}.
+\end{definition}
 
 Traditionally, process mining is divided into a set of subdisciplines mainly process discovery, conformance checking, process enhancement and process analytics \cite{DBLP:conf/caise/EckLLA15}.
-Process discovery aims to generate process models out of event data in order to understand a process and enable further analysis.
+Process discovery aims to generate process models out of event data in order to understand the control flow of a process and enable further analysis.
 Conformance checking is about comparing the intended and observed behavior of a process and identifying deviations.
 On top of these diagnostic approaches, process enhancement deals with the improvement of processes regarding compliance, performance or complexity.
 
@@ -77,8 +81,7 @@ Moreover, the $i$-th element of a sequence $\sigma = \langle a_1, a_2, \dots, a_
 The length of a sequence is denoted by $|\sigma|$.
 For a sequence $\sigma=\langle a_1, a_2, \dots, a_n\rangle$, the function
 $hd^k(\sigma)= \langle a_1, a_2, \dots, a_k\rangle$ gives the prefix of length $k$ of $\sigma$ and $tl^k(\sigma)= \langle a_{k+1}, a_{k+2}, \dots, a_n\rangle$ the suffix of length $n-k$ for $0 \leq k \leq n$.
-%Note that $\sigma = hd^k(\sigma) \cdot tl^{n-k+1}(\sigma)$ for corresponding $k$.
-%If an element $a_i \in A$ appears in a sequence $\sigma$, we also write $a_i \in \sigma$.
+Note that $\sigma = hd^k(\sigma) \cdot tl^{k}(\sigma)$ for $0 \leq k \leq n$ and any sequence $\sigma$.
 
 A function $f \colon A \to B$ can be lifted element-wise to sequences over $A$, precisely:
 \begin{equation*}
@@ -88,52 +91,57 @@ f(\sigma) =
 \langle f(a_1), f(a_2), \dots, f(a_n)\rangle & \text{else} 
 \end{cases}
 \end{equation*}
+If an element $a \in A$ appears in a sequence $\sigma \in A^*$, the set membership notation $a \in \sigma$ is used for simplification.
 
 \section{Events, Traces, Event Logs}
 
+Based on the definition of sequences, the concepts of events, traces and event logs can formalized.
+
 \begin{definition}[Event]
-An  \textit{event} is defined by a tuple $e = (a,c,t,d_1,\dots, d_m) \in \mathcal{C} \times \mathcal{A}  \times \mathcal{T} \times \mathcal{D}_1 \times \dots \times \mathcal{D}_m =  \mathcal{E}$ where  $c \in \mathcal{C} $ is the case ID, $a \in \mathcal{A}$ is the executed activity and $t \in \mathcal{T}$ is the timestamp of the event.
-Furthermore, each event contains a fixed number $m \in \mathbb{N}_0$ of additional attributes $d_1 \dots d_m$ in their corresponding domains $\mathcal{D}_1, \dots , \mathcal{D}_m$.
-In case that no additional attribute data is given ($m = 0$) the event space $\mathcal{E}$ (set of all possible events) is reduced to $\mathcal{C} \times \mathcal{A}  \times \mathcal{T}$.
+An  \textit{event} is a tuple $e = (a,c,t,d_1,\dots, d_m) \in \mathcal{C} \times \mathcal{A}  \times \mathcal{T} \times \mathcal{D}_1 \times \dots \times \mathcal{D}_m =  \mathcal{E}$ where  $c \in \mathcal{C} $ is the case ID, $a \in \mathcal{A}$ is the executed activity and $t \in \mathcal{T}$ is the timestamp of the event.
+Furthermore, each event contains a fixed number $m \in \mathbb{N}_0$ of additional attributes $d_1, \dots, d_m$ in their corresponding domains $\mathcal{D}_1, \dots , \mathcal{D}_m$.
+In case that no additional attribute data is given ($m = 0$) the event space $\mathcal{E}$ (set of all possible events) is reduced to its minimal form $\mathcal{C} \times \mathcal{A}  \times \mathcal{T}$.
 \end{definition}
 
 Each attribute $d \in \mathcal{D}$ of an event (including activity, timestamp and case ID) can be accessed by a projection function $\pi_D \colon \mathcal{E} \to \mathcal{D}$.
 For example, the activity $a$ of an event $e$ is retrieved by $\pi_\mathcal{A}(e) = a$.
 
 Throughout this thesis,  $\mathcal{C} = \mathbb{N}_0$, $|\mathcal{A}| < \infty$ and $ \mathcal{T} = \mathbb{R}$ is assumed, where $t \in \mathcal{T}$ is given in Unix time, precisely the number of seconds since 00:00:00 UTC on 1 January 1970 minus the applied leap seconds.
-Each additional attribute is assumed to be numerical, categorical or textual, i.e. $\mathcal{D}_i = \mathbb{R}$, $|\mathcal{D}_i| < \infty$ or $\mathcal{D}_i = V^\ast$  for $1 \leq i \leq m$ and some fixed vocabulary $V$.
+Each additional attribute is assumed to be numerical, categorical or textual, i.e. $\mathcal{D}_i = \mathbb{R}$, $|\mathcal{D}_i| < \infty$ or $\mathcal{D}_i = \Sigma^\ast$  for $1 \leq i \leq m$ and some fixed alphabet $\Sigma$.
 
 \begin{definition}[Trace]
-	A \textit{trace} is a finite and non-empty sequence of events $\sigma = \langle e_1, e_2, \dots\rangle \in  \mathcal{E}^\ast$ with increasing timestamps, i.e. $\pi_\mathcal{T} (e_i) < \pi_\mathcal{T} (e_j) $ for $1 \leq i < j \leq |\sigma|$.
+	A \textit{trace} is a finite sequence of events $\sigma = \langle e_1, e_2, \dots\rangle \in  \mathcal{E}^\ast$ with increasing timestamps, i.e. $\pi_\mathcal{T} (e_i) < \pi_\mathcal{T} (e_j) $ for $1 \leq i < j \leq |\sigma|$.
 \end{definition}
 
 
 By lifting the projection functions to sequences a trace can be transformed into a sequence of attributes by applying the projection function to the trace.
 For example, $\pi_\mathcal{A}(\sigma)$ gives the sequence of the activities of the events in $\sigma$.
 
-\begin{definition}[Event log]
+\begin{definition}[Event Log]
 	An \textit{event log} or \textit{trace log} $\eventlog = \{ \sigma_1, \sigma _2, \dots, \sigma_k \}$ is a set of traces, where each event of a trace is unique in the log and all events of a trace share a case IDs, which is unique per trace.
 \end{definition}
 
 \section{Text Mining}
 
-\textit{Text mining} describes all techniques to generate value out of unstructured or semi-structured textual data.
+With the consideration of textual data in event logs, the concept of \textit{text mining} becomes relevant.
+Text mining describes all techniques that aim to generate value out of unstructured or semi-structured textual data.
 It combines concepts of natural language processing, machine learning and data mining \cite{DBLP:journals/coling/Mihalcea08}.
+
 The base object in text mining is a \textit{document} containing textual data.
-The textual data can be completed unstructured, i.e. it does not conform to a pre-defined data model, or semi-structured, like in an e-mail, where text information is assigned to sender, subject, message etc.
-In our setting, a document $d \in V^*$ (i.e. textual data) is always a sequence of words from a fixed vocabulary $V$.
+The textual data can be completed unstructured, i.e. it does not conform to a pre-defined data model, or semi-structured, like in an email, where text information is assigned to sender, subject, message etc.
+In this setting, a document $d \in \Sigma^*$ (i.e. textual data) is always a sequence of symbols from a fixed alphabet $\Sigma$.
 A collection of documents is called \textit{text corpus}, which forms the basis for many text mining techniques.
 
-In order to derive a mathematical representation of the text data that can be interpreted by a computer, a text model has to be build using the text corpus.
-Popular text models are Bag-of-words, Bag-of-n-gram, Paragraph vector (a.k.a. Doc2Vec) \cite{DBLP:conf/icml/LeM14} and Latent Dirichlet Allocation \cite{DBLP:journals/jmlr/BleiNJ03}.
+In order to derive a mathematical representation of the textual data that can be interpreted by learning algorithms, a text model has to be build using the whole text corpus.
+Popular text models are Bag-of-words \cite{harris1954distributional}, Bag-of-n-gram, Paragraph vector (a.k.a. Doc2Vec) \cite{DBLP:conf/icml/LeM14} and Latent Dirichlet Allocation \cite{DBLP:journals/jmlr/BleiNJ03}.
 Most models do not work with the raw text data, but require a text normalization step, where the text is cleaned from linguistic variation as well as meaningless words and symbols \cite{DBLP:books/lib/JurafskyM09}.
 
 \section{Supervised Learning}
 
 In \textit{supervised learning} an unknown function is learned (i.e. approximated) from a set of example input-output pairs \cite{DBLP:books/daglib/0023820}.
-In contrast, \textit{unsupervised learning} does not require examples pattern and is about finding pattern in the data. 
+In contrast, \textit{unsupervised learning} does not require examples pattern and deals with finding pattern in the data. 
 An input instance is usually described by a set of \textit{feature variables} $X$ and the output is defined by a \textit{target variable} $y$.
-If the target variable $y$ is continuous, we refer to this as a regression problem, if however it is discrete variable with a finite range of values, the learning problem is called classification problem.
+If the target variable $y$ is continuous, this is referred to as a regression problem, if however it is discrete variable with a finite range of values, the learning problem is called classification problem.
 Given a \textit{training set} of input-output pairs $\{(X_1, y_1), (X_2, y_2), \dots, (X_m,y_m)\}$, that were generated from an unknown function $y = f(X)$, the goal is to approximate a hypothesis function $h(X)$, which is close to f(X), i.e. $h(X) \approx f(X)$.
 
 The challenge in supervised learning is to generalize from the training set of input-output pairs in such a way, that the learned hypothesis function $h(x)$ can also successfully predict the target variable for unseen problem instances.
@@ -151,21 +159,22 @@ Typical supervised learning algorithms are linear regression, support vector mac
 
 Long short-term memory (LSMT) is an advanced recurrent neural network architecture for sequential data originally presented by \citeauthor{DBLP:journals/neco/HochreiterS97} in \citeyear{DBLP:journals/neco/HochreiterS97}  \cite{DBLP:journals/neco/HochreiterS97}.
 This approach addresses the well-known vanishing and exploding gradient problem \cite{DBLP:conf/icml/PascanuMB13}  of traditional recurrent neural networks by introducing more complex LSTM cells as hidden units.
-The proposed architecture has been improved several times \cite{DBLP:journals/neco/GersSC00} \cite {DBLP:journals/tnn/GreffSKSS17} and considered as one of the most successful recurrent neural network models.
-Although LSTM networks have been available for a long time, the breakthrough of this technology is dated around 2016 after many success stories of LSTM in combination with large data sets and GPU hardware have been reported for sequence to sequence tasks like text translation \cite{DBLP:journals/corr/WuSCLNMKCGMKSJL16}.
+The proposed architecture has been improved several times \cite{DBLP:journals/neco/GersSC00} \cite {DBLP:journals/tnn/GreffSKSS17} and is considered as one of the most successful recurrent neural network models.
+Although, LSTM networks have been available for a long time, the breakthrough of this technology is dated around 2016 after many success stories of LSTM in combination with large data sets and GPU hardware have been reported for sequence to sequence tasks like text translation \cite{DBLP:journals/corr/WuSCLNMKCGMKSJL16}.
 
 Gated recurrent units (GRU) \cite{DBLP:conf/emnlp/ChoMGBBSB14} are the competing gating mechanism by \citeauthor{DBLP:conf/emnlp/ChoMGBBSB14} that have fewer parameters and perform similar to LSTM.
 However, more recent studies show, that LSTM outperforms GRU consistently in neural machine translation tasks \cite{DBLP:journals/corr/BritzGLL17}.
 
 A simple feedforward neural networks consists of an input layer, arbitrarily many hidden layers and an output layer, where each layer consists of neurons that compute and output the weighted sum of the cells of the previous layer that has been passed to an non-linear activation function \cite{DBLP:journals/nn/Schmidhuber15}.
-These networks can learn and compute complex functions in supervised learning settings, where input and output pattern are provided.
+These networks can learn and compute complex functions in supervised learning settings, where input and output pattern in form of vectors are provided.
 The network computes a loss function for each training pattern and adjusts its weights with gradient descents using a back-propagation algorithm in order to minimize the loss function \cite{rumelhart1986learning}.
 
 Recurrent neural networks extend traditional feed forward networks with backfeeding connections between hidden layers.
 This enables the network to keep a state across inputs and allows the neural network to process arbitrarily long sequences of input data while learning temporal dependencies.
 
 In LTSM networks the layers are replaced by more complex LSTM modules, where each module contains four different sublayers.
-The module uses as input the state $\vec{c}_{t-1}$ and the hidden output $\vec{h}_{t-1}$ of the module in the previous time step as well as the output of the previous layer $\vec{x}_t$ to compute a new cell state $\vec{c}_{t}$ and a (hidden) output $\vec{h}_{t}$.
+The architecture of a single LSTM module is shown in Figure \ref{fig:lstm-module}.
+The module uses as input the state $\vec{c}_{t-1}$ and the hidden output $\vec{h}_{t-1}$ of the module in the previous time step as well as the output of the previous layer $\vec{x}_t$ to compute a new cell state $\vec{c}_{t}$ and a hidden output $\vec{h}_{t}$.
 
 \begin{figure}[htbp!]
 	\centering
@@ -174,9 +183,8 @@ The module uses as input the state $\vec{c}_{t-1}$ and the hidden output $\vec{h
 	\label{fig:lstm-module}
 \end{figure}
 
-
-The input vector $\vec{x}_t$ is concatenated with the previous hidden output $\vec{h}_{t-1}$ and fed to four neural network layers, which are designed to decide what part of the cell state will remain (forget gate $\vec{f}_t$), how it is updated (update gate $\vec{i}_t$ and $\vec{\bar{c}}_t$) and what the output of the layer will be (output gate $\vec{o}_t$ leading to $\vec{h}_t$).
-The sublayer apply $\text{sigmoid}(x) = \frac{1}{1+\exp({-x})}$ or $\tanh(x) = \frac{\exp({x}) - \exp({-x})}{\exp({x}) + \exp({-x})}$ activation functions elementwise, leading to the following equations:
+The input vector $\vec{x}_t$ is concatenated with the previous hidden output $\vec{h}_{t-1}$ and transferred to four neural network layers, which are designed to decide what part of the cell state will remain (forget gate $\vec{f}_t$), how it is updated (update gate $\vec{i}_t$ and $\vec{\bar{c}}_t$) and what the output of the layer will be (output gate $\vec{o}_t$ leading to $\vec{h}_t$ considering the updated cell state $\vec{c}$).
+The sublayer apply $\text{sigmoid}(x) = \frac{1}{1+\exp({-x})}$ or $\tanh(x) = \frac{\exp({x}) - \exp({-x})}{\exp({x}) + \exp({-x})}$ activation functions elementwise to vectors, leading to the following equations:
 
 \begin{equation*}
 	\vec{f}_t = \text{sigmoid}(\vec{W}_f \cdot (\vec{h}_{t-1}, \vec{x}_t) + \vec{b}_f)
@@ -209,3 +217,4 @@ The result of the output gate $\vec{o}_t$ is pointwise multiplied with the tanh-
 \end{equation*}
 
 LSTM networks are able to backpropagate a more stable error with this gating mechanism, such that these networks are much more capable of learning complex functions for sequences compared to standard recurrent neural networks.
+As a machine learning model that naturally supports sequential data, LSTM networks are a suitable prediction model for processes.
