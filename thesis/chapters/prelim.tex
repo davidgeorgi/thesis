@@ -74,7 +74,7 @@ The set of natural numbers up to $n$ is noted as $[n] = \{1, 2, \dots, n\} \subs
 
 Given a set $A$, $A^n$ describes the set of all sequences $\langle a_1, a_2, \dots, a_n\rangle$ over $A$ of length $n$.
 The set $A^0$ is defined as $\{\langle \rangle\}$, the set that only contains the empty sequence.
-The set of all possible sequences over $A$ is given with $A^* = \bigcup\limits_{i\in \mathbb{N}_0} A^i$.
+$A^* = \bigcup\limits_{i\in \mathbb{N}_0} A^i$ is the set of all sequences over $A$ and $A^+ = \bigcup\limits_{i\in \mathbb{N}} A^i = A^* \setminus \{ \langle \rangle\}$ is the set of all sequences over $A$ with a length of at least 1.
 
 Given sequences $\sigma_1$ and $\sigma_2$, the concatenation of both sequences is denoted by $\sigma_1 \cdot \sigma_2$.
 Moreover, the $i$-th element of a sequence $\sigma = \langle a_1, a_2, \dots, a_n\rangle$ is accessed using $\sigma(i)= a_i$ for $1 \leq i \leq n$.
@@ -169,7 +169,7 @@ A simple feedforward neural networks consists of an input layer, arbitrarily man
 These networks can learn and compute complex functions in supervised learning settings, where input and output pattern in form of vectors are provided.
 The network computes a loss function for each training pattern and adjusts its weights with gradient descents using a back-propagation algorithm in order to minimize the loss function \cite{rumelhart1986learning}.
 
-Recurrent neural networks extend traditional feed forward networks with backfeeding connections between hidden layers.
+Recurrent neural networks extend traditional feedforward networks with backfeeding connections between hidden layers.
 This enables the network to keep a state across inputs and allows the neural network to process arbitrarily long sequences of input data while learning temporal dependencies.
 
 In LTSM networks the layers are replaced by more complex LSTM modules, where each module contains four different sublayers.
@@ -186,21 +186,12 @@ The module uses as input the state $\vec{c}_{t-1}$ and the hidden output $\vec{h
 The input vector $\vec{x}_t$ is concatenated with the previous hidden output $\vec{h}_{t-1}$ and transferred to four neural network layers, which are designed to decide what part of the cell state will remain (forget gate $\vec{f}_t$), how it is updated (update gate $\vec{i}_t$ and $\vec{\bar{c}}_t$) and what the output of the layer will be (output gate $\vec{o}_t$ leading to $\vec{h}_t$ considering the updated cell state $\vec{c}$).
 The sublayer apply $\text{sigmoid}(x) = \frac{1}{1+\exp({-x})}$ or $\tanh(x) = \frac{\exp({x}) - \exp({-x})}{\exp({x}) + \exp({-x})}$ activation functions elementwise to vectors, leading to the following equations:
 
-\begin{equation*}
-	\vec{f}_t = \text{sigmoid}(\vec{W}_f \cdot (\vec{h}_{t-1}, \vec{x}_t) + \vec{b}_f)
-\end{equation*}
-
-\begin{equation*}
-	\vec{i}_t =  \text{sigmoid} (\vec{W}_i \cdot (\vec{h}_{t-1}, \vec{x}_t) + \vec{b}_i)
-\end{equation*}
-
-\begin{equation*}
-	\vec{\bar{c}}_t = \tanh (\vec{W}_c \cdot (\vec{h}_{t-1}, \vec{x}_t) + \vec{b}_c)
-\end{equation*}
-
-\begin{equation*}
-	\vec{o}_t =  \text{sigmoid} (\vec{W}_o \cdot (\vec{h}_{t-1}, \vec{x}_t) + \vec{b}_o)
-\end{equation*}
+\begin{align*}
+\vec{f}_t & = \text{sigmoid}(\vec{W}_f \cdot (\vec{h}_{t-1}, \vec{x}_t) + \vec{b}_f) \\
+\vec{i}_t & =  \text{sigmoid} (\vec{W}_i \cdot (\vec{h}_{t-1}, \vec{x}_t) + \vec{b}_i) \\
+\vec{\bar{c}}_t & = \tanh (\vec{W}_c \cdot (\vec{h}_{t-1}, \vec{x}_t) + \vec{b}_c) \\
+\vec{o}_t & =  \text{sigmoid} (\vec{W}_o \cdot (\vec{h}_{t-1}, \vec{x}_t) + \vec{b}_o)
+\end{align*}
 
 $\vec{W}_f$, $\vec{W}_i$, $\vec{W}_c$ and $\vec{W}_o$ are the sublayer's learned weights and $\vec{b}_f$, $\vec{b}_i$, $\vec{b}_c$ and $\vec{b}_o$ are the corresponding biases.
 
