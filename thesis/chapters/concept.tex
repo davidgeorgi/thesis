@@ -239,8 +239,6 @@ Compared to the BoW model, n-grams also take the order of words into account, wh
 However, the vocabulary size is usually even higher than in the BoW model.
 In order to generate more compact vectors, distributed text representations are needed for larger text corpora and vocabularies.
 
-
-
 \subsection{Paragraph Vector}
 
 The \textit{Paragraph Vector} model (also known as \textit{Doc2Vec}), originally presented by \citeauthor{DBLP:conf/icml/LeM14} in \citeyear{DBLP:conf/icml/LeM14}, is an unsupervised algorithm that learns distributed fixed length vector representations for documents of variable length using a simple feedforward neural network \cite{DBLP:conf/icml/LeM14}.
@@ -269,9 +267,13 @@ The paragraph vector model tends to perform better than non-distributed models, 
 
 \subsection{Latent Dirichlet Allocation}
 
-The Latent Dirichlet Allocation presented by \citeauthor{DBLP:journals/jmlr/BleiNJ03} in \citeyear{DBLP:journals/jmlr/BleiNJ03} \cite{DBLP:journals/jmlr/BleiNJ03} is generative statistical text model, that represents documents as a mixture of a fixed number of topics, depending on the words of the document.
-Therefore, a document is encoded as a vector whose dimension is equal to the number of chosen topics and each component indicates the degree of affiliation between the document and the corresponding topic.
-The topics are are not generated manually, but by the model itself.
+The \textit{Latent Dirichlet Allocation} (LDA) presented by \citeauthor{DBLP:journals/jmlr/BleiNJ03} in \citeyear{DBLP:journals/jmlr/BleiNJ03} \cite{DBLP:journals/jmlr/BleiNJ03} is generative statistical text model, which represents documents as a mixture of a small and fixed number of topics.
+Topics are defined by probability distribution over all words in the vocabulary and are also learned by the model in an unsupervised manner.
+The underlying assumption of the LDA model is that the documents were created by a statistical process, that sampled the words of the document from sampled topics.
+A document is encoded as a vector, whose dimension is equal to the number of topics and each component indicates the probability that the corresponding topic distribution was chosen to sample a word in the document.
+The distributions and therefore document encoding can be learned with statistical inference algorithms like Monte Carlo Simulation, Variational Bayes or maximum likelihood estimation using the words of each document.
+Compared to the other text models, LDA can generate very compact documents encodings, since the documents are only described by their degree of affiliation to each topic.
+Similar to the Bag of Words model, LDA does not consider the order of words in the document, which can be disadvantageous for some text corpora.
 
 \section{Network Architecture and Training}
 
@@ -301,7 +303,6 @@ All prefix traces together form the 3-dimensional training matrix.
 
 The training is realized by a backpropagation through time (BPTT) algorithm that updates the weights of the network using the update rules of the Adam optimizer with Nesterov momentum \cite{dozat2016incorporating}.
 The loss for numerical prediction values $\hat{y}$ and the true value $y$ is the absolute error $\text{AE}(\hat{y},y)=|\hat{y} - y|$, while the loss for categorical prediction values is computed using the categorical cross entropy error $\text{CE}(\vec{\hat{y}}, \vec{y}) = - \sum_{i=1}^{k} y_i \cdot \log \hat{y}_i$.
-
 
 \section{Predictive Business Processing Monitoring}
 

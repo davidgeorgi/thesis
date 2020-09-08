@@ -1,21 +1,21 @@
 
-The prediction of the future of an process instance has been an important subfield in the process mining research, that aims to enhance process monitoring capabilities.
+The prediction of the future course of a process instance has been an important subfield in process mining research, aiming to enhance process monitoring capabilities.
 Depending on the use case, for example predicting time-related attributes, the future path or the the outcome of a case can be of interest.
-Most approaches presented in the literature either use machine learning models or process models to construct a predictor that generalizes from a historical event log.
+Most approaches presented in the literature either use machine learning or process models to construct a predictor, that generalizes from a historical event log.
 
-\Citeauthor{DBLP:conf/otm/DongenCA08} presented five different non-parametric regression predictors for forecasting the total cycle time of an unfinished case\cite{DBLP:conf/otm/DongenCA08}.
+Five different non-parametric regression predictors for forecasting the total cycle time of an unfinished case have been presented by \Citeauthor{DBLP:conf/otm/DongenCA08} presented\cite{DBLP:conf/otm/DongenCA08}.
 The estimates are based on activity occurrences, activity duration and attributes.
 
-\Citeauthor{DBLP:journals/is/AalstSS11} proposed to build a transition system using a set, bag or sequence abstraction, which is annotated with time-related data in order to predict the remaining time of case \cite{DBLP:journals/is/AalstSS11}.
+Furthermore, \Citeauthor{DBLP:journals/is/AalstSS11} proposed to build a transition system using a set, bag or sequence abstraction, which is annotated with time-related data in order to predict the cycle time of case \cite{DBLP:journals/is/AalstSS11}.
 The core idea of this approach is to replay unfinished cases on the learned transition system and compute the prediction using the annotated data.
 
-\citeauthor{DBLP:conf/colcom/PandeyNC11} use a hidden markov model to predict the remaining time of a case using the activity and timestamp data of an event log \cite{DBLP:conf/colcom/PandeyNC11}.
+\citeauthor{DBLP:conf/colcom/PandeyNC11} use a hidden markov model to predict the cycle time of a case using the activity and timestamp data of an event log \cite{DBLP:conf/colcom/PandeyNC11}.
 
-\citeauthor{DBLP:conf/icsoc/Rogge-SoltiW13} showed how a stochastic Petri net can be used to predict the remaining of a process instance.
-The model naturally supports parallelism in business processes and considers future events which are expected to occur. 
+\citeauthor{DBLP:conf/icsoc/Rogge-SoltiW13} showed how a stochastic Petri net can be used to predict the cycle time of a process instance.
+The model naturally supports parallelism in business processes and considers future events, which are expected to occur. 
 
 \citeauthor{DBLP:conf/dis/CeciLFCM14} presented an approach, where a sequence tree is learned in order relate a running traces to similar historical traces \cite{DBLP:conf/dis/CeciLFCM14}.
-A decision tree is then used to predict the next activity and the remaining time of a case.
+A decision tree is then used to predict the next activity and the cycle time of a case.
 
 \citeauthor{DBLP:conf/bpm/TeinemaaDMF16} applied text vectorization techniques like bag-of-n-grams (BoNG), Latent Dirichlet Allocation (LDA) and Paragraph Vectors (PV) to textual data of processes in order to predict a binary label describing the process outcome\cite{DBLP:conf/bpm/TeinemaaDMF16}.
 In this approach random forest and logistic regression classifiers for each prefix length of a trace are trained.
@@ -26,9 +26,9 @@ Most recently, several authors have applied recurrent neural networks in form of
 This is done by using a two-layered LSTM network\cite{DBLP:conf/caise/TaxVRD17}.
 
 
-The work by \citeauthor{DBLP:conf/ssci/NavarinVPS17} adopts the idea of using an LSTM network \cite{DBLP:conf/caise/TaxVRD17} and extends the encoding to additional data attributes associated with each event\cite{DBLP:conf/ssci/NavarinVPS17} to predict the remaining time of an case.
+The work by \citeauthor{DBLP:conf/ssci/NavarinVPS17} adopts the idea of using an LSTM network \cite{DBLP:conf/caise/TaxVRD17} and extends the encoding to additional data attributes associated with each event\cite{DBLP:conf/ssci/NavarinVPS17} to predict the cycle time of an case.
 
-\citeauthor{DBLP:journals/computing/PolatoSBL18} presented a set of approaches that use support vector regression for remaining time prediction\cite{DBLP:journals/computing/PolatoSBL18}.
+\citeauthor{DBLP:journals/computing/PolatoSBL18} presented a set of approaches that use support vector regression for cycle time prediction\cite{DBLP:journals/computing/PolatoSBL18}.
 In this work the authors implement different encoding for events including simple one-hot-encoding and a more advanced state based encoding using transition systems.
 Furthermore, they enhance the approach in  \cite{DBLP:journals/is/AalstSS11} by taking additional data attributes into account.
 
@@ -46,29 +46,29 @@ A comparison of the process prediction methods is presented in Table \ref{tab:pr
 		
 		\toprule
 		\textbf{Contribution} & \textbf{Year} & \textbf{Model(s)}  & \textbf{Data-Aware} &  \textbf{Text-Aware} & \textbf{Predictions} \\ \midrule
-		 \Citeauthor{DBLP:conf/otm/DongenCA08} \cite{DBLP:conf/otm/DongenCA08}& \citeyear{DBLP:conf/otm/DongenCA08} & Regression  & \checkmark & \xmark& Remaining time\\
+		 Van Dongen et al. \cite{DBLP:conf/otm/DongenCA08}& \citeyear{DBLP:conf/otm/DongenCA08} & Regression  & \checkmark & \xmark& Cycle time\\
 		 
-		 \Citeauthor{DBLP:journals/is/AalstSS11} \cite{DBLP:journals/is/AalstSS11}&  \citeyear{DBLP:journals/is/AalstSS11}& Transition system  
-		   & \xmark & \xmark & Remaining time \\   
+		 Van der Aalst et al. \cite{DBLP:journals/is/AalstSS11}&  \citeyear{DBLP:journals/is/AalstSS11}& Transition system  
+		   & \xmark & \xmark & Cycle time \\   
 		   
-		 \citeauthor{DBLP:conf/colcom/PandeyNC11} \cite{DBLP:conf/colcom/PandeyNC11} & \citeyear{DBLP:conf/colcom/PandeyNC11} & Hidden Markov & \xmark & \xmark & Remaining time \\
+		 \citeauthor{DBLP:conf/colcom/PandeyNC11} \cite{DBLP:conf/colcom/PandeyNC11} & \citeyear{DBLP:conf/colcom/PandeyNC11} & Hidden Markov & \xmark & \xmark & Cycle time \\
 		 
-		 \citeauthor{DBLP:conf/icsoc/Rogge-SoltiW13} \cite{DBLP:conf/icsoc/Rogge-SoltiW13} & \citeyear{DBLP:conf/icsoc/Rogge-SoltiW13} &Stochastic Petri Net & \xmark & \xmark & Remaining time\\
+		 \citeauthor{DBLP:conf/icsoc/Rogge-SoltiW13} \cite{DBLP:conf/icsoc/Rogge-SoltiW13} & \citeyear{DBLP:conf/icsoc/Rogge-SoltiW13} &Stochastic Petri Net & \xmark & \xmark & Cycle time\\
 		 
-		 \citeauthor{DBLP:conf/dis/CeciLFCM14} \cite{DBLP:conf/dis/CeciLFCM14} & \citeyear{DBLP:conf/dis/CeciLFCM14} & Sequence Tree \newline Decision Tree& \checkmark & \xmark & Next activity \newline Remaining time \\
+		 \citeauthor{DBLP:conf/dis/CeciLFCM14} \cite{DBLP:conf/dis/CeciLFCM14} & \citeyear{DBLP:conf/dis/CeciLFCM14} & Sequence Tree \newline Decision Tree& \checkmark & \xmark & Next activity \newline Cycle time \\
 		 
 		 \citeauthor{DBLP:conf/bpm/TeinemaaDMF16}  \cite{DBLP:conf/bpm/TeinemaaDMF16} &  \citeyear{DBLP:conf/bpm/TeinemaaDMF16} & Random Forest \newline Logistic regression & \checkmark & \checkmark & Case outcome \\
 		 
 		 \citeauthor{ DBLP:conf/bpm/EvermannRF16} \cite{ DBLP:conf/bpm/EvermannRF16} &  \citeyear{ DBLP:conf/bpm/EvermannRF16}& LSTM & \xmark & \xmark & Next activity \\
 		 
-		 \citeauthor{DBLP:conf/caise/TaxVRD17} \cite{DBLP:conf/caise/TaxVRD17} & \citeyear{DBLP:conf/caise/TaxVRD17} & LSTM & \xmark & \xmark & Next activity \newline Future path \newline Next event time \newline Remaining time\\
-		 \citeauthor{DBLP:conf/ssci/NavarinVPS17} \cite{DBLP:conf/ssci/NavarinVPS17} &  \citeyear{DBLP:conf/ssci/NavarinVPS17}&  LSTM & \checkmark  & \xmark & Remaining time\\
+		 \citeauthor{DBLP:conf/caise/TaxVRD17} \cite{DBLP:conf/caise/TaxVRD17} & \citeyear{DBLP:conf/caise/TaxVRD17} & LSTM & \xmark & \xmark & Next activity \newline Future path \newline Next event time \newline Cycle time\\
+		 \citeauthor{DBLP:conf/ssci/NavarinVPS17} \cite{DBLP:conf/ssci/NavarinVPS17} &  \citeyear{DBLP:conf/ssci/NavarinVPS17}&  LSTM & \checkmark  & \xmark & Cycle time\\
 		 
-		 \citeauthor{DBLP:journals/computing/PolatoSBL18} \cite{DBLP:journals/computing/PolatoSBL18}&  \citeyear{DBLP:journals/computing/PolatoSBL18} &  Transition system \newline SVR \newline Naive Bayes &  \checkmark & \xmark & Next activity  \newline Future path \newline Remaining time \\
+		 \citeauthor{DBLP:journals/computing/PolatoSBL18} \cite{DBLP:journals/computing/PolatoSBL18}&  \citeyear{DBLP:journals/computing/PolatoSBL18} &  Transition system \newline SVR \newline Naive Bayes &  \checkmark & \xmark & Next activity  \newline Future path \newline Cycle time \\
 		 
 		 \citeauthor{DBLP:conf/icpm/ParkS19} \cite{DBLP:conf/icpm/ParkS19} & \citeyear{DBLP:conf/icpm/ParkS19} & LSTM & \checkmark & \xmark &Next activity \newline Next event time  \\
 		 
-		 This contribution &  2020 &  LSTM & \checkmark & \checkmark &  Next activity \newline Future path \newline Next event time  \newline Remaining time \newline Case outcome 
+		 This contribution &  2020 &  LSTM & \checkmark & \checkmark &  Next activity \newline Future path \newline Next event time  \newline Cycle time \newline Case outcome 
 	 	\\ \bottomrule
 	\end{tabularx}
 	\caption[Comparison  of process prediction methods]{Comparison  of process prediction methods.}
