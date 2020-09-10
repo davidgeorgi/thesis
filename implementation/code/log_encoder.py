@@ -26,6 +26,7 @@ class LogEncoder(Encoder):
         self.categorical_attributes = []
         self.categorical_attributes_values = []
         self.numerical_attributes = []
+        self.numerical_divisor = []
         self.event_dim = 0
         self.feature_dim = 0
         self.advanced_time_attributes = advanced_time_attributes
@@ -41,6 +42,7 @@ class LogEncoder(Encoder):
         self.categorical_attributes = list(filter(lambda attribute: not _is_numerical_attribute(log, attribute), self.data_attributes))
         self.categorical_attributes_values = [_get_event_labels(log, attribute) for attribute in self.categorical_attributes]
         self.numerical_attributes = list(filter(lambda attribute: _is_numerical_attribute(log, attribute), self.data_attributes))
+        self.numerical_divisor = [np.max([event[attribute].timestamp() for case in log for event in case]) for attribute in self.numerical_attributes]
         self.process_start_time = np.min([event["time:timestamp"].timestamp() for case in log for event in case])
 
         # Scaling divisors for time related features to achieve values between 0 and 1
@@ -65,7 +67,7 @@ class LogEncoder(Encoder):
 
         # Train text encoder
         if self.text_encoder is not None and self.text_attribute is not None:
-            docs = [event[self.text_attribute] for case in log for event in case]
+            docs = [event[self.text_attribute] for case in log for event in case if self.text_attribute in event]
             self.text_encoder.fit(docs)
 
     def transform(self, log, for_training=True):
@@ -129,11 +131,11 @@ class LogEncoder(Encoder):
 
                         # Encode numerical attributes
                         for attribute_index, attribute in enumerate(self.numerical_attributes):
-                            x[trace_dim_index][padding+event_index][offset] = float(event[attribute])
+                            x[trace_dim_index][padding+event_index][offset] = float(event[attribute])/self.numerical_divisor[attribute_index]
                             offset += 1
 
                         # Encode textual attribute
-                        if self.text_encoder is not None and self.text_attribute is not None:
+                        if self.text_encoder is not None and self.text_attribute is not None and self.text_attribute in event:
                             text_vectors = self.text_encoder.transform([event[self.text_attribute]])
                             x[trace_dim_index][padding+event_index][offset:offset+self.text_encoder.encoding_length] = text_vectors[0]
                             offset += self.text_encoder.encoding_length

@@ -16,10 +16,25 @@ from abc import ABC, abstractmethod
 class TextEncoder(ABC):
 
     def __init__(self, language="english", encoding_length=50):
-        self.name = "TextModel"
         self.language = language
         self.encoding_length = encoding_length
+        self.stop_words = set(stopwords.words(language))
+        self.lemmatizer = WordNetLemmatizer()
+        nltk.download("wordnet")
+        nltk.download("punkt")
         super().__init__()
+
+    def preprocess_docs(self, docs, as_list=True):
+        docs_preprocessed = []
+        for doc in docs:
+            doc = doc.lower()
+            words = word_tokenize(doc, language=self.language)
+            words_processed = [self.lemmatizer.lemmatize(word) for word in words if word not in self.stop_words and word.isalpha()]
+            if as_list:
+                docs_preprocessed.append(words_processed)
+            else:
+                docs_preprocessed.append(" ".join(words_processed))
+        return docs_preprocessed
 
     @abstractmethod
     def fit(self, docs):
@@ -39,11 +54,11 @@ class BoWTextEncoder(TextEncoder):
 
     def fit(self, docs):
         self.vectorizer = TfidfVectorizer(ngram_range=(1, 1), max_features=self.encoding_length, analyzer='word', norm="l2")
-        self.vectorizer.fit(preprocess_docs(docs, language=self.language))
+        self.vectorizer.fit(self.preprocess_docs(docs, as_list=False))
         return self
 
     def transform(self, docs):
-        return self.vectorizer.transform(preprocess_docs(docs, language=self.language))
+        return self.vectorizer.transform(self.preprocess_docs(docs, as_list=False)).toarray()
 
 
 class BoNGTextEncoder(TextEncoder):
@@ -56,11 +71,11 @@ class BoNGTextEncoder(TextEncoder):
 
     def fit(self, docs):
         self.vectorizer = TfidfVectorizer(ngram_range=(self.n, self.n), max_features=self.encoding_length, analyzer='word', norm="l2")
-        self.vectorizer.fit(preprocess_docs(docs, language=self.language))
+        self.vectorizer.fit(self.preprocess_docs(docs, as_list=False))
         return self
 
     def transform(self, docs):
-        return self.vectorizer.transform(preprocess_docs(docs, language=self.language))
+        return self.vectorizer.transform(self.preprocess_docs(docs, as_list=False)).toarray()
 
 
 class PVTextEncoder(TextEncoder):
@@ -74,9 +89,9 @@ class PVTextEncoder(TextEncoder):
         super().__init__(language=language, encoding_length=encoding_length)
 
     def fit(self, docs):
-        docs = preprocess_docs(docs, language=self.language)
+        docs = self.preprocess_docs(docs)
 
-        tagged_docs = [TaggedDocument(words=word_tokenize(doc), tags=[i]) for i, doc in enumerate(docs)]
+        tagged_docs = [TaggedDocument(words=doc, tags=[i]) for i, doc in enumerate(docs)]
 
         self.model = Doc2Vec(dm=1, vector_size=self.encoding_length, negative=5, hs=0, min_count=self.min_count, sample=0, workers=self.workers)
         self.model.build_vocab(tagged_docs)
@@ -85,8 +100,8 @@ class PVTextEncoder(TextEncoder):
         return self
 
     def transform(self, docs):
-        docs = preprocess_docs(docs, language=self.language)
-        return np.array([self.model.infer_vector(word_tokenize(doc)) for doc in docs])
+        docs = self.preprocess_docs(docs)
+        return np.array([self.model.infer_vector(doc) for doc in docs])
 
 
 class LDATextEncoder(TextEncoder):
@@ -99,7 +114,7 @@ class LDATextEncoder(TextEncoder):
         super().__init__(language=language, encoding_length=encoding_length)
 
     def fit(self, docs):
-        docs = preprocess_docs(docs, language=self.language)
+        docs = self.preprocess_docs(docs)
         self.dictionary = Dictionary(docs)
         corpus = [self.dictionary.doc2bow(doc) for doc in docs]
         self.model = LdaModel(corpus, id2word=self.dictionary, num_topics=self.num_topics)
@@ -107,16 +122,3 @@ class LDATextEncoder(TextEncoder):
 
     def transform(self, docs):
         return np.array([self.model[doc] for doc in docs])
-
-
-def preprocess_docs(docs, language="english"):
-    nltk.download("wordnet")
-    nltk.download("punkt")
-    stop_words = set(stopwords.words(language))
-    lemmatizer = WordNetLemmatizer()
-    docs_preprocessed = []
-    for doc in docs:
-        doc = doc.lower()
-        words = word_tokenize(doc)
-        docs_preprocessed.append(" ".join([lemmatizer.lemmatize(word) for word in words if word not in stop_words and word.isalpha()]))
-    return docs_preprocessed
