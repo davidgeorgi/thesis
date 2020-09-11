@@ -15,7 +15,7 @@ class PredictionModel(ABC):
         pass
 
     @abstractmethod
-    def predict_final_activity(self, log):
+    def predict_outcome(self, log):
         pass
 
     @abstractmethod
@@ -23,7 +23,7 @@ class PredictionModel(ABC):
         pass
 
     @abstractmethod
-    def predict_final_time(self, log):
+    def predict_cycle_time(self, log):
         pass
 
     @abstractmethod

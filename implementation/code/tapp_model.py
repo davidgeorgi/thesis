@@ -87,16 +87,16 @@ class TappModel(PredictionModel):
         # Stop early if metrics do not improve for longer time
         early_stopping = EarlyStopping(monitor="val_loss", patience=10)
         # Save model
-        model_checkpoint = ModelCheckpoint("../models/model_{epoch:02d}-{val_loss:.2f}.h5", monitor="val_loss", verbose=0, save_best_only=True, save_weights_only=False, mode="auto")
+        #model_checkpoint = ModelCheckpoint("../models/model_{epoch:02d}-{val_loss:.2f}.h5", monitor="val_loss", verbose=0, save_best_only=True, save_weights_only=False, mode="auto")
         # Fit the model to data
-        return self.model.fit(x, {"next_activity_output": y_next_act, "final_activity_output": y_final_act, "next_timestamp_output": y_next_time, "final_timestamp_output": y_final_time}, epochs=epochs, batch_size=None, validation_split=0.2, callbacks=[reduce_lr, early_stopping, model_checkpoint])
+        return self.model.fit(x, {"next_activity_output": y_next_act, "final_activity_output": y_final_act, "next_timestamp_output": y_next_time, "final_timestamp_output": y_final_time}, epochs=epochs, batch_size=None, validation_split=0.2, callbacks=[reduce_lr, early_stopping])
 
     def predict_next_activity(self, log):
         x = self.log_encoder.transform(log, for_training=False)
         prediction = self.model.predict(x)
         return prediction[0]
 
-    def predict_final_activity(self, log):
+    def predict_outcome(self, log):
         x = self.log_encoder.transform(log, for_training=False)
         prediction = self.model.predict(x)
         return prediction[1]
@@ -106,7 +106,7 @@ class TappModel(PredictionModel):
         prediction = self.model.predict(x)
         return np.maximum(prediction[2].flatten() * self.log_encoder.time_scaling_divisor[1], 0)
 
-    def predict_final_time(self, log):
+    def predict_cycle_time(self, log):
         x = self.log_encoder.transform(log, for_training=False)
         prediction = self.model.predict(x)
         return np.maximum(prediction[3].flatten() * self.log_encoder.time_scaling_divisor[0], 0)
@@ -145,7 +145,7 @@ class TappModel(PredictionModel):
         columns = ["caseID", "prefix-length", "true-next-activity", "pred-next-activity", "true-outcome", "pred-outcome", "true-next-time", "pred-next-time", "true-cycle-time", "pred-cylce-time"]
         return pd.DataFrame(predictions, columns=columns)
 
-    def evaluate(self, log):
+    def evaluate(self, log, num_prefixes=8):
         raw = self._evaluate_raw(log)
 
         next_activity_acc = len(raw[raw["pred-next-activity"] == raw["true-next-activity"]]) / len(raw)
@@ -153,10 +153,9 @@ class TappModel(PredictionModel):
         outcome_acc = len(raw[raw["pred-outcome"] == raw["true-outcome"]]) / len(raw)
         cycle_time_mae = mean_absolute_error(raw["true-cycle-time"].astype(float).to_numpy(), raw["pred-cylce-time"].astype(float).to_numpy()).numpy()
 
-        num_prefixes = 8
-        next_activity_acc_pre = [len(raw[(raw["pred-next-activity"] == raw["true-next-activity"]) & (raw["prefix-length"] == prefix_length)]) / len(raw[raw["prefix-length"] == prefix_length]) for prefix_length in range(1, num_prefixes + 1)]
+        next_activity_acc_pre = [len(raw[(raw["pred-next-activity"] == raw["true-next-activity"]) & (raw["prefix-length"] == prefix_length)]) / np.max([len(raw[raw["prefix-length"] == prefix_length]), 1]) for prefix_length in range(1, num_prefixes + 1)]
         next_time_mae_pre = [mean_absolute_error(raw[raw["prefix-length"] == prefix_length]["true-next-time"].astype(float).to_numpy(), raw[raw["prefix-length"] == prefix_length]["pred-next-time"].astype(float).to_numpy()).numpy() for prefix_length in range(1, num_prefixes + 1)]
-        outcome_acc_pre = [len(raw[(raw["pred-outcome"] == raw["true-outcome"]) & (raw["prefix-length"] == prefix_length)]) / len(raw[raw["prefix-length"] == prefix_length]) for prefix_length in range(1, num_prefixes + 1)]
+        outcome_acc_pre = [len(raw[(raw["pred-outcome"] == raw["true-outcome"]) & (raw["prefix-length"] == prefix_length)]) / np.max([len(raw[raw["prefix-length"] == prefix_length]), 1]) for prefix_length in range(1, num_prefixes + 1)]
         cycle_time_mae_pre = [mean_absolute_error(raw[raw["prefix-length"] == prefix_length]["true-cycle-time"].astype(float).to_numpy(), raw[raw["prefix-length"] == prefix_length]["pred-cylce-time"].astype(float).to_numpy()).numpy() for prefix_length in range(1, num_prefixes + 1)]
 
         prefix_predictions = next_activity_acc_pre + next_time_mae_pre + outcome_acc_pre + cycle_time_mae_pre
@@ -165,7 +164,7 @@ class TappModel(PredictionModel):
 
         if not os.path.exists(path):
             prefix_columns = []
-            for metric in ["next_activity_acc_{}", "next_time_mae_{}", "outcome_acc_{}", "cycle_time_mae_{}"]:
+            for metric in ["naa_{}", "ntm_{}", "oa_{}", "ctm_{}"]:
                 for prefix in range(1, num_prefixes + 1):
                     prefix_columns.append(metric.format(prefix))
             columns = ["model", "timestamp", "num_layer", "num_shared_layer", "hidden_neurons", "advanced_time_attributes", "data_attributes", "event_dim", "text_encoding", "text_dim", "next_activity_acc", "next_time_mae", "outcome_acc", "cycle_time_mae"] + prefix_columns
@@ -173,7 +172,7 @@ class TappModel(PredictionModel):
             df.to_csv(path, encoding="utf-8", sep=",", index=False)
         df = pd.read_csv(path, sep=",")
 
-        df.loc[len(df)] = ["lstm", datetime.now().strftime("%Y-%m-%d-%H-%M-%S"),self.num_shared_layer + self.num_specialized_layer, self.num_shared_layer, self.neurons_per_layer, self.log_encoder.advanced_time_attributes, self.log_encoder.data_attributes, self.log_encoder.text_encoder.name if self.log_encoder.text_encoder is not None else "-",
+        df.loc[len(df)] = ["tapp", datetime.now().strftime("%Y-%m-%d-%H-%M-%S"),self.num_shared_layer + self.num_specialized_layer, self.num_shared_layer, self.neurons_per_layer, self.log_encoder.advanced_time_attributes, self.log_encoder.data_attributes, self.log_encoder.feature_dim, self.log_encoder.text_encoder.name if self.log_encoder.text_encoder is not None else "-",
             self.log_encoder.text_encoder.encoding_length if self.log_encoder.text_encoder is not None else 0, next_activity_acc, next_time_mae, outcome_acc, cycle_time_mae] + prefix_predictions
         df.to_csv(path, encoding="utf-8", sep=",", index=False)
         return df
