@@ -123,31 +123,38 @@ class TappModel(PredictionModel):
 
     def _evaluate_raw(self, log):
         # Make predictions
-        predictions = []
+        prefix_log = [case[0:prefix_length] for case in log for prefix_length in range(1, len(case) + 1)]
+        predictions = self.predict(prefix_log)
+        predicted_next_activities = np.argmax(predictions[0], axis=1)
+        predicted_case_outcomes = np.argmax(predictions[1], axis=1)
+        predicted_next_times = predictions[2] / 86400
+        predicted_cycle_times = predictions[3] / 86400
+        caseIDs = []
+        prefix_lengths = []
+        true_next_activities = []
+        true_case_outcomes = []
+        true_next_times = []
+        true_cycle_times = []
         for case in log:
             caseID = case.attributes["concept:name"]
             for prefix_length in range(1, len(case) + 1):
-                prediction = self.predict([case[0:prefix_length]])
+                caseIDs.append(caseID)
+                prefix_lengths.append(prefix_length)
 
-                true_next_activity = len(self.activities) if prefix_length == len(case) else self.activities.index(case[prefix_length]["concept:name"]) if case[prefix_length]["concept:name"] in self.activities else -1
-                true_case_outcome = self.activities.index(case[-1]["concept:name"]) if case[-1]["concept:name"] in self.activities else -1
-                true_next_time = 0 if prefix_length == len(case) else (case[prefix_length]["time:timestamp"].timestamp() - case[prefix_length - 1]["time:timestamp"].timestamp()) / 86400
-                true_cycle_time = (case[-1]["time:timestamp"].timestamp() - case[0]["time:timestamp"].timestamp()) / 86400
-
-                predicted_next_activity = np.argmax(prediction[0][0])
-                predicted_case_outcome = np.argmax(prediction[1][0])
-                predicted_next_time = prediction[2][0] / 86400
-                predicted_cycle_time = prediction[3][0] / 86400
-
-                predictions.append([caseID, prefix_length, true_next_activity, predicted_next_activity, true_case_outcome, predicted_case_outcome, true_next_time, predicted_next_time, true_cycle_time, predicted_cycle_time])
+                true_next_activities.append(len(self.activities) if prefix_length == len(case) else self.activities.index(case[prefix_length]["concept:name"]) if case[prefix_length]["concept:name"] in self.activities else -1)
+                true_case_outcomes.append(self.activities.index(case[-1]["concept:name"]) if case[-1]["concept:name"] in self.activities else -1)
+                true_next_times.append(0 if prefix_length == len(case) else (case[prefix_length]["time:timestamp"].timestamp() - case[prefix_length - 1]["time:timestamp"].timestamp()) / 86400)
+                true_cycle_times.append((case[-1]["time:timestamp"].timestamp() - case[0]["time:timestamp"].timestamp()) / 86400)
 
         # Generate DataFrame
-        columns = ["caseID", "prefix-length", "true-next-activity", "pred-next-activity", "true-outcome", "pred-outcome", "true-next-time", "pred-next-time", "true-cycle-time", "pred-cylce-time"]
-        return pd.DataFrame(predictions, columns=columns)
+        column_data = {"caseID": caseIDs, "prefix-length": prefix_lengths, "true-next-activity": true_next_activities, "pred-next-activity": predicted_next_activities, "true-outcome": true_case_outcomes, "pred-outcome": predicted_case_outcomes, "true-next-time": true_next_times, "pred-next-time": predicted_next_times, "true-cycle-time": true_cycle_times, "pred-cylce-time": predicted_cycle_times}
+        columns = ["caseID", "prefix-length", "true-next-activity", "pred-next-activity", "true-next-time", "pred-next-time", "true-outcome", "pred-outcome", "true-cycle-time", "pred-cylce-time"]
+        return pd.DataFrame(column_data, columns=columns)
 
     def evaluate(self, log, num_prefixes=8):
+        # Generate raw predictions
         raw = self._evaluate_raw(log)
-
+        # Compute metrics
         next_activity_acc = len(raw[raw["pred-next-activity"] == raw["true-next-activity"]]) / len(raw)
         next_time_mae = mean_absolute_error(raw["true-next-time"].astype(float).to_numpy(), raw["pred-next-time"].astype(float).to_numpy()).numpy()
         outcome_acc = len(raw[raw["pred-outcome"] == raw["true-outcome"]]) / len(raw)
