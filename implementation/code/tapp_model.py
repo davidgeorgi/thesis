@@ -12,11 +12,13 @@ from prediction_model import PredictionModel
 
 class TappModel(PredictionModel):
 
-    def __init__(self, log_encoder=None, num_shared_layer=1, num_specialized_layer=1, neurons_per_layer=100):
+    def __init__(self, log_encoder=None, num_shared_layer=1, num_specialized_layer=1, neurons_per_layer=100, dropout=0.2, learning_rate=0.002):
         self.log_encoder = log_encoder
         self.num_shared_layer = num_shared_layer
         self.num_specialized_layer = num_specialized_layer
         self.neurons_per_layer = neurons_per_layer
+        self.learning_rate = learning_rate
+        self.dropout = dropout
         self.activities = []
         self.timesteps = 0
         self.feature_dim = 0
@@ -32,7 +34,7 @@ class TappModel(PredictionModel):
         for layer in range(self.num_shared_layer):
             # Do not return sequences in the last LSTM layer
             return_sequences = False if self.num_specialized_layer == 0 and layer == self.num_shared_layer - 1 else True
-            shared_lstm_layer = layers.LSTM(self.neurons_per_layer, implementation=2, kernel_initializer="glorot_uniform", return_sequences=return_sequences, dropout=0.2)(previous_layer)
+            shared_lstm_layer = layers.LSTM(self.neurons_per_layer, implementation=2, kernel_initializer="glorot_uniform", return_sequences=return_sequences, dropout=self.dropout)(previous_layer)
             shared_lstm_normalization_layer = layers.LayerNormalization()(shared_lstm_layer)
             previous_layer = shared_lstm_normalization_layer
 
@@ -43,10 +45,10 @@ class TappModel(PredictionModel):
         for layer in range(self.num_specialized_layer):
             # Do not return sequences in the last LSTM layer
             return_sequences = False if layer == self.num_specialized_layer - 1 else True
-            next_activity_lstm_layer = layers.LSTM(self.neurons_per_layer, implementation=2, kernel_initializer="glorot_uniform", return_sequences=return_sequences, dropout=0.2)(previous_layer_next_activity)
-            final_activity_lstm_layer = layers.LSTM(self.neurons_per_layer, implementation=2, kernel_initializer="glorot_uniform", return_sequences=return_sequences, dropout=0.2)(previous_layer_final_activity)
-            next_timestamp_lstm_layer = layers.LSTM(self.neurons_per_layer, implementation=2, kernel_initializer="glorot_uniform", return_sequences=return_sequences, dropout=0.2)(previous_layer_next_timestamp)
-            final_timestamp_lstm_layer = layers.LSTM(self.neurons_per_layer, implementation=2, kernel_initializer="glorot_uniform", return_sequences=return_sequences, dropout=0.2)(previous_layer_final_timestamp)
+            next_activity_lstm_layer = layers.LSTM(self.neurons_per_layer, implementation=2, kernel_initializer="glorot_uniform", return_sequences=return_sequences, dropout=self.dropout)(previous_layer_next_activity)
+            final_activity_lstm_layer = layers.LSTM(self.neurons_per_layer, implementation=2, kernel_initializer="glorot_uniform", return_sequences=return_sequences, dropout=self.dropout)(previous_layer_final_activity)
+            next_timestamp_lstm_layer = layers.LSTM(self.neurons_per_layer, implementation=2, kernel_initializer="glorot_uniform", return_sequences=return_sequences, dropout=self.dropout)(previous_layer_next_timestamp)
+            final_timestamp_lstm_layer = layers.LSTM(self.neurons_per_layer, implementation=2, kernel_initializer="glorot_uniform", return_sequences=return_sequences, dropout=self.dropout)(previous_layer_final_timestamp)
             next_activity_normalization_layer = layers.LayerNormalization()(next_activity_lstm_layer)
             final_activity_normalization_layer = layers.LayerNormalization()(final_activity_lstm_layer)
             next_timestamp_normalization_layer = layers.LayerNormalization()(next_timestamp_lstm_layer)
@@ -64,13 +66,13 @@ class TappModel(PredictionModel):
 
         # Build and configure model
         model = tf.keras.Model(inputs=[inputs], outputs=[next_activity_output, final_activity_output, next_timestamp_ouput, final_timestamp_ouput])
-        optimizer_param = tf.keras.optimizers.Nadam(learning_rate=0.002, beta_1=0.9, beta_2=0.999, epsilon=1e-07, name="Nadam")
+        optimizer_param = tf.keras.optimizers.Nadam(learning_rate=self.learning_rate, beta_1=0.9, beta_2=0.999, epsilon=1e-07, name="Nadam")
         metric_param = {"next_activity_output": metrics.CategoricalAccuracy(), "final_activity_output": metrics.CategoricalAccuracy(), "next_timestamp_output": metrics.MeanAbsoluteError(), "final_timestamp_output": metrics.MeanAbsoluteError()}
         loss_param = {"next_activity_output": "categorical_crossentropy", "final_activity_output": "categorical_crossentropy", "next_timestamp_output": "mae", "final_timestamp_output": "mae"}
         model.compile(loss=loss_param, metrics=metric_param, optimizer=optimizer_param)
         self.model = model
 
-    def fit(self, log, data_attributes=None, text_attribute=None, epochs=100):
+    def fit(self, log, data_attributes=None, text_attribute=None, epochs=100, validation_split=0.2):
 
         # Encode training data
         self.activities = _get_event_labels(log, "concept:name")
@@ -89,7 +91,7 @@ class TappModel(PredictionModel):
         # Save model
         #model_checkpoint = ModelCheckpoint("../models/model_{epoch:02d}-{val_loss:.2f}.h5", monitor="val_loss", verbose=0, save_best_only=True, save_weights_only=False, mode="auto")
         # Fit the model to data
-        return self.model.fit(x, {"next_activity_output": y_next_act, "final_activity_output": y_final_act, "next_timestamp_output": y_next_time, "final_timestamp_output": y_final_time}, epochs=epochs, batch_size=None, validation_split=0.2, callbacks=[reduce_lr, early_stopping])
+        return self.model.fit(x, {"next_activity_output": y_next_act, "final_activity_output": y_final_act, "next_timestamp_output": y_next_time, "final_timestamp_output": y_final_time}, epochs=epochs, batch_size=None, validation_split=validation_split, callbacks=[reduce_lr, early_stopping])
 
     def predict_next_activity(self, log):
         x = self.log_encoder.transform(log, for_training=False)
@@ -155,10 +157,10 @@ class TappModel(PredictionModel):
         # Generate raw predictions
         raw = self._evaluate_raw(log)
         # Compute metrics
-        next_activity_acc = len(raw[raw["pred-next-activity"] == raw["true-next-activity"]]) / len(raw)
-        next_time_mae = mean_absolute_error(raw["true-next-time"].astype(float).to_numpy(), raw["pred-next-time"].astype(float).to_numpy()).numpy()
-        outcome_acc = len(raw[raw["pred-outcome"] == raw["true-outcome"]]) / len(raw)
-        cycle_time_mae = mean_absolute_error(raw["true-cycle-time"].astype(float).to_numpy(), raw["pred-cylce-time"].astype(float).to_numpy()).numpy()
+        next_activity_acc = len(raw[(raw["pred-next-activity"] == raw["true-next-activity"]) & (raw["prefix-length"] > 1)]) / np.max([len(raw[raw["prefix-length"] > 1]), 1])
+        next_time_mae = mean_absolute_error(raw[raw["prefix-length"] > 1]["true-next-time"].astype(float).to_numpy(), raw[raw["prefix-length"] > 1]["pred-next-time"].astype(float).to_numpy()).numpy()
+        outcome_acc = len(raw[(raw["pred-outcome"] == raw["true-outcome"]) & (raw["prefix-length"] > 1)]) / np.max([len(raw[raw["prefix-length"] > 1]), 1])
+        cycle_time_mae = mean_absolute_error(raw[raw["prefix-length"] > 1]["true-cycle-time"].astype(float).to_numpy(), raw[raw["prefix-length"] > 1]["pred-cylce-time"].astype(float).to_numpy()).numpy()
 
         next_activity_acc_pre = [len(raw[(raw["pred-next-activity"] == raw["true-next-activity"]) & (raw["prefix-length"] == prefix_length)]) / np.max([len(raw[raw["prefix-length"] == prefix_length]), 1]) for prefix_length in range(1, num_prefixes + 1)]
         next_time_mae_pre = [mean_absolute_error(raw[raw["prefix-length"] == prefix_length]["true-next-time"].astype(float).to_numpy(), raw[raw["prefix-length"] == prefix_length]["pred-next-time"].astype(float).to_numpy()).numpy() for prefix_length in range(1, num_prefixes + 1)]

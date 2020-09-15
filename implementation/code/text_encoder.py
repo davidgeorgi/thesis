@@ -1,6 +1,6 @@
 import numpy as np
-import multiprocessing
 import nltk
+from nltk.stem import SnowballStemmer
 from nltk.stem import WordNetLemmatizer
 from nltk.tokenize import word_tokenize
 from nltk.corpus import stopwords
@@ -19,9 +19,16 @@ class TextEncoder(ABC):
         self.language = language
         self.encoding_length = encoding_length
         self.stop_words = set(stopwords.words(language))
-        self.lemmatizer = WordNetLemmatizer()
-        nltk.download("wordnet")
-        nltk.download("punkt")
+        self.lemmatizer = WordNetLemmatizer() if language == "english" else None
+        self.stemmer = SnowballStemmer(language)
+        try:
+            nltk.data.find("corpora/wordnet")
+        except LookupError:
+            nltk.download("wordnet")
+        try:
+            nltk.data.find("tokenizers/punkt")
+        except LookupError:
+            nltk.download("punkt")
         super().__init__()
 
     def preprocess_docs(self, docs, as_list=True):
@@ -29,7 +36,10 @@ class TextEncoder(ABC):
         for doc in docs:
             doc = doc.lower()
             words = word_tokenize(doc, language=self.language)
-            words_processed = [self.lemmatizer.lemmatize(word) for word in words if word not in self.stop_words and word.isalpha()]
+            if self.lemmatizer is not None:
+                words_processed = [self.lemmatizer.lemmatize(word) for word in words if word not in self.stop_words and word.isalpha()]
+            else:
+                words_processed = [self.stemmer.stem(word) for word in words if word not in self.stop_words and word.isalpha()]
             if as_list:
                 docs_preprocessed.append(words_processed)
             else:
@@ -84,7 +94,6 @@ class PVTextEncoder(TextEncoder):
         self.name = "PV"
         self.epochs = epochs
         self.min_count = min_count
-        self.workers = multiprocessing.cpu_count()
         self.model = None
         super().__init__(language=language, encoding_length=encoding_length)
 
@@ -93,7 +102,7 @@ class PVTextEncoder(TextEncoder):
 
         tagged_docs = [TaggedDocument(words=doc, tags=[i]) for i, doc in enumerate(docs)]
 
-        self.model = Doc2Vec(dm=1, vector_size=self.encoding_length, negative=5, hs=0, min_count=self.min_count, sample=0, workers=self.workers)
+        self.model = Doc2Vec(dm=1, vector_size=self.encoding_length, min_count=self.min_count, window=8)
         self.model.build_vocab(tagged_docs)
 
         self.model.train(utils.shuffle(tagged_docs), total_examples=len(tagged_docs), epochs=self.epochs)
@@ -117,8 +126,10 @@ class LDATextEncoder(TextEncoder):
         docs = self.preprocess_docs(docs)
         self.dictionary = Dictionary(docs)
         corpus = [self.dictionary.doc2bow(doc) for doc in docs]
-        self.model = LdaModel(corpus, id2word=self.dictionary, num_topics=self.num_topics)
+        self.model = LdaModel(corpus, id2word=self.dictionary, num_topics=self.num_topics, minimum_probability=0.0)
         return self
 
     def transform(self, docs):
-        return np.array([self.model[doc] for doc in docs])
+        docs = self.preprocess_docs(docs)
+        docs = [self.dictionary.doc2bow(doc) for doc in docs]
+        return np.array([self.model[doc] for doc in docs])[:, :, 1]
