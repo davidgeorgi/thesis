@@ -34,6 +34,4 @@
 
 # Folder
 /implementation/models/*
-/implementation/logs/*
-/implementation/results/*
 /implementation/code/__pycache__/*
