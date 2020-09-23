@@ -3,13 +3,13 @@ In this chapter the basic concepts of process mining, text mining, supervised le
 \section{Processes and Process Mining}
 
 \begin{definition}[Business Process]
-	A \textit{business process} is a collection of activities that are performed in a specific order to archive a goal \cite{DBLP:conf/bpm/AalstAM11}.
+	A \textit{business process} is a collection of activities that are performed in a specific order to achieve a goal \cite{DBLP:conf/bpm/AalstAM11}.
 	A single execution of a process is a \textit{case} or \textit{process instance}, which is identified by a case ID.
 \end{definition}
 
 Each performed activity belongs to specific case and is completed at a certain time.
 For example, a case can be a patient treated in a hospital, a customer journey or an online order. The time on which an activity for a certain case is performed is specified by a timestamp.
-The trinity of case, activity and timestamp is called \textit{event}.
+The subject identified by the case ID, the performed activity and the timestamp form an \textit{event}.
 An event can have additional attributes, describing for example the resource, costs or transaction information associated with the event.
 
 \begin{table}[htbp!]
@@ -19,22 +19,22 @@ An event can have additional attributes, describing for example the resource, co
 		\toprule
 		\textbf{ID} & \textbf{Activity}          & \textbf{Timestamp} & \textbf{Resource} & \textbf{Cost} & \textbf{Comment}  \\
 		\midrule
-		0                & Register patient           & 01.02.2020:14.12   & SYSTEM            & 0             & -     \\
-		& Consultation               & 01.02.2020:14.34   & J. Brown, MD    & 24.32         & The patient reports persistent nausea.   \\
-		& Blood test                 & 01.02.2020:15.12   & K. Smith         & 14.23         & Tests: Complete blood count    \\
-		& Evaluate test  & 01.02.2020:16.35   & J. Brown, MD    & 38.67         &No abnormalities in the complete blood count.   \\
-		& Release patient            & 01.02.2020:17.24   & SYSTEM            & 0             & -  \\
+		0                & Register patient           & 2020-02-01 14:12   & SYSTEM            & 0             & -     \\
+		& Consultation               & 2020-02-01 14:34   & J. Brown, MD    & 24.32         & The patient reports persistent nausea.   \\
+		& Blood test                 & 2020-02-01 15:12   & K. Smith         & 14:23         & Tests: Complete blood count    \\
+		& Evaluate test  & 2020-02-01 16:35   & J. Brown, MD    & 38.67         &No abnormalities in the complete blood count.   \\
+		& Release patient            & 2020-02-01 17:24   & SYSTEM            & 0             & -  \\
 		&                            &                    &                   &               &     \\
 		\midrule
-		1                & Register patient           & 02.02.2020:08.20   & SYSTEM            & 0             & -  \\
-		& Consultation               & 02.02.2020:14.12   & J. Simpson, MD  & 24.32         & Noticeable tachycardia. No chronic pre-existing conditions are known.    \\
-		& MRI & 02.02.2020:14.12   & Sara Taylor, MD   & 352.87        & -    \\
-		& Release patient            & 02.02.2020:14.12   & SYSTEM            & 0             & -   \\
+		1                & Register patient           & 2020-02-02 08:20   & SYSTEM            & 0             & -  \\
+		& Consultation               & 2020-02-02 14:12   & J. Simpson, MD  & 24.32         & Noticeable tachycardia. No chronic pre-existing conditions are known.    \\
+		& MRI & 2020-02-02 16:10   & Sara Taylor, MD   & 352.87        & -    \\
+		& Release patient            & 2020-02-02 18:33   & SYSTEM            & 0             & -   \\
 		&                            &                    &                   &               &     \\
 		\midrule
-		2                & Register patient           & 02.02.2020:09.08   & SYSTEM            & 0             & -    \\
-		& Consultation               & 02.02.2020:09.14   & J. Simpson, MD  & 24.32         & The patient has severe leg injuries due to a motorcycle accident.  \\
-		& Hospitalization       & 02.02.2020:09.20   & M. Johnson      & 130.37        & -     \\
+		2                & Register patient           & 2020-02-02 09:08   & SYSTEM            & 0             & -    \\
+		& Consultation               & 2020-02-02 09:14   & J. Simpson, MD  & 24.32         & The patient has severe leg injuries due to a motorcycle accident.  \\
+		& Hospitalization       & 2020-02-02 09:20   & M. Johnson      & 130.37        & -     \\
 		...              & ...                        & ...                & ...               & ...           & ...     \\ \bottomrule
 	\end{tabularx}
 	\caption[Artificial event log of patient treatments in a hospital]{An artificial event log of patient treatments in a hospital. Each line corresponds to one event. The events are grouped by their case IDs, that each represent a single patient.}
@@ -95,19 +95,19 @@ If an element $a \in A$ appears in a sequence $\sigma \in A^*$, the set membersh
 
 \section{Events, Traces, Event Logs}
 
-Based on the definition of sequences, the concepts of events, traces and event logs can formalized.
+Based on the definition of sequences, the concepts of events, traces and event logs can be formalized.
 
 \begin{definition}[Event]
-An  \textit{event} is a tuple $e = (a,c,t,d_1,\dots, d_m) \in \mathcal{C} \times \mathcal{A}  \times \mathcal{T} \times \mathcal{D}_1 \times \dots \times \mathcal{D}_m =  \mathcal{E}$ where  $c \in \mathcal{C} $ is the case ID, $a \in \mathcal{A}$ is the executed activity and $t \in \mathcal{T}$ is the timestamp of the event.
+An  \textit{event} is a tuple $e = (c,a,t,d_1,\dots, d_m) \in \mathcal{C} \times \mathcal{A}  \times \mathcal{T} \times \mathcal{D}_1 \times \dots \times \mathcal{D}_m =  \mathcal{E}$ where  $c \in \mathcal{C} $ is the case ID, $a \in \mathcal{A}$ is the executed activity and $t \in \mathcal{T}$ is the timestamp of the event.
 Furthermore, each event contains a fixed number $m \in \mathbb{N}_0$ of additional attributes $d_1, \dots, d_m$ in their corresponding domains $\mathcal{D}_1, \dots , \mathcal{D}_m$.
 In case that no additional attribute data is given ($m = 0$) the event space $\mathcal{E}$ (set of all possible events) is reduced to its minimal form $\mathcal{C} \times \mathcal{A}  \times \mathcal{T}$.
 \end{definition}
 
-Each attribute $d \in \mathcal{D}$ of an event (including activity, timestamp and case ID) can be accessed by a projection function $\pi_D \colon \mathcal{E} \to \mathcal{D}$.
+Each attribute $d \in \mathcal{D}$ of an event (including activity, timestamp and case ID) can be accessed by a corresponding projection function $\pi_D \colon \mathcal{E} \to \mathcal{D}$.
 For example, the activity $a$ of an event $e$ is retrieved by $\pi_\mathcal{A}(e) = a$.
 
 Throughout this thesis,  $\mathcal{C} = \mathbb{N}_0$, $|\mathcal{A}| < \infty$ and $ \mathcal{T} = \mathbb{R}$ is assumed, where $t \in \mathcal{T}$ is given in Unix time, precisely the number of seconds since 00:00:00 UTC on 1 January 1970 minus the applied leap seconds.
-Each additional attribute is assumed to be numerical, categorical or textual, i.e. $\mathcal{D}_i = \mathbb{R}$, $|\mathcal{D}_i| < \infty$ or $\mathcal{D}_i = \Sigma^\ast$  for $1 \leq i \leq m$ and some fixed alphabet $\Sigma$.
+Each additional attribute is assumed to be numerical, categorical or textual, i.e. $\mathcal{D}_i = \mathbb{R}$, $|\mathcal{D}_i| < \infty$ or $\mathcal{D}_i = \Sigma^\ast$  for $1 \leq i \leq m$ and some fixed language-dependent alphabet $\Sigma$.
 
 \begin{definition}[Trace]
 	A \textit{trace} is a finite sequence of events $\sigma = \langle e_1, e_2, \dots\rangle \in  \mathcal{E}^\ast$ with increasing timestamps, i.e. $\pi_\mathcal{T} (e_i) < \pi_\mathcal{T} (e_j) $ for $1 \leq i < j \leq |\sigma|$.
@@ -139,26 +139,27 @@ Most models do not work with the raw text data, but require a text normalization
 \section{Supervised Learning}
 
 In \textit{supervised learning} an unknown function is learned (i.e. approximated) from a set of example input-output pairs \cite{DBLP:books/daglib/0023820}.
-In contrast, \textit{unsupervised learning} does not require examples pattern and deals with finding pattern in the data. 
-An input instance is usually described by a set of \textit{feature variables} $X$ and the output is defined by a \textit{target variable} $y$.
-If the target variable $y$ is continuous, this is referred to as a regression problem, if however it is discrete variable with a finite range of values, the learning problem is called classification problem.
-Given a \textit{training set} of input-output pairs $\{(X_1, y_1), (X_2, y_2), \dots, (X_m,y_m)\}$, that were generated from an unknown function $y = f(X)$, the goal is to approximate a hypothesis function $h(X)$, which is close to f(X), i.e. $h(X) \approx f(X)$.
+In contrast, in \textit{unsupervised learning} no target outputs are available and the machine tries to identify pattern in the data \ref{DBLP:conf/ac/Ghahramani03}.
+
+An input instance in the supervised scenario is usually described by a set of \textit{feature variables} $X$ and the output is defined by a \textit{target variable} $y$.
+The target variable $y$ is either continuous (regression problem) or discrete (classification problem).
+Given a \textit{training set} of input-output pairs $\{(X_1, y_1), (X_2, y_2), \dots, (X_m,y_m)\}$, that were generated from an unknown function $y = f(X)$, the goal is to compute a hypothesis function $h(X)$, which is as close as possible to the true function f(X), i.e. $h(X) \approx f(X)$.
 
 The challenge in supervised learning is to generalize from the training set of input-output pairs in such a way, that the learned hypothesis function $h(x)$ can also successfully predict the target variable for unseen problem instances.
 In order to evaluate a hypothesis, the function is tested on a separate \textit{test set} of input-output pairs, which has not been used for the construction of $h(X)$.
 
 A hypothesis is assumed to generalize well, if its prediction performance is high on the training set as well as on test set.
-However, if the prediction performance is high on the training set, but not reliable on unseen data, the hypothesis might \textit{overfit} the training data.
-In this case, the model complexity, i.e. the number of parameters is higher than justified by the true function. 
+However, if the prediction performance is high on the training set, but performs poorly on unseen data, the hypothesis is \textit{overfitting} with respect to the training data.
+In this case, the model fails to generalize.
 In contrast, if the model is too simple to fit any data from training set, the hypothesis is \textit{underfitting}.
 
-In many real-world applications, the true function $f(X)$ is stochastic, i.e. we need to estimate a conditional probability function $P(Y | X)$ (classification problem) or a conditional expectation $E(Y | X)$ (regression problem) for prediction.
+In many real-world applications, the true function $f(X)$ is stochastic, i.e. we need to estimate a conditional probability function $P(Y | X)$ (classification problem) or a conditional expectation $E(Y | X)$ (regression problem) for the prediction.
 Therefore, the prediction accuracy is always limited by the randomness of the true distribution.
-Typical supervised learning algorithms are linear regression, support vector machines, decision trees or neural networks including long short-term memory networks.
+Typical supervised learning methods are linear regression, support vector machines, decision trees or neural networks including long short-term memory networks.
 \section{Long Short-Term Memory Networks}
 
 Long short-term memory (LSMT) is an advanced recurrent neural network architecture for sequential data originally presented by \citeauthor{DBLP:journals/neco/HochreiterS97} in \citeyear{DBLP:journals/neco/HochreiterS97}  \cite{DBLP:journals/neco/HochreiterS97}.
-This approach addresses the well-known vanishing and exploding gradient problem \cite{DBLP:conf/icml/PascanuMB13}  of traditional recurrent neural networks by introducing more complex LSTM cells as hidden units.
+This approach addresses the well-known vanishing or exploding gradient problem \cite{DBLP:conf/icml/PascanuMB13}  of traditional recurrent neural networks by introducing more complex LSTM cells as hidden units.
 The proposed architecture has been improved several times \cite{DBLP:journals/neco/GersSC00} \cite {DBLP:journals/tnn/GreffSKSS17} and is considered as one of the most successful recurrent neural network models.
 Although, LSTM networks have been available for a long time, the breakthrough of this technology is dated around 2016 after many success stories of LSTM in combination with large data sets and GPU hardware have been reported for sequence to sequence tasks like text translation \cite{DBLP:journals/corr/WuSCLNMKCGMKSJL16}.
 
@@ -183,22 +184,22 @@ The module uses as input the state $\vec{c}_{t-1}$ and the hidden output $\vec{h
 	\label{fig:lstm-module}
 \end{figure}
 
-The input vector $\vec{x}_t$ is concatenated with the previous hidden output $\vec{h}_{t-1}$ and transferred to four neural network layers, which are designed to decide what part of the cell state will remain (forget gate $\vec{f}_t$), how it is updated (update gate $\vec{i}_t$ and $\vec{\bar{c}}_t$) and what the output of the layer will be (output gate $\vec{o}_t$ leading to $\vec{h}_t$ considering the updated cell state $\vec{c}$).
+The input vector $\vec{x}_t$ is concatenated with the previous hidden output $\vec{h}_{t-1}$ and transferred to four neural network layers, which are designed to decide what part of the cell state will remain (forget gate $\vec{f}_t$), how it is updated (update gate $\vec{i}_t$ and $\vec{\tilde{c}}_t$) and what the output of the layer will be (output gate $\vec{o}_t$ leading to $\vec{h}_t$ considering the updated cell state $\vec{c}$).
 The sublayer apply $\text{sigmoid}(x) = \frac{1}{1+\exp({-x})}$ or $\tanh(x) = \frac{\exp({x}) - \exp({-x})}{\exp({x}) + \exp({-x})}$ activation functions elementwise to vectors, leading to the following equations:
 
 \begin{align*}
 \vec{f}_t & = \text{sigmoid}(\vec{W}_f \cdot (\vec{h}_{t-1}, \vec{x}_t) + \vec{b}_f) \\
 \vec{i}_t & =  \text{sigmoid} (\vec{W}_i \cdot (\vec{h}_{t-1}, \vec{x}_t) + \vec{b}_i) \\
-\vec{\bar{c}}_t & = \tanh (\vec{W}_c \cdot (\vec{h}_{t-1}, \vec{x}_t) + \vec{b}_c) \\
+\vec{\tilde{c}}_t & = \tanh (\vec{W}_c \cdot (\vec{h}_{t-1}, \vec{x}_t) + \vec{b}_c) \\
 \vec{o}_t & =  \text{sigmoid} (\vec{W}_o \cdot (\vec{h}_{t-1}, \vec{x}_t) + \vec{b}_o)
 \end{align*}
 
 $\vec{W}_f$, $\vec{W}_i$, $\vec{W}_c$ and $\vec{W}_o$ are the sublayer's learned weights and $\vec{b}_f$, $\vec{b}_i$, $\vec{b}_c$ and $\vec{b}_o$ are the corresponding biases.
 
-The new cell state $\vec{c}_t$ is then a combination of the old cell state $\vec{c}_{t-1}$ and the result of the update gate $\vec{\bar{c}}_t$, where the layer computations $\vec{f}_t$ and $\vec{i}_t$ determine the proportions by a pointwise multiplication ($\odot$) with the cell states.
+The new cell state $\vec{c}_t$ is then a combination of the old cell state $\vec{c}_{t-1}$ and the result of the update gate $\vec{\tilde{c}}_t$, where the layer computations $\vec{f}_t$ and $\vec{i}_t$ determine the proportions by a pointwise multiplication ($\odot$) with the cell states.
 
 \begin{equation*}
-	\vec{c}_t = f_t \odot \vec{c}_{t-1} + \vec{i}_t \odot \vec{\bar{c}}_t
+	\vec{c}_t = f_t \odot \vec{c}_{t-1} + \vec{i}_t \odot \vec{\tilde{c}}_t
 \end{equation*}
 
 The result of the output gate $\vec{o}_t$ is pointwise multiplied with the tanh-activated new cell state to calculate the hidden output $\vec{h}_t$ of the module.
