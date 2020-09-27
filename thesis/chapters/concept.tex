@@ -1,9 +1,9 @@
 Text-aware process prediction aims to utilize unstructured text information in event data to improve predictions for unfinished cases.
 While many prediction methods have been applied to event data, almost none of them are able to handle textual data.
 Nevertheless, a lot of textual information in the context of processes is available, for example in form of business emails or notes by employees or customers.
-These texts in natural language might hold process-critical information and should consequently be consider for process prediction.
-However, taking advantage of textual data remains a major challenge, since natural language is predominantly context-sensitive and ambiguous \cite{textminingissues}.
-A first approach has been presented by \citeauthor{DBLP:conf/bpm/TeinemaaDMF16} \cite{DBLP:conf/bpm/TeinemaaDMF16}, where traces with textual data are encoded as vectors and a random forest classifier is learned for each prefix length.
+These texts in natural language might hold process-critical information and should consequently be considered for process prediction.
+However, taking advantage of textual data remains a major challenge, since natural language is predominantly context-sensitive and ambiguous  \cite{textminingissues}.
+A first approach has been presented by \citeauthor{DBLP:conf/bpm/TeinemaaDMF16}  \cite{DBLP:conf/bpm/TeinemaaDMF16}, where traces with textual data are encoded as vectors and a random forest classifier is learned for each prefix length.
 
 In this chapter a novel approach for text-aware process prediction is presented that considers the control flow and additional numerical, categorical and textual data of the process.
 The model is able to captures temporal dependencies between events, seasonal variability and concept drifts using an event-wise encoding and a sequential LSTM prediction model.
@@ -12,11 +12,11 @@ The main application scenario for the model is inside of real-time business proc
 \section{Overview}
 
 The framework is designed to approximate prediction functions $f_\mathrm{a}, f_\mathrm{t}, f_\mathrm{o}$ and $f_\mathrm{c}$, that predict the next \textbf{a}ctivity, next \textbf{t}imestamp, case \textbf{o}utcome and case \textbf{c}ycle time given any prefix $hd^k(\sigma)$ of length $1 \leq k \leq |\sigma|$ of the full (unkown) trace $\sigma = \langle e_1, \dots, e_{|\sigma|} \rangle \in \mathcal{E}^+$.
-The next activity prediction function $f_\mathrm{a}\colon \mathcal{E}^+ \to \mathcal{A} \cup \{\text{END OF PROCESS}\}$ returns the activity of the next event or an artificial "END OF PROCESS" activity, if the given trace is already completed, precisely:
+The next activity prediction function $f_\mathrm{a}\colon \mathcal{E}^+ \to \mathcal{A} \cup \{\text{END OF PROCESS}\}$ returns the activity of the next event or an artificial END OF PROCESS activity, if the given trace is already completed, precisely:
 \begin{align*}
 f_\mathrm{a}(hd^k(\sigma)) &= 
 \begin{cases}
-	\text{PROCESS END}& \text{if $k = |\sigma|$} \\
+	\text{END OF PROCESS}& \text{if $k = |\sigma|$} \\
 	\pi_\mathcal{A}(\sigma(k+1)) & \text{else} 
 \end{cases}\\
 \end{align*}
@@ -29,7 +29,7 @@ f_\mathrm{t}(hd^k(\sigma)) &=
 \end{cases}\\
 \end{align*}
 The case outcome of trace can be a binary label, ie. a label describing if the case has been successful or has failed.
-In some applications the case outcome is defined by the activity of activity of the final event of a case.
+In some applications the case outcome is defined by the activity of the final event of a case.
 In that scenario,the outcome function $f_\mathrm{o} \colon \mathcal{E}^+ \to \mathcal{A}$ returns the last activity of the trace:
 \begin{align*}
 f_\mathrm{o}(hd^k(\sigma)) &= \pi_\mathcal{A}(\sigma(|\sigma|))\\
@@ -39,19 +39,20 @@ Finally, $f_\mathrm{c} \colon \mathcal{E}^+ \to \mathbb{R}$ returns the total du
 f_\mathrm{c}(hd^k(\sigma)) &=  \pi_\mathcal{T}(\sigma(|\sigma|))-  \pi_\mathcal{T}(\sigma(1)).
 \end{align*}
 
-These functions are approximated via an LSTM model using historical event log data, i.e. a set of completed traces with full information about the course of the process instances.
+All functions are approximated via an LSTM model using historical event log data, i.e. a set of completed traces with full information about the course of the process instances.
 The goal is to generalize from the completed traces in such a way, that the prediction error is minimized for new unseen and uncompleted traces.
 Due to the probabilistic behavior of real-life processes, the prediction accuracy is always limited by the randomness of the process behavior.
 
 The proposed framework (see Figure \ref{fig:framework}) consists of a preprocessing, encoding and prediction model component, which operate in an offline and online phase.
 In the offline phase, a historical event log with completed traces of a business process is used to fit the encoding and prediction component.
-Given an event log $\eventlog = \{\sigma_1, \dots, \sigma_l\}$ with completed traces, the set of all prefix traces $\eventlog_\mathrm{prefix} = \{ hd^k(\sigma) \mid  \sigma \in \eventlog, 1 \leq k \leq |\sigma|\}$ is computed and each trace is encoded as a sequence of event vectors.
+Given a historical event log $\eventlog = \{\sigma_1, \dots, \sigma_l\}$ with completed traces, the set of all prefix traces $\eventlog_\mathrm{prefix} = \{ hd^k(\sigma) \mid  \sigma \in \eventlog, 1 \leq k \leq |\sigma|\}$ is computed and each trace is encoded as a sequence of event vectors.
 The encoding component distinguish between categorical or numerical data that can be encoded directly and textual data, that is prepossessed and encoded based on a text model.
 The text model is an exchangeable component and is fit to the text corpus, that is extracted from the textual data in the event log $\eventlog$.
 
 \begin{figure}[!htbp]
-	\includegraphics[width=\textwidth]{figures/framework}
-	\caption[Overview of the text-aware process prediction framework]{Overview of the text-aware process prediction framework.}
+	\centering
+	\includegraphics[width=0.8\textwidth]{figures/framework}
+	\caption[Overview of the text-aware process prediction framework]{Overview of the text-aware process prediction framework. Predictions for real-time processes are realized by an LSTM model that is fitted using an encoded representation of all prefixes of the historical event log. The encoding of textual attributes is realized by a text preprocessing pipeline and an exchangeable text encoding model.}
 	\label{fig:framework}
 \end{figure}
 
@@ -77,27 +78,33 @@ Each encoded event vector $\vec{x_i}$ is the concatenation of set of feature vec
 \vec{d}_{i1}^\mathrm{text}, \dots, \vec{d}_{iu}^\mathrm{text})
 \end{equation*}
 The activity of the event is represented by vector $\vec{a_i}$ using \textit{one-hot encoding}.
-Given the set of possible activities $\mathcal{A}$, an arbitrary but fixed ordering over is introduced with a bijective index function $index_\mathcal{A} \colon \mathcal{A} \to \{1, \dots, |\mathcal{A}|\}$.
+More precisely, given the set of possible activities $\mathcal{A}$, an arbitrary but fixed ordering over $\mathcal{A}$ is introduced with a bijective index function $index_\mathcal{A} \colon \mathcal{A} \to \{1, \dots, |\mathcal{A}|\}$.
 Using this function, the activity is encoded as a vector of size $|\mathcal{A}|$, where the component $index_\mathcal{A}(\pi_\mathcal{A}(e))$ has value 1 and all the other components have value 0.
 We write $\mathds{1}_\mathcal{A}\colon \mathcal{A} \to \{0,1\}^\mathcal{A}$ to describe the function that realizes such an one-hot encoding transformation for the set of all activities $\mathcal{A}$.
-The timestamp of the event is used to compute a vector $\vec{t_i}$ of time-related features, which is explained in detail in Section \ref*{sec:time}.
+The timestamp of the event is used to compute a six-dimensional vector $\vec{t_i}$ of time-related features, which is explained in detail in Section \ref*{sec:time}.
 
 Additional attributes of the events are encoded based on their type, i.e. if they are numerical, categorical or textual.
-Categorical attributes are encoded using one-hot-encoding in the same way as the activity, i.e. $\vec{d}_{ij}^\mathrm{cat} = \mathds{1}_{\mathcal{D}_j^{\mathrm{cat}}}(\pi_{\mathcal{D}_j^\mathrm{cat}}(e_i))$.
+Categorical attributes are encoded using one-hot encoding in the same way as the activity, i.e. $\vec{d}_{ij}^\mathrm{cat} = \mathds{1}_{\mathcal{D}_j^{\mathrm{cat}}}(\pi_{\mathcal{D}_j^\mathrm{cat}}(e_i))$.
 Textual attributes are vectorized via a dedicated text model, that is explained in Section \ref{sec:text}.
+The dimensions of the text vectorizations can be tuned individually per attribute using the parameter $z_j$, which is the encoding dimension of the $j$-th textual attribute.
 
 \begin{table}[!htbp]
 	\renewcommand{\arraystretch}{1.2}
 	\setlength\tabcolsep{5pt}
-	\begin{tabularx}{\textwidth}{p{2cm} l l p{6.8cm} }
+	\begin{tabularx}{\textwidth}{
+		>{\hsize=0.6\hsize}X
+		>{\hsize=0.8\hsize}X
+		>{\hsize=0.6\hsize}X
+		>{\hsize=2.0\hsize}X
+		}
 		\toprule
 		\textbf{Feature} \newline \textbf{Vector} & \textbf{Construction} &\textbf{Dimension} &  \textbf{Description} \\
 		\midrule
 		$\vec{a_i}$ &$\mathds{1}_\mathcal{A}(\pi_\mathcal{A}(e_i))$& $|\mathcal{A}|$& One-hot encoding of the activity. \\
 		$\vec{t_i}$ & See Section \ref{sec:time} &6 & Time-based feature vector.\\
-		$\vec{d}_{ij}^\mathrm{num}$ &  $\hat{\pi_{\mathcal{D}_j^\mathrm{num}}(e_i)} $ &1 & Normalized value of the $j$-th numerical attribute\\
+		$\vec{d}_{ij}^\mathrm{num}$ &  $\widehat{\pi_{\mathcal{D}_j^\mathrm{num}}(e_i)} $ &1 & Normalized value of the $j$-th numerical attribute\\
 		$\vec{d}_{ij}^\mathrm{cat}$ & $\mathds{1}_{\mathcal{D}_j^{\mathrm{cat}}}(\pi_{\mathcal{D}_j^\mathrm{cat}}(e_i))$&$|\mathcal{D}_j^\mathrm{cat}|$ & One-hot encoding of the $j$-th categorical attribute.\\
-		$\vec{d}_{ij}^\mathrm{text}$ & See Section \ref{sec:text} & $z_i$& Fixed-length vectorization of the $j$-th text attribute.\\
+		$\vec{d}_{ij}^\mathrm{text}$ & See Section \ref{sec:text} & $z_j$ \newline (parameter) & Fixed-length vectorization of the $j$-th text attribute.\\
 		\bottomrule
 	\end{tabularx}
 	\caption[Feature vectors as part of the event encoding]{Feature vectors as part of the event encoding $\vec{x_i}$ for an event $e_i$.}
@@ -112,29 +119,29 @@ The scaling for a numerical feature $x$ is realized with the transformation
 where $\min(x)$ is the lowest and $\max(x)$ is the highest value $x$ can take.
 If the limits are not bounded conceptually, the lowest or highest value of $x$ in the event log is used for scaling.
 
-All in all, the encoding results in vector of size
+All in all, the encoding of an event $e_i$ results in a vector of size
 \begin{equation*}
 |\vec{x_i}|= |\mathcal{A}| + r + \sum_{i=1}^{s} |\mathcal{D}_i| + \sum_{j=1}^{u} z_j + 6.
 \end{equation*}
-An overview of each feature vector is provided in Table \ref{tab:features}.
+An overview of each feature vector that is part of the event encoding is provided in Table \ref{tab:features}.
 
 \section{Capturing Temporal Dependencies}\label{sec:time}
 
 A set of time-based features is computed from the timestamp data in the event log in order to profit from time-related pattern in the process.
-As part of the complete encoding $\vec{x}_i$ for an event $e_i$ in a (prefix) trace $\sigma = \langle e_1, \dots, e_k \rangle$ a time vector $\vec{t_i} = (t_i^1, t_i^2,t_i^3,t_i^4,t_i^5,t_i^6)$ of dimension 6 is computed.
+As part of the complete encoding $\vec{x}_i$ for an event $e_i$ in a (prefix) trace $\sigma = \langle e_1, \dots, e_k \rangle$, a time vector $\vec{t_i} = (t_i^1, t_i^2,t_i^3,t_i^4,t_i^5,t_i^6)$ of dimension 6 is computed.
 
 \begin{table}[!htbp]
 	\centering
-	\begin{tabularx}{0.6\textwidth}{l l}
+	\begin{tabularx}{0.8\textwidth}{l l}
 		\toprule
 		 \textbf{Feature} & \textbf{Description} \\
 		 \midrule
-		$t_i^1$ & Time since previous event \\
-		$t_i^2$ & Time since case start \\
-		$t_i^3$ & Time since first recorded event \\
-		$t_i^4$ & Time since midnight \\
-		$t_i^5$ & Time since last Monday \\
-		$t_i^6$ & Time since last January 1 00:00 \\
+		$t_i^1$ & Normalized time in seconds since previous event \\
+		$t_i^2$ & Normalized time in seconds since case start \\
+		$t_i^3$ & Normalized time in seconds since first recorded event \\
+		$t_i^4$ & Normalized time in seconds since midnight \\
+		$t_i^5$ & Normalized time in seconds since last Monday \\
+		$t_i^6$ & Normalized time in seconds since last January 1 00:00 \\
 		\bottomrule
 	\end{tabularx}
 	\caption[Time-based features as part of the event encoding]{Time-based features as part of event encoding $\vec{x_i}$.}
@@ -144,7 +151,7 @@ As part of the complete encoding $\vec{x}_i$ for an event $e_i$ in a (prefix) tr
 Using these features time-related correlations can be captured and utilized for prediction.
 The feature $t_i^1$ describes the time difference between the current event $e_i$ and previous event $e_{i-1}$, while $t_i^2$ gives the time difference between the current event and the first event of the case $e_1$, i.e. the time since the start of the case.
 Furthermore, $t_i^3$ is the time difference between the current event and the first event that is recorded in the log. This feature indicates the absolute time position of an event in the data.
-This information is important to detect concept drift in the process \cite{DBLP:journals/tnn/BoseAZP14}.
+This information is important to detect concept drift \cite{DBLP:journals/tnn/BoseAZP14} in the process.
 Most real-life processes are not static, i.e. the behavior of the process changes over time.
 For example, in earlier process executions customers might have been informed by a letter, whereas in more recent cases customers are messaged using email or app notifications.
 Therefore, the knowledge about the absolute time of the events can be used to relate cases in similar periods of time.
@@ -158,17 +165,17 @@ A summary of all time-related features can be seen in Table \ref{tab:time-featur
 
 \section{Text Vectorization}\label{sec:text}
 
-In order to prepare the textual data of the event log for a prediction model, the texts have to be encoded in a compact, finite and "useful" numerical vector representationu using a text model.
+In order to prepare the textual data of the event log for a prediction model, the texts have to be encoded in a compact, finite and useful numerical vector representation using a text model.
 Useful in that context means, that texts with similar semantic meanings should also have similar representations.
 The vector representation of textual data is an important aspect in \textit{Natural Language Processing} (NLP).
 Extracting the meaning of textual information remains a challenge even for humans, because textual data is unstructured, language dependent and domain specific.
-Many words are ambiguous, for example the word "apple" might denote a fruit or a global technology company.
+Many words are ambiguous, for example the word 'apple' might denote a fruit or a global technology company.
 In addition, grammatical variations and the importance of context in language makes extracting the semantic meaning even more difficult for computers.
 
-In our setting, the text vectorization for textual attributes is realized in a two step procedure by text encoding component.
+In our setting, the text vectorization for textual attributes is realized in a two step procedure.
 First, all textual data associated with the events in the corresponding textual attribute is collected in a so called \textit{text corpus}.
 Each document in the text corpus is then preprocessed in order to filter out linguistic noise or useless information.
-This step is called \textit{text normalization} \cite{DBLP:books/lib/JurafskyM09}.
+This step is called \textit{text normalization}  \cite{DBLP:books/lib/JurafskyM09}.
 Finally, the normalized text corpus is used to build up a \textit{vocabulary} and a text vectorization technique is applied to encode the text of the attribute into a fixed-length vector.
 The vocabulary of a text corpus is a set $V$ of all relevant words that appear in the corpus and is indexed by a bijective index function $index_V \colon V \to \{1, 2, \dots, |V|\}$.
 As text vectorization techniques the Bag of Words, Bag of N-Grams, Paragraph Vector and Latent Dirichlet Allocation text models are considered.
@@ -186,26 +193,26 @@ The first step eliminates all capital letters in the text.
 In the tokenenization step a document is split up into a sequence of words.
 Each word is then lemmatized, i.e. it is converted to its canonical form.
 The idea is to unify words that have a very similar meaning and filter out grammatical variations.
-For example, the words  "go", "going", "goes", "gone" and "went" are all transformed to the basic form "go".
+For example, the words  'go', 'going', 'goes', 'gone' and 'went' are all transformed to the basic form 'go'.
 
 \begin{table}[!htbp]
 	\begin{tabularx}{\textwidth}{l l p{9.8cm}}
 		\toprule
 		\textbf{Step} & \textbf{Transformation} & \textbf{Example Document}                                                       \\ \midrule
-		0             & Original       & "The patient has been diagnosed with high blood pressure." \\
-		1             & Lowercase               & "the patient has been diagnosed with high blood pressure." \\
-		2 & Tokenization  & $\langle$"the", "patient", "has", "been", "diagnosed", "with", "high", "blood", "pressure", "."$\rangle$ \\
-		3 & Lemmatization & $\langle$"the", "patient", "have", "be", "diagnose", "with", "high", "blood", "pressure", "."$\rangle$  \\
-		4             & Stop word filtering     & $\langle$"patient", "diagnose", "high", "blood", "pressure"$\rangle$ \\ \bottomrule
+		0             & Original       & 'The patient has been diagnosed with high blood pressure.' \\
+		1             & Lowercase               & 'the patient has been diagnosed with high blood pressure.' \\
+		2 & Tokenization  & $\langle$'the', 'patient', 'has', 'been', 'diagnosed', 'with', 'high', 'blood', 'pressure', '.'$\rangle$ \\
+		3 & Lemmatization & $\langle$'the', 'patient', 'have', 'be', 'diagnose', 'with', 'high', 'blood', 'pressure', '.'$\rangle$  \\
+		4             & Stop word filtering     & $\langle$'patient', 'diagnose', 'high', 'blood', 'pressure'$\rangle$ \\ \bottomrule
 	\end{tabularx}
 	\caption[Preprocessing transformation of an example document]{Preprocessing transformation of an example document containing a single sentence.}
 	\label{tab:text-preprocessing}
 \end{table}
 
 Ultimately, all stop words are filtered out of each document.
-Stop words are words with low information value like "the", "a", "of" or "here".
+Stop words are words with low information value like 'the', 'a', 'of' or 'here'.
 Stop word lists are language dependent and can be more or less aggressive at filtering.
-Usually they contains articles, auxiliary verbs, prepositions and generic verbs like "be" and "have".
+Usually they contains articles, auxiliary verbs, prepositions and generic verbs like 'be' and 'have'.
 In addition, punctuation marks and numerical symbols are excluded.
 An example application of the text normalization pipeline is shown in Table \ref{tab:text-preprocessing}.
 Using the corpus of normalized documents (i.e. texts), a text model is fitted in the offline phase to realized the encoding of the textual attributes.
@@ -220,7 +227,7 @@ The inverse document frequency indicates the specificity of a word in the corpus
 The resulting value is the tf-idf score of a word in a document.
 
 The Bag of Words model is easy to build and effective for certain applications, but limited in several ways.
-First, the model completely ignores the order of words, which is often crucial for understanding the semantic meaning. For example, the sentences "The patient's health state went from stable to critical." and "The patient's health state went from critical to stable." would result in the same vector representation, while the meaning is clearly inverted.
+First, the model completely ignores the order of words, which is often crucial for understanding the semantic meaning. For example, the sentences 'The patient's health state went from stable to critical.' and 'The patient's health state went from critical to stable.' would result in the same vector representation, while the meaning is clearly inverted.
 Second, the vector representations are sparse and of high dimensionality since they depend of the size of the vocabulary.
 However, the dimension can be reduced by limiting the size of the vocabulary. For example, words with low tf-idf scores can excluded from the vocabulary.
 Unseen words, that appear during online prediction and are not part of the learned vocabulary are not considered.
@@ -231,7 +238,7 @@ The \textit{Bag of N-Grams} model is a generalization of the Bag of Words model,
 Instead of single words, the vocabulary consists of $n$-tuples of words, that appear consecutive in the corpus.
 The unigram model ($n=1$) is equivalent to the BoW model.
 For the bigram model ($n=2$), the vocabulary consists of pairs of words that appear next to each other in the documents.
-For example, for the preprocessed document $\langle$"patient", "diagnose", "high", "blood", "pressure"$\rangle$, the pairs ("patient", "diagnose"), ("diagnose", "high"), ("high", "blood") and ("blood", "pressure") are taken into the vocabulary.
+For example, for the preprocessed document $\langle$'patient', 'diagnose', 'high', 'blood', 'pressure'$\rangle$, the pairs ('patient', 'diagnose'), ('diagnose', 'high'), ('high', 'blood') and ('blood', 'pressure') are taken into the vocabulary.
 For $n>2$ $n$-tuples are generated accordingly.
 The feature vector is constructed by computing the tf-idf score for each vocabulary entry like in the BoW model.
 
@@ -244,7 +251,7 @@ In order to generate more compact vectors, distributed text representations are 
 The \textit{Paragraph Vector} model (also known as \textit{Doc2Vec}), originally presented by \citeauthor{DBLP:conf/icml/LeM14} in \citeyear{DBLP:conf/icml/LeM14}, is an unsupervised algorithm that learns distributed fixed length vector representations for documents of variable length using a simple feedforward neural network \cite{DBLP:conf/icml/LeM14}.
 The idea is inspired by the word embedding model presented by \citeauthor{DBLP:journals/jmlr/BengioDVJ03} \cite{DBLP:journals/jmlr/BengioDVJ03}, which can learn distributed fixed-length vector representations for words.
 In this model words are mapped to vectors, that are trained to predict words from its context, i.e. words that appear before or after the target word in the training documents.
-Several variants of this approach exits, notably the \textit{Continuous Bag of Words} model, which ignores the order of the words in the context and the \textit{Continuous Skip-gram} model, which predicts the skip-gram context for a word vector (also known as \textit{Word2Vec})\cite{DBLP:journals/corr/abs-1301-3781}.
+Several variants of this approach exits, notably the \textit{Continuous Bag of Words} model, which ignores the order of the words in the context and the \textit{Continuous Skip-gram} model, which predicts the skip-gram context for a word vector (also known as \textit{Word2Vec}) \cite{DBLP:journals/corr/abs-1301-3781}.
 
 \begin{figure}[!htbp]
 	\centering
