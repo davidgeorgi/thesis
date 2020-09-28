@@ -1,3 +1,23 @@
 
+\section{Results and Archievments}
 
 \section{Limitations and Future Research}
+
+The text-aware process prediction model is able to take advantage of textual data in predictive business process monitoring and can improve the prediction quality by exploiting correlations in (textual) data.
+The generalizability of the evaluation in Chapter \ref{chap:eval} is limited due the small amount of evaluated data sets.
+To further validate the approach, more event logs with textual data need to evaluated.
+However, the data in common use cases like help desk or hospital processes is maintained under high privacy regulations.
+Since textual data can not easily be anonymized for evaluation and is highly sensitive, the data acquisition remains challenging.
+
+In certain contexts, a high and reliable prediction performance is not sufficient as the interpretability of prediction model is necessary.
+LSTM-based methods are usually unable to deliver insights about the construction of the prediction and the influence of individual feature variables.
+The frequently observed trade-off between prediction performance and interpretability in machine learning, is also recognizable in process prediction \cite{DBLP:journals/corr/abs-1811-00062}.
+While in this contribution the prediction performance has been prioritized, interpretability text-aware prediction models could be viable.
+Nevertheless, the utilization of textual data is an additional barrier and current interpretable methods based on process models can not be naturally extended for this purpose.
+
+Another for the most part unsolved problem is to identify causality in processes.
+In order to derive predictions for processes, correlations in the event data are sufficient.
+But when predictive methods are applied to support decision making, it is important to identify the main forces that really \textit{influence} the future path of the process.
+The ascertainment of causality is a significant harder problem, since it requires a much deeper understanding of the individual process.
+Therefore, tailor made methods might be necessary, that are specific to the field of use.
+Gained insights could then be utilized to improve process prediction by not only considering event data, but also background knowledge of the process.
