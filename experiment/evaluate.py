@@ -88,16 +88,16 @@ text_models = [
     None,
     BoWTextEncoder(encoding_length=50, language=language),
     BoWTextEncoder(encoding_length=100, language=language),
-    BoWTextEncoder(encoding_length=250, language=language),
+    BoWTextEncoder(encoding_length=500, language=language),
     BoNGTextEncoder(n=2, encoding_length=50, language=language),
     BoNGTextEncoder(n=2, encoding_length=100, language=language),
-    BoNGTextEncoder(n=2, encoding_length=250, language=language),
-    PVTextEncoder(encoding_length=5, language=language),
+    BoNGTextEncoder(n=2, encoding_length=500, language=language),
     PVTextEncoder(encoding_length=10, language=language),
-    PVTextEncoder(encoding_length=25, language=language),
-    LDATextEncoder(encoding_length=5, language=language),
+    PVTextEncoder(encoding_length=20, language=language),
+    PVTextEncoder(encoding_length=100, language=language),
     LDATextEncoder(encoding_length=10, language=language),
-    LDATextEncoder(encoding_length=25, language=language),
+    LDATextEncoder(encoding_length=20, language=language),
+    LDATextEncoder(encoding_length=100, language=language),
 ]
 
 shared_layers = [1]

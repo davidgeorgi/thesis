@@ -41,7 +41,7 @@ f_\mathrm{c}(hd^k(\sigma)) &=  \pi_\mathcal{T}(\sigma(|\sigma|))-  \pi_\mathcal{
 
 All functions are approximated via an LSTM model using historical event log data, i.e. a set of completed traces with full information about the course of the process instances.
 The goal is to generalize from the completed traces in such a way, that the prediction error is minimized for new unseen and uncompleted traces.
-Due to the probabilistic behavior of real-life processes, the prediction accuracy is always limited by the randomness of the process behavior.
+Due to the probabilistic behavior of real-world processes, the prediction accuracy is always limited by the randomness of the process behavior.
 
 The proposed framework (see Figure \ref{fig:framework}) consists of a preprocessing, encoding and prediction model component, which operate in an offline and online phase.
 In the offline phase, a historical event log with completed traces of a business process is used to fit the encoding and prediction component.
@@ -152,7 +152,7 @@ Using these features time-related correlations can be captured and utilized for 
 The feature $t_i^1$ describes the time difference between the current event $e_i$ and previous event $e_{i-1}$, while $t_i^2$ gives the time difference between the current event and the first event of the case $e_1$, i.e. the time since the start of the case.
 Furthermore, $t_i^3$ is the time difference between the current event and the first event that is recorded in the log. This feature indicates the absolute time position of an event in the data.
 This information is important to detect concept drift \cite{DBLP:journals/tnn/BoseAZP14} in the process.
-Most real-life processes are not static, i.e. the behavior of the process changes over time.
+Most real-world processes are not static, i.e. the behavior of the process changes over time.
 For example, in earlier process executions customers might have been informed by a letter, whereas in more recent cases customers are messaged using email or app notifications.
 Therefore, the knowledge about the absolute time of the events can be used to relate cases in similar periods of time.
 
@@ -177,8 +177,8 @@ First, all textual data associated with the events in the corresponding textual 
 Each document in the text corpus is then preprocessed in order to filter out linguistic noise or useless information.
 This step is called \textit{text normalization}  \cite{DBLP:books/lib/JurafskyM09}.
 Finally, the normalized text corpus is used to build up a \textit{vocabulary} and a text vectorization technique is applied to encode the text of the attribute into a fixed-length vector.
-The vocabulary of a text corpus is a set $V$ of all relevant words that appear in the corpus and is indexed by a bijective index function $index_V \colon V \to \{1, 2, \dots, |V|\}$.
-As text vectorization techniques the Bag of Words, Bag of N-Grams, Paragraph Vector and Latent Dirichlet Allocation text models are considered.
+The vocabulary of a text corpus is a set $V$ of all relevant words (after filtering) that appear in the corpus, which is indexed by a bijective index function $index_V \colon V \to \{1, 2, \dots, |V|\}$.
+As text vectorization techniques the \textit{Bag of Words}, \textit{Bag of N-Grams}, \textit{Paragraph Vector} and \textit{Latent Dirichlet Allocation} text models are considered, which are introduced in more detail in the Sections \ref{sec:bow} to \ref{sec:lda}.
 
 \subsection{Text Normalization}
 
@@ -194,6 +194,7 @@ In the tokenenization step a document is split up into a sequence of words.
 Each word is then lemmatized, i.e. it is converted to its canonical form.
 The idea is to unify words that have a very similar meaning and filter out grammatical variations.
 For example, the words  'go', 'going', 'goes', 'gone' and 'went' are all transformed to the basic form 'go'.
+Lemmatization significantly reduces the complexity of textual data accepting a hopefully small loss of information.
 
 \begin{table}[!htbp]
 	\begin{tabularx}{\textwidth}{l l p{9.8cm}}
@@ -217,7 +218,7 @@ In addition, punctuation marks and numerical symbols are excluded.
 An example application of the text normalization pipeline is shown in Table \ref{tab:text-preprocessing}.
 Using the corpus of normalized documents (i.e. texts), a text model is fitted in the offline phase to realized the encoding of the textual attributes.
 
-\subsection{Bag of Words}
+\subsection{Bag of Words}\label{sec:bow}
 
 The \textit{Bag of Words} (BoW) model is a simple text model, which represents documents based on the \textit{term frequencies} of its words, while ignoring their order \cite{harris1954distributional}.
 Given the learned vocabulary $V$, a document is represented by a vector of size $|V|$, where the $i$-th component gives the number of occurrences of the word indexed with $i$ in the document.
@@ -229,12 +230,12 @@ The resulting value is the tf-idf score of a word in a document.
 The Bag of Words model is easy to build and effective for certain applications, but limited in several ways.
 First, the model completely ignores the order of words, which is often crucial for understanding the semantic meaning. For example, the sentences 'The patient's health state went from stable to critical.' and 'The patient's health state went from critical to stable.' would result in the same vector representation, while the meaning is clearly inverted.
 Second, the vector representations are sparse and of high dimensionality since they depend of the size of the vocabulary.
-However, the dimension can be reduced by limiting the size of the vocabulary. For example, words with low tf-idf scores can excluded from the vocabulary.
+However, the dimension can be reduced by limiting the size of the vocabulary. For example, words with low term frequencies can be excluded from the vocabulary.
 Unseen words, that appear during online prediction and are not part of the learned vocabulary are not considered.
 
 \subsection{Bag of N-Grams}
 
-The \textit{Bag of N-Grams} model is a generalization of the Bag of Words model, which addresses the missing word order awareness of the latter.
+The \textit{Bag of N-Grams} (BoNG) model is a generalization of the Bag of Words model, which addresses the missing word order awareness of the latter.
 Instead of single words, the vocabulary consists of $n$-tuples of words, that appear consecutive in the corpus.
 The unigram model ($n=1$) is equivalent to the BoW model.
 For the bigram model ($n=2$), the vocabulary consists of pairs of words that appear next to each other in the documents.
@@ -272,7 +273,7 @@ The network is also able to learn a representation for new unseen documents by a
 In this phase, the word matrix $\vec{W}$ and the prediction matrix $\vec{W'}$ are fixed and only the document vector is trained.
 The paragraph vector model tends to perform better than non-distributed models, however since new documents are vectorized via inference, a bigger training corpus of documents is usually required.
 
-\subsection{Latent Dirichlet Allocation}
+\subsection{Latent Dirichlet Allocation}\label{sec:lda}
 
 The \textit{Latent Dirichlet Allocation} (LDA) presented by \citeauthor{DBLP:journals/jmlr/BleiNJ03} in \citeyear{DBLP:journals/jmlr/BleiNJ03} \cite{DBLP:journals/jmlr/BleiNJ03} is generative statistical text model, which represents documents as a mixture of a small and fixed number of topics.
 Topics are defined by probability distribution over all words in the vocabulary and are also learned by the model in an unsupervised manner.
@@ -308,7 +309,7 @@ Since the prefix traces have different length, shorter traces are pre-padded \ci
 Hence, a prefix trace of encoded events $\vec{x_1}, \vec{x_2}, \dots, \vec{x_n}$  is represented in the training set by a 2-dimensional matrix $(\mathbf{0}, \dots, \mathbf{0},\vec{x_1}, \vec{x_2}, \dots, \vec{x_n})$, such that the zero vectors fill up shorter traces to the length of the longest trace in the training set.
 All prefix traces together form the 3-dimensional training matrix.
 
-The training is realized by a backpropagation through time (BPTT) algorithm that updates the weights of the network using the update rules of the Adam optimizer with Nesterov momentum \cite{dozat2016incorporating}.
+The training is realized using a learning algorithm based on stochastic gradient descent and backpropagation through time (BPTT), which update the weights of the network using the update rules of the Adam optimizer with Nesterov momentum \cite{dozat2016incorporating}.
 The loss for numerical prediction values $\hat{y}$ and the true value $y$ is the absolute error $\text{AE}(\hat{y},y)=|\hat{y} - y|$, while the loss for categorical prediction values is computed using the categorical cross entropy error $\text{CE}(\vec{\hat{y}}, \vec{y}) = - \sum_{i=1}^{k} y_i \cdot \log \hat{y}_i$.
 
 \section{Predictive Business Processing Monitoring}
@@ -318,4 +319,4 @@ The component with the highest value of the softmax outputs for the next activit
 The output values for the next event time $(y_t)$ and case duration  $(y_c)$ are clipped to 0 for negative outputs and the normalization is reverted in order to compute the final prediction value.
 
 With every new event, that is registered by the business process monitoring system, the prediction can be updated with another forward-pass through the model.
-This guarantees a continuous forward-projection on running process instances, that is updated whenever new information becomes available.
+This guarantees a continuous forward-projection on running process instances, that is updated whenever new information in form of new events becomes available.
