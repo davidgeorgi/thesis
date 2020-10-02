@@ -34,17 +34,17 @@ The event log is filtered to remove outlier activities (threshold <0.5\%) and in
 		\toprule
 		\textbf{Data Set} & \textbf{Job Application} & \textbf{werk.nl} &\textbf{Help Desk}  \\
 		\midrule
-		Number of cases & & 15\,001& \\
-		Number of trace variants & & 1\,001 & \\
-		Number of events & & 55\,220 & \\
-		Events per case (mean) & & 3.681& \\
-		Median case duration (days) & & 0.224& \\
-		Mean case duration (days)&&  0.713 & \\
-		Number of activities & & 18 & \\
-		Number of words (pre filtering) & &247\,010 & \\
-		Number of words (post filtering)  & &98\,915 & \\
-		Vocabulary size (pre filtering) & & 1\,203 & \\
-		Vocabulary size (post filtering) & & 815 & \\
+		Number of cases & 20\,000& 15\,001& \\
+		Number of trace variants &19 & 1\,001 & \\
+		Number of events & 132\,268 & 55\,220 & \\
+		Events per case (mean) & 6.6134& 3.681& \\
+		Median case duration (days) & 2.4661 & 0.224& \\
+		Mean case duration (days)&2.2108 &  0.713 & \\
+		Number of activities & 9 & 18 & \\
+		Number of words (pre filtering) & 1\,774\,587 &247\,010 & \\
+		Number of words (post filtering)  & 760\,504 &98\,915 & \\
+		Vocabulary size (pre filtering) &131 & 1\,203 & \\
+		Vocabulary size (post filtering) & 91 & 815 & \\
 		\bottomrule
 	\end{tabularx}
 	\caption[Overview of evaluated data sets]{Overview of evaluated data sets.}
@@ -66,17 +66,18 @@ Furthermore, the LSTM layers use dropout \cite{DBLP:journals/corr/abs-1207-0580}
 For classification (i.e. categorical prediction) task, like next event and outcome prediction, the accuracy is utilized as metric.
 The accuracy is computed as the number of correct predictions $t$ divided by the total number of predictions $n$, i.e. 
 \begin{equation*}
-	\textrm{accuracy} = \dfrac{t}{n} = \dfrac{\textrm{\# correct predictions}}{\textrm{\# total predictions}}.
+	\textrm{accuracy} = \dfrac{t}{n} = \dfrac{\textrm{\# correct predictions}}{\textrm{\# total predictions}} \in [0,1].
 \end{equation*}
 
 For regression tasks, like the next event time and the case cycle time predictions, the mean absolute error (MAE) is computed to measure the prediction performance. The mean absolute error indicates the average absolute difference between the predicted value $\hat{y}$ and the true value $y$,  precisely
 \begin{equation*}
-	\textrm{MAE} = \dfrac{1}{n}\sum_{i=1}^{n}|\hat{y_i} - y_i|.
+	\textrm{MAE} = \dfrac{1}{n}\sum_{i=1}^{n}|\hat{y_i} - y_i| \in [0, \infty).
 \end{equation*}
 This error metric is favored, since it gives a more intuitive interpretation and is less sensitive to outliers compared to similar metrics like the mean squared error (MSE).
+An accuracy of 1 and a MAE of 0 would be the most desirable.
 
 The prediction model is evaluated with each presented text model and different encoding lengths for the text.
-For the Bag of Words and Bag of N-Gram model the encoding length is adjusted by only considering the most frequent terms in the log.
+For the Bag of Words and Bag of N-Gram model the encoding length is adjusted by only considering the most frequent terms for the vocabulary.
 The encoding length of the non-textual data depends on the considered attributes and their number of the distinct values in the event logs.
 The Bag of N-Gram model is used with bigrams ($n=2$).
 The Paragraph Vector model is trained for 15 epochs.
@@ -96,24 +97,24 @@ The Paragraph Vector model is trained for 15 epochs.
 			>{\hsize=1.0\hsize}X
 		}
 		\toprule
-		 & & \multicolumn{2}{l}{\textbf{werk.nl}} & \multicolumn{2}{l}{\textbf{Job Application}} & \multicolumn{2}{l}{\textbf{Help Desk}} \\
+		 & & \multicolumn{2}{l}{\textbf{Job Application}} & \multicolumn{2}{l}{\textbf{werk.nl}} & \multicolumn{2}{l}{\textbf{Help Desk}} \\
 		 Text \newline Model & Encoding Length &Accuracy & MAE & Accuracy& MAE  & Accuracy& MAE  \\
 		\midrule
 		\multicolumn{8}{c}{\textit{Text-Aware Process Prediction (LSTM)}} \\
-		BoW& 50 &  && & \\
-		BoW& 100 && &&& \\
-		BoW& 500 &  &&& \\
-		BoNG& 50 &  &&& \\
-		BoNG& 100 &  &&& \\
-		BoNG& 500 &  &&& \\
-		PV& 10 & & && \\
-		PV& 20 & & && \\
-		PV& 100 & & && \\
-		LDA& 10 & & & & \\
-		LDA& 20 & & & &\\
-		LDA& 100 & & && \\
+		BoW&50&   &&  0.5274&     0.0778 & &  \\
+		BoW&100& &&    0.5293&     0.0776 & &  \\
+		BoW&500& &&    0.5229&     0.0785 & &  \\
+		BoNG&50&  &&   0.5288&     0.0788 & &  \\
+		BoNG&100&  &&   0.5242&     0.0798 & &  \\
+		BoNG&500&  &&   0.5214&     0.0782 & &  \\
+		PV&10&  &&   0.5153&     0.0785 & & \\
+		PV&20&  &&   0.5206&     0.0789 & &  \\
+		PV&100&  &&   0.5199&     0.0785 & &  \\
+		LDA&10&  &&   0.5244&     0.0786 & & \\
+		LDA&20&   &&  0.5214&     0.0782 & &  \\
+		LDA&100&  &&   0.5271&     0.0788 & &  \\
 		\multicolumn{8}{c}{\textit{LSTM baseline}} \\
-		- & 0 & & && \\
+		-&0&  &&   0.5128&     0.0785 & &  \\
 		\bottomrule
 	\end{tabularx}
 	\caption[Experimental results for the next event prediction]{Experimental results for the next event prediction.}
