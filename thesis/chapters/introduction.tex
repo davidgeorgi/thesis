@@ -38,9 +38,10 @@ Although, many approaches for process prediction have been suggested in the lite
 Many approaches derive their prediction purely from the control flow of a process instance ignoring additional data attributes in the event log.
 Most notably, almost no approach is able to consider textual data for process prediction.
 However, textual data is highly available in many systems and might hold important information, that can be used to improve the prediction performance.
+For example, millions of emails are sent everyday and their content influences processes inside of organizations. 
 In addition, most of the existing prediction methods focus on a single prediction task only, for example they just predict the remaining time or cycle time of a process instance.
 Depending on the context, information about the next event or the future path of process instance can be of interest.
-In some scenarios, processes instances have an outcome like success/failure or accepted/declined that can be predicted.
+In some scenarios, processes instances have an outcome like success/failure or accepted/rejected that can be predicted.
 
 In data science, predictions are usually derived using \textit{predictive inference} \cite{predinf}, i.e. correlations in past observations are used to estimate target variables for new observations.
 In the context of processes, past observations come in the form of historical event log data, that has been logged during the execution of a process.
@@ -53,7 +54,7 @@ Given an event log with past executions of a process holding numerical, categori
 	\item Next event time prediction: When will the event happen?
 	\item Case outcome prediction: What is the outcome of the process instance?
 	\item Case cycle time prediction: When will the process instance finish?
-	\item Future path prediction: What is the most likely future path of the process instance?
+	\item Future path prediction: What is the most likely sequence of future activities of the process instance?
 \end{itemize}
 
 \begin{figure}[htbp!]
@@ -87,7 +88,15 @@ These goals lead to the formulation of the following three research questions:
 
 \section{Contribution}
 
+In this thesis two main contributions are made.
+First, a process prediction model is designed and implemented, which additionally counts in textual data associated with events.
+The approach is realized by combining state-of-the-art text and sequence prediction models.
+It prioritizes high prediction performance and flexibility, i.e. it is applicable to a wide range of processes in terms of variability, underlying data types and process complexity.
+The implementation of the proposed prediction model is purely based on Python and additional open-source packages.
 
+The second contribution is a comprehensive evaluation and analysis of the approach based on simulated and real-world event data.
+This includes performance measurements of differently parameterized models and a comparison with existing methods.
+In addition, advantages and limitations of the approach are discussed.
 
 \section{Thesis Structure}
 
