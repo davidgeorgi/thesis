@@ -17,27 +17,30 @@ The model naturally supports parallelism in business processes and considers fut
 \citeauthor{DBLP:conf/dis/CeciLFCM14} presented an approach, where a sequence tree is learned in order relate running traces to similar historical traces \cite{DBLP:conf/dis/CeciLFCM14}.
 A decision tree is then used to predict the next activity and the cycle time of a case.
 
-\citeauthor{DBLP:conf/bpm/TeinemaaDMF16} applied text vectorization techniques like bag-of-n-grams (BoNG), Latent Dirichlet Allocation (LDA) and Paragraph Vectors (PV) to textual data of processes in order to predict a binary label describing the process outcome \cite{DBLP:conf/bpm/TeinemaaDMF16}.
+\citeauthor{DBLP:conf/bpm/TeinemaaDMF16} applied text vectorization techniques like Bag of N-Gram (BoNG), Latent Dirichlet Allocation (LDA) and Paragraph Vectors (PV) to textual data of processes in order to predict a binary label describing the process outcome \cite{DBLP:conf/bpm/TeinemaaDMF16}.
 In this approach random forest and logistic regression classifiers for each prefix length of a trace are trained.
 
 Most recently, several authors have applied recurrent neural networks in form of LSTM networks for process prediction. \citeauthor{ DBLP:conf/bpm/EvermannRF16} encode events using an embedding matrix as it is known for word embeddings. The embedded events are then used as input for an LSTM network that predicts the next activity \cite{DBLP:conf/bpm/EvermannRF16}.
 
-\citeauthor{DBLP:conf/caise/TaxVRD17} use an one-hot-encoding of the activity and the timestamp of an event to predict the activity and timestamp of the next event.
+\citeauthor{DBLP:conf/caise/TaxVRD17} use an one-hot encoding of the activity and the timestamp of an event to predict the activity and timestamp of the next event.
 This is done by using a two-layered LSTM network \cite{DBLP:conf/caise/TaxVRD17}.
 
-The work by \citeauthor{DBLP:conf/ssci/NavarinVPS17} adopts the idea of using an LSTM network \cite{DBLP:conf/caise/TaxVRD17} and extends the encoding to additional data attributes associated with each event \cite{DBLP:conf/ssci/NavarinVPS17} to predict the cycle time of an case.
+The work by \citeauthor{DBLP:conf/ssci/NavarinVPS17} adopted the idea of using an LSTM network \cite{DBLP:conf/caise/TaxVRD17} and extends the encoding to additional data attributes associated with each event \cite{DBLP:conf/ssci/NavarinVPS17} to predict the cycle time of a case.
 
 \citeauthor{DBLP:journals/computing/PolatoSBL18} presented a set of approaches that use support vector regression for cycle time prediction  \cite{DBLP:journals/computing/PolatoSBL18}.
-In this work the authors implement different encoding for events including simple one-hot-encoding and a more advanced state based encoding using transition systems.
+In this contribution the authors implement different encodings for events including a simple one-hot encoding and a more advanced state-based encodings using transition systems.
 Furthermore, they enhance the approach in \cite{DBLP:journals/is/AalstSS11} by taking additional data attributes into account.
 
 \citeauthor{DBLP:journals/tkdd/TeinemaaDRM19} reported an in-depth review and benchmark of outcome-oriented predictive process monitoring approaches.
-The study showed that aggregated encoding like counting frequencies of activities as most reliable encoding for outcome-prediction \cite{DBLP:journals/tkdd/TeinemaaDRM19}.
+The study showed that aggregated encodings like counting frequencies of activities are the most reliable encoding for predicting the outcome of a case \cite{DBLP:journals/tkdd/TeinemaaDRM19}.
 
 \citeauthor{DBLP:conf/icpm/ParkS19} showed how LSTM-based predictions can be used to solve a resource allocation problem, leading to direct recommendations for process improvement \cite{DBLP:conf/icpm/ParkS19}.
 
-A comparison of the process prediction methods is presented in Table \ref{tab:preliminaries}.
+The most extensive benchmarking of sequential prediction models has been realized by \citeauthor{DBLP:journals/sosym/TaxTZ20} \cite{DBLP:journals/sosym/TaxTZ20}.
+They show that black-box process prediction methods from the machine learning field outperform process model-oriented techniques.
+The latter offer more interpretable models at the cost of prediction accuracy.
 
+A comparison of the process prediction methods is presented in Table \ref{tab:preliminaries}.
 
 \begin{table}[]
 	\renewcommand{\arraystretch}{1.5}

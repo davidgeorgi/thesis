@@ -262,3 +262,4 @@ pdfkeywords={Master's Thesis, David Benedikt Georgi},]{hyperref}
 \RequirePackage{pifont}
 \RequirePackage{emptypage}
 \RequirePackage{siunitx}
+\RequirePackage{csquotes}

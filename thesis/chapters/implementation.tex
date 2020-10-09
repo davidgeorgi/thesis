@@ -3,7 +3,7 @@ In Section \ref{sec:technology} the underlying technology is depicted, whereas i
 
 \section{Technology}\label{sec:technology}
 
-The implementation of the text-aware process prediction model is purely based on Python 3.6 \cite{python}.
+The implementation of the text-aware process prediction model is purely based on Python 3.8 \cite{python}.
 The set of Python packages that are utilized for the implementation are summarized in Table \ref{tab:packages}.
 All packages follow the open-source development model and are mostly community-driven.
 
@@ -29,10 +29,10 @@ It is used for event log parsing and its internal event log representation.
 TensorFlow \cite{DBLP:journals/corr/AbadiABBCCCDDDG16} is a dataflow oriented framework originally developed by Google, which includes a diverse set of neural network models and serves with its LSTM implementation using the Keras API \cite{chollet2015keras}.
 
 Furthermore, the packages NTLK \cite{DBLP:books/daglib/0022921}, Scikit-learn \cite{DBLP:journals/jmlr/PedregosaVGMTGBPWDVPCBPD11} and Gensim \cite{rehurek_lrec} are applied for the preprocessing and encoding of textual data.
-NTLK is used to realize the tokenization and word lemmatization, whereas the implementation of the text models is supported by the Scikit-learn (Bag of Words, Bag of N-Gram) and Gensim (LDA, Paragraph Vector) packages.
+NTLK is used to realize the tokenization, word lemmatization and stop word removal whereas the implementation of the text models is supported by the Scikit-learn (Bag of Words, Bag of N-Gram) and Gensim (LDA, Paragraph Vector) packages.
 
 
-\section{Model Implementation}\label{sec:model-implementation}
+\section{Model Architecture}\label{sec:model-implementation}
 
 The interface of the text-aware process prediction model (tapp) is realized through a class \texttt{TappModel}, which implements the functions \texttt{fit()},  \texttt{predict()} and  \texttt{evaluate()}, that can be used to fit the model to an event log with historical data, compute prediction for an event log with uncompleted traces and evaluate the performance of the prediction model.
 The \texttt{TappModel} manages the underlying LSTM model and can be configured with the number of shared and specialized layers as well as the dimension of the hidden neurons per LSTM layer.
@@ -45,9 +45,9 @@ The \texttt{TappModel} manages the underlying LSTM model and can be configured w
 \end{figure}
 
 The encoding of traces as described in Section \ref{sec:event}, \ref{sec:time} and \ref{sec:text} is computed in the \texttt{LogEncoder} module, which is controlled by the \texttt{TappModel}.
-The \texttt{LogEncoder} is also fitted to the historical log and can transform (prefix) traces to the encoded matrix format via functions \texttt{fit()} and \texttt{transform()}.
-It is configured with one out of the four text encoding models described in Section \ref{sec:text} (\texttt{BowTextEncoder},  \texttt{BongTextEncoder}, \texttt{LDATextEncoder} and  \texttt{PVTextEncoder}), that realizes the vectorization of textual data.
-Just like the \texttt{LogEncoder}, the text encoding models offers the functions \texttt{fit()} and \texttt{transform()} adapt to the historical data and compute the text encoding.
+The \texttt{LogEncoder} is also fitted to the historical log and can transform traces to the encoded matrix format via functions \texttt{fit()} and \texttt{transform()}.
+It is configured with one out of the four text encoding models described in the Sections \ref{sec:bow} to \ref{sec:lda} (\texttt{BoWTextEncoder},  \texttt{BoNGTextEncoder}, \texttt{LDATextEncoder} and  \texttt{PVTextEncoder}), that realize the vectorization of textual data.
+Similar to the \texttt{LogEncoder}, the text encoding models offers the functions \texttt{fit()} and \texttt{transform()} to adapt to the historical data and compute the text encoding.
 
 During the fitting phase of the  \texttt{LogEncoder}, all possible values for categorical attribute are indexed and the parameters for the normalization of numerical attributes are computed.
 With regard to the text encoding model, the indexed vocabulary of all words (after preprocessing) in the historical event log is built during fitting.

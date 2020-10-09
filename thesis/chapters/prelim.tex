@@ -9,15 +9,15 @@ In this chapter the basic concepts of process mining, text mining, supervised le
 
 Each performed activity belongs to specific case and is completed at a certain time.
 For example, a case can be a patient treated in a hospital, a customer journey or an online order. The time on which an activity for a certain case is performed is specified by a timestamp.
-The subject identified by the case ID, the performed activity and the timestamp form an \textit{event}.
-An event can have additional attributes, describing for example the resource, costs or transaction information associated with the event.
+The associated case ID, the performed activity and the timestamp form together an \textit{event}.
+An event can have additional attributes, describing for example a resource, costs or a transaction.
 
 \begin{table}[htbp!]
 	\small
 	\setlength\tabcolsep{3pt}
 	\begin{tabularx}{\textwidth}{lllllp{4.7cm}l}
 		\toprule
-		\textbf{ID} & \textbf{Activity}          & \textbf{Timestamp} & \textbf{Resource} & \textbf{Cost} & \textbf{Comment}  \\
+		\textbf{ID} & \textbf{Activity}          & \textbf{Timestamp} & \textbf{Resource} & \textbf{Costs} & \textbf{Comment}  \\
 		\midrule
 		0                & Register patient           & 2020-02-01 14:12   & SYSTEM            & 0             & -     \\
 		& Consultation               & 2020-02-01 14:34   & J. Brown, MD    & 24.32         & The patient reports persistent nausea.   \\
@@ -37,7 +37,7 @@ An event can have additional attributes, describing for example the resource, co
 		& Hospitalization       & 2020-02-02 09:20   & M. Johnson      & 130.37        & -     \\
 		...              & ...                        & ...                & ...               & ...           & ...     \\ \bottomrule
 	\end{tabularx}
-	\caption[Artificial event log of patient treatments in a hospital]{An artificial event log of patient treatments in a hospital. Each line corresponds to one event. The events are grouped by their case IDs, that each represent a single patient.}
+	\caption[Artificial event log of patient treatments in a hospital]{An artificial event log of patient treatments in a hospital. Each row corresponds to one event. The events are grouped by their case IDs, each representing a single patient.}
 	\label{tab:event-log}
 \end{table}
 
@@ -55,9 +55,9 @@ Besides the case ID, activity and timestamp, the event log also contains informa
 Traditionally, process mining is divided into a set of subdisciplines mainly process discovery, conformance checking, process enhancement and process analytics \cite{DBLP:conf/caise/EckLLA15}.
 Process discovery aims to generate process models out of event data in order to understand the control flow of a process and enable further analysis.
 Conformance checking is about comparing the intended and observed behavior of a process and identifying deviations.
-On top of these diagnostic approaches, process enhancement deals with the improvement of processes regarding compliance, performance or complexity.
+On top of these diagnostic approaches, process enhancement deals with the improvement of processes regarding compliance, performance and complexity.
 
-Finally, process analytics focuses on metric and performance evaluation of processes. Similar to conformance checking, this term is closely related to business process monitoring, a rising subfield enabling the analysis of running business processes in real-time.
+Finally, process analytics focuses on the metric and performance evaluation of processes. Similar to conformance checking, this term is closely related to business process monitoring, a rising subfield enabling the analysis of running business processes in real-time.
 Driven by the fast and ongoing development of quantitative prediction methods in data science and machine learning, also prediction-based methods have been applied to event data.
 These methods add the forward perspective to business process monitoring and deal with forecasting the future of a running process instance, which is also the main focus of this work.
 
@@ -80,7 +80,7 @@ Given sequences $\sigma_1$ and $\sigma_2$, the concatenation of both sequences i
 Moreover, the $i$-th element of a sequence $\sigma = \langle a_1, a_2, \dots, a_n\rangle$ is accessed using $\sigma(i)= a_i$ for $1 \leq i \leq n$.
 The length of a sequence is denoted by $|\sigma|$.
 For a sequence $\sigma=\langle a_1, a_2, \dots, a_n\rangle$, the function
-$hd^k(\sigma)= \langle a_1, a_2, \dots, a_k\rangle$ gives the prefix of length $k$ of $\sigma$ and $tl^k(\sigma)= \langle a_{k+1}, a_{k+2}, \dots, a_n\rangle$ the suffix of length $n-k$ for $0 \leq k \leq n$.
+$hd^k(\sigma)= \langle a_1, a_2, \dots, a_k\rangle$ gives the head or prefix of length $k$ of $\sigma$ and $tl^k(\sigma)= \langle a_{k+1}, a_{k+2}, \dots, a_n\rangle$ the tail or suffix of length $n-k$ for $0 \leq k \leq n$.
 Note that $\sigma = hd^k(\sigma) \cdot tl^{k}(\sigma)$ for $0 \leq k \leq n$ and any sequence $\sigma$.
 
 A function $f \colon A \to B$ can be lifted element-wise to sequences over $A$, precisely:
@@ -114,8 +114,9 @@ Each additional attribute is assumed to be numerical, categorical or textual, i.
 \end{definition}
 
 
-By lifting the projection functions to sequences a trace can be transformed into a sequence of attributes by applying the projection function to the trace.
+A trace can be transformed into a sequence of attributes by applying a projection function to the trace.
 For example, $\pi_\mathcal{A}(\sigma)$ gives the sequence of the activities of the events in $\sigma$.
+The sequence of activities is also called \textit{path} or \textit{trace variant}.
 
 \begin{definition}[Event Log]
 	An \textit{event log} or \textit{trace log} $\eventlog = \{ \sigma_1, \sigma _2, \dots, \sigma_k \}$ is a set of traces, where each event of a trace is unique in the log and all events of a trace share a case IDs, which is unique per trace.
@@ -128,18 +129,18 @@ Text mining describes all techniques that aim to generate value out of unstructu
 It combines concepts of natural language processing, machine learning and data mining \cite{DBLP:journals/coling/Mihalcea08}.
 
 The base object in text mining is a \textit{document} containing textual data.
-The textual data can be completed unstructured, i.e. it does not conform to a pre-defined data model, or semi-structured, like in an email, where text information is assigned to sender, subject, message etc.
+The textual data can be completely unstructured, i.e. it does not conform to a pre-defined data model, or semi-structured, like in an email, where text information is assigned to sender, subject, message etc.
 In this setting, a document $d \in \Sigma^*$ (i.e. textual data) is always a sequence of symbols from a fixed alphabet $\Sigma$.
 A collection of documents is called \textit{text corpus}, which forms the basis for many text mining techniques.
 
 In order to derive a mathematical representation of the textual data that can be interpreted by learning algorithms, a text model has to be build using the whole text corpus.
-Popular text models are Bag-of-words \cite{harris1954distributional}, Bag-of-n-gram, Paragraph vector (a.k.a. Doc2Vec) \cite{DBLP:conf/icml/LeM14} and Latent Dirichlet Allocation \cite{DBLP:journals/jmlr/BleiNJ03}.
+Popular text models for documents are \textit{Bag of Words} \cite{harris1954distributional}, \textit{Bag of N-Gram}, \textit{Paragraph Vector} (a.k.a. Doc2Vec) \cite{DBLP:conf/icml/LeM14} and \textit{Latent Dirichlet Allocation} \cite{DBLP:journals/jmlr/BleiNJ03}.
 Most models do not work with the raw text data, but require a text normalization step, where the text is cleaned from linguistic variation as well as meaningless words and symbols \cite{DBLP:books/lib/JurafskyM09}.
 
 \section{Supervised Learning}
 
 In \textit{supervised learning} an unknown function is learned (i.e. approximated) from a set of example input-output pairs \cite{DBLP:books/daglib/0023820}.
-In contrast, in \textit{unsupervised learning} no target outputs are available and the machine tries to identify pattern in the data \ref{DBLP:conf/ac/Ghahramani03}.
+In contrast, in \textit{unsupervised learning} no target outputs are available and the goal is to identify pattern in the data \cite{DBLP:conf/ac/Ghahramani03}.
 
 An input instance in the supervised scenario is usually described by a set of \textit{feature variables} $X$ and the output is defined by a \textit{target variable} $y$.
 The target variable $y$ is either continuous (regression problem) or discrete (classification problem).
@@ -148,23 +149,23 @@ Given a \textit{training set} of input-output pairs $\{(X_1, y_1), (X_2, y_2), \
 The challenge in supervised learning is to generalize from the training set of input-output pairs in such a way, that the learned hypothesis function $h(x)$ can also successfully predict the target variable for unseen problem instances.
 In order to evaluate a hypothesis, the function is tested on a separate \textit{test set} of input-output pairs, which has not been used for the construction of $h(X)$.
 
-A hypothesis is assumed to generalize well, if its prediction performance is high on the training set as well as on test set.
-However, if the prediction performance is high on the training set, but performs poorly on unseen data, the hypothesis is \textit{overfitting} with respect to the training data.
+A hypothesis is assumed to generalize well, if its prediction performance is high on the training set and on the test set.
+However, if the prediction performance is high on the training set, but the hypothesis performs poorly on unseen data, the hypothesis is \textit{overfitting} with respect to the training data.
 In this case, the model fails to generalize.
 In contrast, if the model is too simple to fit any data from training set, the hypothesis is \textit{underfitting}.
 
 In many real-world applications, the true function $f(X)$ is stochastic, i.e. we need to estimate a conditional probability function $P(Y | X)$ (classification problem) or a conditional expectation $E(Y | X)$ (regression problem) for the prediction.
 Therefore, the prediction accuracy is always limited by the randomness of the true distribution.
-Typical supervised learning methods are linear regression, support vector machines, decision trees or neural networks including long short-term memory networks.
+Typical supervised learning methods are linear regression, support vector machines \cite{DBLP:journals/ml/CortesV95}, decision trees \cite{DBLP:journals/ml/Quinlan86} or neural networks including long short-term memory networks \cite{DBLP:journals/neco/HochreiterS97}.
 \section{Long Short-Term Memory Networks}
 
 Long short-term memory (LSMT) is an advanced recurrent neural network architecture for sequential data originally presented by \citeauthor{DBLP:journals/neco/HochreiterS97} in \citeyear{DBLP:journals/neco/HochreiterS97} \cite{DBLP:journals/neco/HochreiterS97}.
 This approach addresses the well-known vanishing or exploding gradient problem \cite{DBLP:conf/icml/PascanuMB13}  of traditional recurrent neural networks by introducing more complex LSTM cells as hidden units.
-The proposed architecture has been improved several times \cite{DBLP:journals/neco/GersSC00} \cite {DBLP:journals/tnn/GreffSKSS17} and is considered as one of the most successful recurrent neural network models.
+The proposed architecture has been improved several times \cite{DBLP:journals/neco/GersSC00} \cite {DBLP:journals/tnn/GreffSKSS17} and is currently considered as one of the most successful recurrent neural network models.
 Although, LSTM networks have been available for a long time, the breakthrough of this technology is dated around 2016 after many success stories of LSTM in combination with large data sets and GPU hardware have been reported for sequence to sequence tasks like text translation \cite{DBLP:journals/corr/WuSCLNMKCGMKSJL16}.
 
 Gated recurrent units (GRU) \cite{DBLP:conf/emnlp/ChoMGBBSB14} are the competing gating mechanism by \citeauthor{DBLP:conf/emnlp/ChoMGBBSB14} that have fewer parameters and perform similar to LSTM.
-However, more recent studies show, that LSTM outperforms GRU consistently in neural machine translation tasks  \cite{DBLP:journals/corr/BritzGLL17}.
+However, more recent studies show, that LSTM outperforms GRU consistently in neural machine translation tasks \cite{DBLP:journals/corr/BritzGLL17}.
 
 A simple feedforward neural networks consists of an input layer, arbitrarily many hidden layers and an output layer, where each layer consists of neurons that compute and output the weighted sum of the cells of the previous layer that has been passed to an non-linear activation function \cite{DBLP:journals/nn/Schmidhuber15}.
 These networks can learn and compute complex functions in supervised learning settings, where input and output pattern in form of vectors are provided.
@@ -180,11 +181,11 @@ The module uses as input the state $\vec{c}_{t-1}$ and the hidden output $\vec{h
 \begin{figure}[htbp!]
 	\centering
 	\includegraphics[width=0.9\textwidth]{figures/lstm-module}
-	\caption[Structure of an LSTM module]{LSTM module with four sublayers that manipulate the cell state and compute the module's output. Graphic adapted from \cite{lstm-blog}.}
+	\caption[Structure of an LSTM module]{LSTM module with four sublayers that manipulate the cell state and compute the module's output. The graphic is adapted from \cite{lstm-blog}.}
 	\label{fig:lstm-module}
 \end{figure}
 
-The input vector $\vec{x}_t$ is concatenated with the previous hidden output $\vec{h}_{t-1}$ and transferred to four neural network layers, which are designed to decide what part of the cell state will remain (forget gate $\vec{f}_t$), how it is updated (update gate $\vec{i}_t$ and $\vec{\tilde{c}}_t$) and what the output of the layer will be (output gate $\vec{o}_t$ leading to $\vec{h}_t$ considering the updated cell state $\vec{c}$).
+The input vector $\vec{x}_t$ is concatenated with the previous hidden output $\vec{h}_{t-1}$ and transferred to four neural network layers, which are designed to decide what part of the cell state will remain (forget gate $\vec{f}_t$), how it is updated (update gate $\vec{i}_t$ and $\vec{\tilde{c}}_t$) and what the output of the layer will be (output gate $\vec{o}_t$ leading to $\vec{h}_t$ considering the updated cell state $\vec{c_t}$).
 The sublayer apply $\text{sigmoid}(x) = \frac{1}{1+\exp({-x})}$ or $\tanh(x) = \frac{\exp({x}) - \exp({-x})}{\exp({x}) + \exp({-x})}$ activation functions elementwise to vectors, leading to the following equations:
 
 \begin{align*}
