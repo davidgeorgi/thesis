@@ -74,15 +74,29 @@ For regression tasks, like the next event time and the case cycle time predictio
 	\textrm{MAE} = \dfrac{1}{n}\sum_{i=1}^{n}|\hat{y_i} - y_i| \in [0, \infty).
 \end{equation*}
 This error metric is favored, since it gives a more intuitive interpretation and is less sensitive to outliers compared to similar metrics like the mean squared error (MSE).
-An accuracy of 1 and a MAE of 0 would be the most desirable.
+An accuracy of 1 and a MAE of 0 is the most desirable.
 
 The prediction model is evaluated with each presented text model and different encoding lengths for the text.
 For the Bag of Words and Bag of N-Gram model the encoding length is adjusted by only considering the most frequent terms for the vocabulary.
-The encoding length of the non-textual data depends on the considered attributes and their number of the distinct values in the event logs.
+The encoding dimension of the non-textual data depends on the considered attributes and their number of the distinct values in the event logs.
 The Bag of N-Gram model is used with bigrams ($n=2$).
 The Paragraph Vector model is trained for 15 epochs.
 
 \section{Next Event Prediction}
+
+First, the prediction performance regarding the activity and timestamp of the next event is evaluated.
+We compare the text-aware prediction model to the LSTM baseline, that only considers the activity, timestamp and additional non-textual data.
+
+Compared to the LSTM baseline, the text-aware model is able to improve the prediction performance for the next activity and timestamp on all data sets.
+However, the effect of textual data is much bigger on the simulated data set compared to the real-world data sets.
+The textual data in the simulated log correlates with the control flow by design, in the real-world data the correlation is just assumed.
+The choice of text model has a rather small impact on the results.
+Notably, the BoW and LDA model perform most consistently on all data sets and all text encoding lengths.
+The PV model reaches similar results using a hundred dimensional text vector, but performs worse when a small text embedding size of 10 or 20 is used.
+The BoNG model has a similar performance to BoW model.
+The word order awareness of the first does not convert to better prediction results.
+
+
 
 
 
@@ -134,7 +148,7 @@ LDA&100&  \B   0.9919&     0.0762&     0.5271&     0.0788 \\
 	olive!60!black,every mark/.append style={fill=olive!60!black},mark=diamond*\\%5
 }
 
-\begin{figure}
+\begin{figure}[!htbp]
 	\centering
 	\begin{subfigure}{\textwidth}
 		\centering
@@ -226,8 +240,8 @@ LDA&100&  \B   0.9919&     0.0762&     0.5271&     0.0788 \\
 	\end{tikzpicture}
 	\caption{Next activity accuracy and timestamp MAE on werk.nl data set.}
 \end{subfigure}
-	\caption[Next activity prediction] {Next activity prediction.}
-	\label{fig:test}
+	\caption[Next activity and timestamp prediction performance subject to the prefix length]{Next activity and timestamp prediction performance subject to the prefix length.}
+	\label{fig:next-activity-prefix}
 \end{figure}
 
 
@@ -269,13 +283,13 @@ LDA&100&   \B   0.7139&     1.1134&     0.5442&     0.2029\\
 -&0&     0.6065&     1.6523&  \B    0.5593&     0.1959\\
 		\bottomrule
 	\end{tabularx}
-	\caption[Experimental results for the next event prediction]{Experimental results for the next event prediction.}
+	\caption[Experimental results for the outcome and cycle time prediction]{Experimental results for the outcome and cycle time prediction.}
 	\label{tab:outcome-cycle-time}
 \end{table}
 
 
 
-\begin{figure}
+\begin{figure}[!htbp]
 	\centering
 	\begin{subfigure}{\textwidth}
 		\centering
@@ -367,7 +381,7 @@ LDA&100&   \B   0.7139&     1.1134&     0.5442&     0.2029\\
 		\end{tikzpicture}
 	\caption{Case outcome accuracy and case cycle time MAE on werk.nl data set.}
 	\end{subfigure}
-	\caption[Next activity prediction] {Next activity prediction.}
-	\label{fig:test}
+	\caption[Case outcome and cycle time prediction performance subject to the prefix length]{Case outcome and cycle time prediction performance subject to the prefix length.}
+	\label{fig:outcome-cycle-time-prefix}
 \end{figure}
 
