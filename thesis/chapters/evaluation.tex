@@ -77,28 +77,12 @@ This error metric is favored, since it gives a more intuitive interpretation and
 An accuracy of 1 and a MAE of 0 is the most desirable.
 
 The prediction model is evaluated with each presented text model and different encoding lengths for the text.
-For the Bag of Words and Bag of N-Gram model the encoding length is adjusted by only considering the most frequent terms for the vocabulary.
+For the Bag of Words and Bag of N-Gram model the encoding length is adjusted by only considering the most frequent terms in the vocabulary.
 The encoding dimension of the non-textual data depends on the considered attributes and their number of the distinct values in the event logs.
 The Bag of N-Gram model is used with bigrams ($n=2$).
 The Paragraph Vector model is trained for 15 epochs.
 
 \section{Next Event Prediction}
-
-First, the prediction performance regarding the activity and timestamp of the next event is evaluated.
-We compare the text-aware prediction model to the LSTM baseline, that only considers the activity, timestamp and additional non-textual data.
-
-Compared to the LSTM baseline, the text-aware model is able to improve the prediction performance for the next activity and timestamp on all data sets.
-However, the effect of textual data is much bigger on the simulated data set compared to the real-world data sets.
-The textual data in the simulated log correlates with the control flow by design, in the real-world data the correlation is just assumed.
-The choice of text model has a rather small impact on the results.
-Notably, the BoW and LDA model perform most consistently on all data sets and all text encoding lengths.
-The PV model reaches similar results using a hundred dimensional text vector, but performs worse when a small text embedding size of 10 or 20 is used.
-The BoNG model has a similar performance to BoW model.
-The word order awareness of the first does not convert to better prediction results.
-
-
-
-
 
 \begin{table}[!htbp]
 	\newrobustcmd{\B}{\fontseries{b}\selectfont}
@@ -114,30 +98,57 @@ The word order awareness of the first does not convert to better prediction resu
 			>{\hsize=1.0\hsize}X
 		}
 		\toprule
-		 & & \multicolumn{2}{l}{\textbf{Job Application}} & \multicolumn{2}{l}{\textbf{werk.nl}} & \multicolumn{2}{l}{\textbf{Help Desk}} \\
-		 Text \newline Model & Encoding Length &Accuracy & MAE & Accuracy& MAE  & Accuracy& MAE  \\
+		& & \multicolumn{2}{l}{\textbf{Job Application}} & \multicolumn{2}{l}{\textbf{werk.nl}} & \multicolumn{2}{l}{\textbf{Help Desk}} \\
+		Text & Text &Activity & Time & Activity& Time  & Activity& Time  \\
+		Model & Dimension &Accuracy & MAE & Accuracy& MAE  & Accuracy& MAE  \\
 		\midrule
 		\multicolumn{8}{c}{\textit{Text-Aware Process Prediction (LSTM)}} \\
-BoW&50&    \B 0.9919&     0.0743&     0.5274&     0.0778 \\
-BoW&100& \B   0.9919&     0.0753& \B    0.5293&  \B   0.0776 \\
-BoW&500&  \B   0.9919&     0.0737&     0.5229&     0.0785 \\
-BoNG&50&     0.9918&     0.0743&     0.5288&     0.0788 \\
-BoNG&100& \B    0.9919&     0.0735&     0.5242&     0.0798 \\
-BoNG&500& \B    0.9919&     0.0738&     0.5214&    0.0782 \\
-PV&10&     0.9216&     0.1633&     0.5153&     0.0785 \\
-PV&20&     0.9759&     0.0939&     0.5206&     0.0789 \\
-PV&100&     0.9916&     0.0760&     0.5199&     0.0785 \\
-LDA&10& \B    0.9919&  \B   0.0734&     0.5244&     0.0786 \\
-LDA&20& \B    0.9919&     0.0756&     0.5214&     0.0782 \\
-LDA&100&  \B   0.9919&     0.0762&     0.5271&     0.0788 \\
+		BoW&50&    \B 0.9919&     0.0743&     0.5274&     0.0778 \\
+		BoW&100& \B   0.9919&     0.0753& \B    0.5293&  \B   0.0776 \\
+		BoW&500&  \B   0.9919&     0.0737&     0.5229&     0.0785 \\
+		BoNG&50&     0.9918&     0.0743&     0.5288&     0.0788 \\
+		BoNG&100& \B    0.9919&     0.0735&     0.5242&     0.0798 \\
+		BoNG&500& \B    0.9919&     0.0738&     0.5214&    0.0782 \\
+		PV&10&     0.9216&     0.1633&     0.5153&     0.0785 \\
+		PV&20&     0.9759&     0.0939&     0.5206&     0.0789 \\
+		PV&100&     0.9916&     0.0760&     0.5199&     0.0785 \\
+		LDA&10& \B    0.9919&  \B   0.0734&     0.5244&     0.0786 \\
+		LDA&20& \B    0.9919&     0.0756&     0.5214&     0.0782 \\
+		LDA&100&  \B   0.9919&     0.0762&     0.5271&     0.0788 \\
 		\multicolumn{8}{c}{\textit{LSTM baseline}} \\
--&0&     0.8733&     0.2122&     0.5128&     0.0785 \\
+		-&0&     0.8733&     0.2122&     0.5128&     0.0785 \\
 		\bottomrule
 	\end{tabularx}
 	\caption[Experimental results for the next event prediction]{Experimental results for the next event prediction.}
 	\label{tab:next-event}
 \end{table}
 
+First, the prediction performance regarding the activity and timestamp of the next event is evaluated.
+We compare the text-aware prediction model to the LSTM baseline, that only considers the activity, timestamp and additional non-textual data.
+The results are summarized in Table \ref{tab:next-event}.
+Each line in the table states the prediction accuracy for the next activity and the mean absolute error in days for the next timestamp prediction of a single model on all evaluated event logs.
+Each text-aware model is tested with 3 different encoding lengths for the text.
+The BoW and BoNG models are evaluated with 50, 100 and 500 dimensional text vectors, the PV and LDA models with smaller text encodings of size 10, 20 and 100.
+
+Compared to the LSTM baseline, the text-aware model is able to improve the prediction performance for the next activity and timestamp on all data sets.
+However, the effect of textual data is much bigger on the simulated data set compared to the real-world data sets.
+The textual data in the simulated log correlates with the control flow by design, in the real-world data the correlation is just assumed.
+
+The choice of text model has a rather small impact on the results.
+Notably, the BoW and LDA model perform most consistently on all data sets and all text encoding lengths.
+The PV model reaches similar results using a hundred dimensional text vector, but performs worse when a small text embedding size of 10 or 20 is used.
+The BoNG model has a similar performance to BoW model.
+The word order awareness of the first does not convert to better prediction results.
+
+In addition, the prediction performance is evaluated per prefix length for each event log.
+Figure \ref{fig:next-activity-prefix} shows the next activity prediction accuracy and next timestamp MAE.
+On the job application event log all text-aware process models almost perfectly predict the activity.
+The LSTM baseline accuracy drops down to around 75\% at every decision point in the process, since it can not take advantage of the documents, but simply predicts the most likely next activity.
+Similarly, the timestamp prediction error of the LSTM baseline jumps up at the decision point.
+All text-aware approaches can unequivocally utilize the textual information, despite the fact that all documents in the log are unique.
+However, the choice of text model has a minimal influence on performance for all prefix lengths.
+
+On the werk.nl log the next activity prediction accuracy is about 1\% 
 
 
 \pgfplotscreateplotcyclelist{colorlist}{%
@@ -154,7 +165,7 @@ LDA&100&  \B   0.9919&     0.0762&     0.5271&     0.0788 \\
 		\centering
 		\begin{tikzpicture}[scale=0.9]
 			\begin{axis}[
-				xlabel={Prefix length},
+				xlabel={Prefix Length},
 				ylabel={Accuracy},
 				legend pos=north west,
 				cycle list name=colorlist,
@@ -175,7 +186,7 @@ LDA&100&  \B   0.9919&     0.0762&     0.5271&     0.0788 \\
 		\hfill
 		\begin{tikzpicture}[scale=0.9]
 			\begin{axis}[
-				xlabel={Prefix length},
+				xlabel={Prefix Length},
 				ylabel={Mean Absolute Error},
 				legend pos=north west,
 				cycle list name=colorlist,
@@ -200,7 +211,7 @@ LDA&100&  \B   0.9919&     0.0762&     0.5271&     0.0788 \\
 	\centering
 	\begin{tikzpicture}[scale=0.9]
 		\begin{axis}[
-			xlabel={Prefix length},
+			xlabel={Prefix Length},
 			ylabel={Accuracy},
 			legend pos=north west,
 			cycle list name=colorlist,
@@ -221,7 +232,7 @@ LDA&100&  \B   0.9919&     0.0762&     0.5271&     0.0788 \\
 	\hfill
 	\begin{tikzpicture}[scale=0.9]
 		\begin{axis}[
-			xlabel={Prefix length},
+			xlabel={Prefix Length},
 			ylabel={Mean Absolute Error},
 			legend pos=north east,
 			cycle list name=colorlist,
@@ -248,7 +259,6 @@ LDA&100&  \B   0.9919&     0.0762&     0.5271&     0.0788 \\
 
 \section{Outcome and Case Cycle Time Prediction}
 
-
 \begin{table}[!htbp]
 	\newrobustcmd{\B}{\fontseries{b}\selectfont}
 	\setlength\tabcolsep{3pt}
@@ -264,28 +274,43 @@ LDA&100&  \B   0.9919&     0.0762&     0.5271&     0.0788 \\
 		}
 		\toprule
 		& & \multicolumn{2}{l}{\textbf{Job Application}} & \multicolumn{2}{l}{\textbf{werk.nl}} & \multicolumn{2}{l}{\textbf{Help Desk}} \\
-		Text \newline Model & Encoding Length &Accuracy & MAE & Accuracy& MAE  & Accuracy& MAE  \\
+		Text & Text &Outcome & Cycle & Outcome& Cycle  & Outcome& Cycle  \\
+		Model & Dimension &Accuracy & MAE & Accuracy& MAE  & Accuracy& MAE  \\
 		\midrule
 		\multicolumn{8}{c}{\textit{Text-Aware Process Prediction (LSTM)}} \\
-BoW&50&   \B   0.7139&     1.1081&     0.5346&     0.2073\\
-BoW&100&   \B   0.7139&     1.1083&     0.5411&  \B    0.1925\\
-BoW&500&   \B   0.7139&     1.0698&     0.5276&     0.2027\\
-BoNG&50&     0.7138&     1.0922&     0.5492&     0.1987\\
-BoNG&100&     0.7137&     1.0122&     0.5378&     0.2075\\
-BoNG&500&     0.6948&  \B   0.9918&     0.5241&     0.1930\\
-PV&10&     0.6639&     1.4796&     0.5464&     0.2163\\
-PV&20&     0.7009&     1.2325&     0.5545&     0.2047\\
-PV&100&     0.7130&     1.0390&     0.5378&     0.2092\\
-LDA&10&   \B   0.7139&     1.1083&     0.5508&     0.2091\\
-LDA&20&    \B  0.7139&     1.1178&     0.5531&     0.2033\\
-LDA&100&   \B   0.7139&     1.1134&     0.5442&     0.2029\\
+		BoW&50&   \B   0.7139&     1.1081&     0.5346&     0.2073\\
+		BoW&100&   \B   0.7139&     1.1083&     0.5411&  \B    0.1925\\
+		BoW&500&   \B   0.7139&     1.0698&     0.5276&     0.2027\\
+		BoNG&50&     0.7138&     1.0922&     0.5492&     0.1987\\
+		BoNG&100&     0.7137&     1.0122&     0.5378&     0.2075\\
+		BoNG&500&     0.6948&  \B   0.9918&     0.5241&     0.1930\\
+		PV&10&     0.6639&     1.4796&     0.5464&     0.2163\\
+		PV&20&     0.7009&     1.2325&     0.5545&     0.2047\\
+		PV&100&     0.7130&     1.0390&     0.5378&     0.2092\\
+		LDA&10&   \B   0.7139&     1.1083&     0.5508&     0.2091\\
+		LDA&20&    \B  0.7139&     1.1178&     0.5531&     0.2033\\
+		LDA&100&   \B   0.7139&     1.1134&     0.5442&     0.2029\\
 		\multicolumn{8}{c}{\textit{LSTM baseline}} \\
--&0&     0.6065&     1.6523&  \B    0.5593&     0.1959\\
+		-&0&     0.6065&     1.6523&  \B    0.5593&     0.1959\\
 		\bottomrule
 	\end{tabularx}
 	\caption[Experimental results for the outcome and cycle time prediction]{Experimental results for the outcome and cycle time prediction.}
 	\label{tab:outcome-cycle-time}
 \end{table}
+
+The case outcome and cycle time prediction is evaluated analogously to next event prediction.
+In contrast to the next event prediction, the target values are case properties that are the same for every prefix trace of the case.
+As outcome the final activity of the trace is used as described in Section \ref{sec:overview}.
+The results are summarized in in Table \ref{tab:outcome-cycle-time}.
+
+The prediction performance of the text-aware models is significantly higher for the job application event log for both prediction tasks, but not for the werk.nl log.
+On the job application
+Regarding the outcome prediction for the werk.nl log the baseline LSTM approach achieves the highest accuracy.
+
+
+
+
+
 
 
 
@@ -295,7 +320,7 @@ LDA&100&   \B   0.7139&     1.1134&     0.5442&     0.2029\\
 		\centering
 		\begin{tikzpicture}[scale=0.9]
 			\begin{axis}[
-				xlabel={Prefix length},
+				xlabel={Prefix Length},
 				ylabel={Accuracy},
 				legend pos=north west,
 				cycle list name=colorlist,
@@ -316,7 +341,7 @@ LDA&100&   \B   0.7139&     1.1134&     0.5442&     0.2029\\
 		\hfill
 		\begin{tikzpicture}[scale=0.9]
 			\begin{axis}[
-				xlabel={Prefix length},
+				xlabel={Prefix Length},
 				ylabel={Mean Absolute Error},
 				legend pos=north west,
 				cycle list name=colorlist,
@@ -341,7 +366,7 @@ LDA&100&   \B   0.7139&     1.1134&     0.5442&     0.2029\\
 		\centering
 		\begin{tikzpicture}[scale=0.9]
 			\begin{axis}[
-				xlabel={Prefix length},
+				xlabel={Prefix Length},
 				ylabel={Accuracy},
 				legend pos=north west,
 				cycle list name=colorlist,
@@ -362,7 +387,7 @@ LDA&100&   \B   0.7139&     1.1134&     0.5442&     0.2029\\
 		\hfill
 		\begin{tikzpicture}[scale=0.9]
 			\begin{axis}[
-				xlabel={Prefix length},
+				xlabel={Prefix Length},
 				ylabel={Mean Absolute Error},
 				legend pos=north east,
 				cycle list name=colorlist,
