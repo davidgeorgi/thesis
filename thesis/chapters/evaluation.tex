@@ -36,11 +36,11 @@ Furthermore, each admission event contains a diagnosis as text information.
 A case contains all the admission and discharge events of a single patient.
 Admission and discharge events occur alternating and every admission event is followed by a discharge event.
 
-The three logs represent different levels of process complexity.
+The logs represent three different levels of process complexity.
 The job application log contains 11 different activities, 41 trace variants and 185 unique words (after preprocessing) in the text attribute.
-This log is the quite structured and therefore easier to predict.
-In contrast, the customer journey log has 18 different activities, 1001 trace variants and 817 unique words.
-The hospital admission log is the most complex with 26 activities, 2784 trace variants and 4633 (!) unique words.
+Therefore, this log can be considered as quite structured and is subsequently easier to predict.
+In contrast, the customer journey log has 18 different activities, 1\,001 trace variants and 817 unique words.
+The hospital admission log is the most complex with 26 activities, 2\,784 trace variants and 4\,633 (!) unique words.
 
 \begin{table}[!htbp]
 	\begin{tabularx}{\textwidth}{l r r r}
@@ -74,10 +74,11 @@ Each event log is evaluated in a consistent procedure.
 In the first step, the event log is separated into a training and test log. 
 The training log consists of the first 2/3 chronologically ordered traces and is used to fit the prediction model to the historical data.
 The remaining 1/3 of traces are used to measure the prediction performance.
-For each trace $\sigma$ in the test log, all prefixes $hd^k(\sigma)$ of length $2 \leq k \leq |\sigma| - 1$ are considered as instances for prediction.
-For prefix traces with only one event, predictions seem to be less stable as also observed in \cite{DBLP:conf/caise/TaxVRD17} and are therefore not included for the metric computation.
-The LSTM network is trained with at most 100 epochs and the learning rate is initialized with 0.001.
-During the training of the LSTM model, 20\% of the training log is used for validation: If the error on the validation log is not decreasing anymore for 5 epochs, the training rate is reduced, and if the error is not decreased for 10 epochs, the training is stopped in order to avoid overfitting.
+For each trace $\sigma$ in the test log, all prefixes $hd^k(\sigma)$ of length $1 \leq k \leq |\sigma| - 1$ are considered as instances for prediction.
+
+The LSTM network is trained with at most 25 epochs and the learning rate is initialized with 0.001.
+During the training of the LSTM model, 20\% of the training log is used for validation: If the error on the validation log is not decreasing anymore, the training rate is reduced by a factor of 10.
+In addition, if the error is not decreasing for 3 epochs in a row, the training is stopped in order to avoid overfitting.
 Furthermore, the LSTM layers use dropout \cite{DBLP:journals/corr/abs-1207-0580} of 20\% during training as an additional measure against overfitting.
 
 For classification (i.e. categorical prediction) task, like next event and outcome prediction, the accuracy is utilized as metric.
@@ -93,11 +94,16 @@ For regression tasks, like the next event time and the case cycle time predictio
 This error metric is favored, since it gives a more intuitive interpretation and is less sensitive to outliers compared to similar metrics like the mean squared error (MSE).
 An accuracy of 1 and a MAE of 0 is the most desirable.
 
-The prediction model is evaluated with each presented text model and different encoding lengths for the text.
+The text-aware process prediction model is evaluated with all presented text models namely Bag of Words, Bag of N-Gram, Paragraph Vector and Latent Dirichlet Allocation.
+Each model is tested with 3 different encoding lengths for the text.
+The BoW and BoNG models are evaluated with 50, 100 and 500 dimensional text vectors, the PV and LDA models with smaller text encodings of size 10, 20 and 100.
 For the Bag of Words and Bag of N-Gram model the encoding length is adjusted by only considering the most frequent terms in the vocabulary.
 The encoding dimension of the non-textual data depends on the considered attributes and their number of the distinct values in the event logs.
-The Bag of N-Gram model is used with bigrams ($n=2$).
-The Paragraph Vector model is trained for 15 epochs.
+The Bag of N-Gram model is used with bigrams ($n=2$) and the Paragraph Vector model is trained for 15 epochs.
+
+The text-aware prediction model is compared to the pure LSTM model approach based on the ideas of \cite{DBLP:conf/caise/TaxVRD17} and \cite{DBLP:conf/ssci/NavarinVPS17}, that only considers the activity, timestamp and additional non-textual data.
+The latter can be considered as the current state-of-the-art approach in process prediction, if the prediction performance is the only criteria.
+
 
 \section{Next Activity and Timestamp Prediction}
 
@@ -120,20 +126,20 @@ The Paragraph Vector model is trained for 15 epochs.
 		Model & Dimension &Accuracy & MAE & Accuracy& MAE  & Accuracy& MAE  \\
 		\midrule
 		\multicolumn{8}{c}{\textit{Text-Aware Process Prediction (LSTM)}} \\
-BoW&50&  \B   0.9166&     0.1252&     0.5321&     0.0779&     0.7521&    44.0700\\
-BoW&100&     0.9163&     0.1266&     0.5316&     0.0800&     0.7538&    43.6988\\
-BoW&500&     0.9163&     0.1251&     0.5307&     0.0785&  \B   0.7564&    42.7451\\
-BoNG&50&     0.8978&     0.1569&     0.5307&     0.0796&     0.7537&    42.9530\\
-BoNG&100&     0.9139&     0.1299&  \B   0.5334& \B    0.0781&     0.7549&    43.8886\\
-BoNG&500&     0.9164&     0.1251&     0.5256&     0.0788&     0.7545&    44.3789\\
-PV&10&     0.8594&     0.2056&     0.5220&     0.0802&     0.7486&    42.9184\\
-PV&20&     0.9052&     0.1366&     0.5241&     0.0809&     0.7529& \B   42.4319\\
-PV&100&     0.9111&     0.1565&     0.5248&     0.0791&     0.7536&    43.3412\\
-LDA&10&     0.9163&  \B   0.1232&     0.5238&     0.0783&     0.7530&    42.5900\\
-LDA&20&     0.9163& \B    0.1232&     0.5238&     0.0789&     0.7533&    43.3191\\
-LDA&100&     0.9162&     0.1233&     0.5326&     0.0788&  \B   0.7564&    44.7474\\
+BoW&50&     0.8892&     0.1043&     0.4896&     0.1787&     0.5982&    27.9673\\
+BoW&100& \B    0.8894&     0.1046& \B    0.4906&  \B   0.1767&     0.6045&    27.8268\\
+BoW&500&     0.8890&     0.1067&     0.4842&     0.1796&  \B   0.6134&    30.7915\\
+BoNG&50&     0.8734&     0.1315&     0.4889&  \B   0.1767&     0.5916&    27.6287\\
+BoNG&100&     0.8870&     0.1087&     0.4875&     0.1783&     0.6010&    27.9706\\
+BoNG&500&     0.8888&  \B   0.1040&     0.4867&     0.1829&     0.6020&    28.3840\\
+PV&10&     0.8316&     0.1749&     0.4802&     0.1789&     0.5877&    28.9150\\
+PV&20&     0.8760&     0.1180&     0.4825&     0.1781&     0.5889&    27.6080\\
+PV&100&     0.8869&     0.1194&     0.4825&     0.1777&     0.5896&    27.4488\\
+LDA&10&     0.8754&     0.1370&     0.4833&     0.1783&     0.5859&    27.7591\\
+LDA&20&     0.8892&     0.1045&     0.4886&     0.1780&     0.5920&    27.9961\\
+LDA&100&     0.8892&     0.1045&     0.4878&     0.1772&     0.6027&    28.0485\\
 		\multicolumn{8}{c}{\textit{LSTM baseline}} \\
--&0&     0.7671&     0.2995&     0.5152&     0.0787&     0.7533&    42.5521\\
+-&0&     0.7647&     0.2502&     0.4740&     0.1779&     0.5870&  \B  27.3528\\
 		\bottomrule
 	\end{tabularx}
 	\caption[Experimental results for the next event prediction]{Experimental results for the next event prediction.}
@@ -141,31 +147,40 @@ LDA&100&     0.9162&     0.1233&     0.5326&     0.0788&  \B   0.7564&    44.747
 \end{table}
 
 First, the prediction performance regarding the activity and timestamp of the next event is evaluated.
-We compare the text-aware prediction model to the LSTM baseline, that only considers the activity, timestamp and additional non-textual data.
 The results are summarized in Table \ref{tab:next-event}.
 Each line in the table states the prediction accuracy for the next activity and the mean absolute error in days for the next timestamp prediction of a single model on all evaluated event logs.
-Each text-aware model is tested with 3 different encoding lengths for the text.
-The BoW and BoNG models are evaluated with 50, 100 and 500 dimensional text vectors, the PV and LDA models with smaller text encodings of size 10, 20 and 100.
 
-Compared to the LSTM baseline, the text-aware model is able to improve the prediction performance for the next activity and timestamp on all data sets.
-However, the effect of textual data is much bigger on the simulated data set compared to the real-world data sets.
-The textual data in the simulated log correlates with the control flow by design, in the real-world data the correlation is just assumed.
+Compared to the LSTM baseline, the text-aware model is able to improve the prediction performance for the next activity and timestamp on all data sets for at least one 
+parameterization.
+However, the effect of textual data is varies a lot between the data sets and the prediction tasks.
+A reason for that is, that the textual data in the simulated log correlates with the control flow by design, where in the real-world data the correlation is only assumed and probably significantly lower.
+
+On the job application log the accuracy of the next activity prediction is increased by up to 14.95 percentage points using the textual data.
+In contrast, on the customer journey log the prediction is improved by at most 1.82 percentage points.
+On the hospital admission log the prediction accuracy is improved by at most 0.031 percentage points and even reduced for some models.
+The hospital log has the biggest vocabulary by far with 4\,633 unique words and contains 2\,784 trace variants.
+Therefore, the utilization of textual data has a rather small impact.
+
+The timestamp prediction is significantly improved on the job application log (0.1232 vs 0.2995 MAE), but only a little bit improved on the customer journey log.
+On the hospital admission log the text-aware approach makes worse timestamp prediction on the majority of models.
 
 The choice of text model has a rather small impact on the results.
 Notably, the BoW and LDA model perform most consistently on all data sets and all text encoding lengths.
 The PV model reaches similar results using a hundred dimensional text vector, but performs worse when a small text embedding size of 10 or 20 is used.
-The BoNG model has a similar performance to BoW model.
-The word order awareness of the first does not convert to better prediction results.
+The BoNG model has a similar performance compared to the BoW model and delivers the best results on the customer journey log.
+Nevertheless, the word order awareness of the BoNG model does not necessarily convert to better prediction results on others logs.
 
 In addition, the prediction performance is evaluated per prefix length for each event log.
-Figure \ref{fig:next-activity-prefix} shows the next activity prediction accuracy and next timestamp MAE.
-On the job application event log all text-aware process models almost perfectly predict the activity.
-The LSTM baseline accuracy drops down to around 75\% at every decision point in the process, since it can not take advantage of the documents, but simply predicts the most likely next activity.
-Similarly, the timestamp prediction error of the LSTM baseline jumps up at the decision point.
-All text-aware approaches can unequivocally utilize the textual information, despite the fact that all documents in the log are unique.
-However, the choice of text model has a minimal influence on performance for all prefix lengths.
+Figure \ref{fig:next-activity-prefix} shows the next activity prediction accuracy and next timestamp MAE for every prefix trace of length $1 \leq k \leq 8$.
+For the text-aware models only the best text encoding length is shown in the diagram.
+On the job application event log all text-aware process models almost perfectly predict the next activity after 3 events (i.e. after the application documents are available).
+This shows that all text-aware approaches can unequivocally take advantage of the emails at every decision point in the process, despite the fact that all documents in the log are unique.
+The improvements on the activity prediction lead consequently to significantly better timestamp predictions on this log.
 
-On the werk.nl log the next activity prediction accuracy is about 1\% 
+
+
+
+
 
 
 \pgfplotscreateplotcyclelist{colorlist}{%
@@ -191,7 +206,7 @@ On the werk.nl log the next activity prediction accuracy is about 1\%
 				\addlegendentry{Baseline}
 				\addplot table[x=index,y=naBoW50, col sep= comma] {data/prefix_application.csv};
 				\addlegendentry{BoW}
-				\addplot table[x=index,y=naBoNG500, col sep= comma]  {data/prefix_application.csv};
+				\addplot table[x=index,y=naBoNG100, col sep= comma]  {data/prefix_application.csv};
 				\addlegendentry{BoNG}
 				\addplot table[x=index,y=naPV100, col sep= comma]  {data/prefix_application.csv};
 				\addlegendentry{PV}
@@ -340,20 +355,20 @@ On the werk.nl log the next activity prediction accuracy is about 1\%
 		Model & Dimension &Accuracy & MAE & Accuracy& MAE  & Accuracy& MAE  \\
 		\midrule
 		\multicolumn{8}{c}{\textit{Text-Aware Process Prediction (LSTM)}} \\
-BoW&50&     0.7207&     1.2829&     0.5460&     0.2058&     0.7521&    44.0700\\
-BoW&100&     0.7212&     1.2661&     0.5514&     0.1931&     0.7538&    43.6988\\
-BoW&500&   \B  0.7223& \B    1.2587&     0.5402&     0.2010&  \B   0.7564&    42.7451\\
-BoNG&50&     0.7065&     1.3067&   \B  0.5619&     0.1934&     0.7537&    42.9530\\
-BoNG&100&     0.7205&     1.2650&     0.5534&     0.1957&     0.7549&    43.8886\\
-BoNG&500&     0.7139&     1.2728&     0.5454&  \B   0.1672&     0.7545&    44.3789\\
-PV&10&     0.6692&     1.4341& \B    0.5619&     0.2036&     0.7486&    42.9184\\
-PV&20&     0.7103&     1.3401&     0.5602&     0.1926&     0.7529&  \B  42.4319\\
-PV&100&     0.7130&     1.3188&     0.5534&     0.2011&     0.7536&    43.3412\\
-LDA&10&     0.7204&     1.2594&     0.5592&     0.2081&     0.7530&    42.5900\\
-LDA&20&     0.7209&     1.2602&     0.5611&     0.1864&     0.7533&    43.3191\\
-LDA&100&     0.7210&     1.2631&     0.5556&     0.2051&  \B   0.7564&    44.7474\\
+BoW&50&  \B   0.6762&     1.4150&     0.5095&     0.3144&     0.6136&    94.8308\\
+BoW&100&     0.6687&     1.4203&     0.5011&     0.3136&     0.6190&    97.2484\\
+BoW&500&     0.6757&     1.4146&     0.4984&     0.3090&  \B   0.6198&   100.8792\\
+BoNG&50&     0.6632&     1.4495&     0.5115& \B    0.2995&     0.6149&    95.8228\\
+BoNG&100&     0.6746&     1.4237&     0.5040&     0.3105&     0.6151&    91.5891\\
+BoNG&500&     0.6694&     1.4235&     0.4968&     0.3068&     0.6081&    96.1264\\
+PV&10&     0.6253&     1.5803&     0.5123&     0.3173&     0.6050&    92.6440\\
+PV&20&     0.6644&     1.4951&     0.5106&     0.3141&     0.6057&    92.7924\\
+PV&100&     0.6678&     1.4577&     0.5083&     0.3167&     0.6103&    93.0984\\
+LDA&10&     0.6684&     1.4541&     0.5099&     0.3225&     0.6065&    92.6729\\
+LDA&20&     0.6750&   \B  1.4132&  \B   0.5165&     0.3129&     0.6057&   101.0274\\
+LDA&100&     0.6744&     1.4183&     0.5114&     0.3091&     0.6125& \B   91.1070\\
 		\multicolumn{8}{c}{\textit{LSTM baseline}} \\
-\multicolumn{2}{l}{Based on \cite{DBLP:conf/caise/TaxVRD17}+\cite{DBLP:conf/ssci/NavarinVPS17}} &     0.6133&     1.6240&     0.5614&     0.2067&     0.7533&    42.5521 \\
+\multicolumn{2}{l}{Based on \cite{DBLP:conf/caise/TaxVRD17}+\cite{DBLP:conf/ssci/NavarinVPS17}} &  0.5836&     1.7144&     0.5083&     0.3158&     0.6043&    91.6329 \\
 		\bottomrule
 	\end{tabularx}
 	\caption[Experimental results for the outcome and cycle time prediction]{Experimental results for the outcome and cycle time prediction.}
@@ -361,13 +376,21 @@ LDA&100&     0.7210&     1.2631&     0.5556&     0.2051&  \B   0.7564&    44.747
 \end{table}
 
 The case outcome and cycle time prediction is evaluated analogously to next event prediction.
-In contrast to the next event prediction, the target values are case properties that are the same for every prefix trace of the case.
+In contrast to the next event prediction, the target values are case properties, i.e. they are the same for every prefix trace of the case.
 As outcome the final activity of the trace is used as described in Section \ref{sec:overview}.
-The results are summarized in in Table \ref{tab:outcome-cycle-time}.
+The results are summarized in Table \ref{tab:outcome-cycle-time}.
 
-The prediction performance of the text-aware models is significantly higher for the job application event log for both prediction tasks, but not for the werk.nl log.
-On the job application
-Regarding the outcome prediction for the werk.nl log the baseline LSTM approach achieves the highest accuracy.
+On the job application log the text-aware prediction model can predict the outcome of the case with 67.62\% accuracy using the BoW text model compared to 58.36\% accuracy on the baseline approach.
+The MAE on the case cycle time prediction can be reduced to 1.4132 compared to 1.7144 on the baseline approach.
+
+On the customer journey log the text-awareness leads to much smaller improvements.
+The best outcome prediction is realized with the LDA text model (51.65\% accuracy), which improves the prediction by 0.83 percentage points.
+The case cycle time MAE is the lowest using the BoNG model with 0.2995, which improves the baseline prediction by 0.0163 days (= 23.47 minutes).
+Strikingly, some text-aware models have slightly worse predictions like the BoW and BoNG models with 500 dimensional text encodings on the outcome prediction tasks.
+A possible reasons for that is, that with a vocabulary size of 817 after preprocessing also infrequent words are encoded, which provide rather low prediction value.
+
+On the hospital admission log the text-aware approach delivers improvements on the outcome prediction task by up to 1.55 percentage points.
+However, the cycle time prediction is worse for almost all text-aware models except the LDA and BoNG model with 100 dimensional text encodings.
 
 
 
@@ -395,7 +418,7 @@ Regarding the outcome prediction for the werk.nl log the baseline LSTM approach 
 				\addlegendentry{BoNG}
 				\addplot table[x=index,y=oaPV100, col sep= comma]  {data/prefix_application.csv};
 				\addlegendentry{PV}
-				\addplot table[x=index,y=oaLDA100, col sep= comma] {data/prefix_application.csv};
+				\addplot table[x=index,y=oaLDA20, col sep= comma] {data/prefix_application.csv};
 				\addlegendentry{LDA}
 				\legend{}
 			\end{axis}
@@ -412,11 +435,11 @@ Regarding the outcome prediction for the werk.nl log the baseline LSTM approach 
 				\addlegendentry{Baseline}
 				\addplot table[x=index,y=ctBoW500, col sep= comma] {data/prefix_application.csv};
 				\addlegendentry{BoW}
-				\addplot table[x=index,y=ctBoNG100, col sep= comma]  {data/prefix_application.csv};
+				\addplot table[x=index,y=ctBoNG500, col sep= comma]  {data/prefix_application.csv};
 				\addlegendentry{BoNG}
 				\addplot table[x=index,y=ctPV100, col sep= comma]  {data/prefix_application.csv};
 				\addlegendentry{PV}
-				\addplot table[x=index,y=ctLDA10, col sep= comma] {data/prefix_application.csv};
+				\addplot table[x=index,y=ctLDA20, col sep= comma] {data/prefix_application.csv};
 				\addlegendentry{LDA}
 				\legend{}
 			\end{axis}
@@ -435,7 +458,7 @@ Regarding the outcome prediction for the werk.nl log the baseline LSTM approach 
 				]
 				\addplot table[x=index,y=oa-0, col sep= comma] {data/prefix_werk.csv};
 				\addlegendentry{Baseline}
-				\addplot table[x=index,y=oaBoW100, col sep= comma] {data/prefix_werk.csv};
+				\addplot table[x=index,y=oaBoW50, col sep= comma] {data/prefix_werk.csv};
 				\addlegendentry{BoW}
 				\addplot table[x=index,y=oaBoNG50, col sep= comma] {data/prefix_werk.csv};
 				\addlegendentry{BoNG}
@@ -456,13 +479,13 @@ Regarding the outcome prediction for the werk.nl log the baseline LSTM approach 
 				]
 				\addplot table[x=index,y=ct-0, col sep= comma] {data/prefix_werk.csv};
 				\addlegendentry{Baseline}
-				\addplot table[x=index,y=ctBoW100, col sep= comma] {data/prefix_werk.csv};
+				\addplot table[x=index,y=ctBoW500, col sep= comma] {data/prefix_werk.csv};
 				\addlegendentry{BoW}
-				\addplot table[x=index,y=ctBoNG500, col sep= comma] {data/prefix_werk.csv};
+				\addplot table[x=index,y=ctBoNG50, col sep= comma] {data/prefix_werk.csv};
 				\addlegendentry{BoNG}
 				\addplot table[x=index,y=ctPV20, col sep= comma]  {data/prefix_werk.csv};
 				\addlegendentry{PV}
-				\addplot table[x=index,y=ctLDA20, col sep= comma] {data/prefix_werk.csv};
+				\addplot table[x=index,y=ctLDA100, col sep= comma] {data/prefix_werk.csv};
 				\addlegendentry{LDA}
 				
 			\end{axis}
@@ -482,7 +505,7 @@ Regarding the outcome prediction for the werk.nl log the baseline LSTM approach 
 			\addlegendentry{Baseline}
 			\addplot table[x=index,y=oaBoW500, col sep= comma] {data/prefix_admissions.csv};
 			\addlegendentry{BoW}
-			\addplot table[x=index,y=oaBoNG100, col sep= comma] {data/prefix_admissions.csv};
+			\addplot table[x=index,y=oaBoNG500, col sep= comma] {data/prefix_admissions.csv};
 			\addlegendentry{BoNG}
 			\addplot table[x=index,y=oaPV100, col sep= comma]  {data/prefix_admissions.csv};
 			\addlegendentry{PV}
@@ -501,11 +524,11 @@ Regarding the outcome prediction for the werk.nl log the baseline LSTM approach 
 			]
 			\addplot table[x=index,y=ct-0, col sep= comma] {data/prefix_admissions.csv};
 			\addlegendentry{Baseline}
-			\addplot table[x=index,y=ctBoW500, col sep= comma] {data/prefix_admissions.csv};
+			\addplot table[x=index,y=ctBoW100, col sep= comma] {data/prefix_admissions.csv};
 			\addlegendentry{BoW}
 			\addplot table[x=index,y=ctBoNG50, col sep= comma] {data/prefix_admissions.csv};
 			\addlegendentry{BoNG}
-			\addplot table[x=index,y=ctPV20, col sep= comma]  {data/prefix_admissions.csv};
+			\addplot table[x=index,y=ctPV100, col sep= comma]  {data/prefix_admissions.csv};
 			\addlegendentry{PV}
 			\addplot table[x=index,y=ctLDA10, col sep= comma] {data/prefix_admissions.csv};
 			\addlegendentry{LDA}
@@ -518,3 +541,4 @@ Regarding the outcome prediction for the werk.nl log the baseline LSTM approach 
 	\label{fig:outcome-cycle-time-prefix}
 \end{figure}
 
+\section{Discussion and Key Findings}
