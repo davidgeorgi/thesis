@@ -111,14 +111,14 @@ The latter can be considered as the current state-of-the-art approach in process
 	\newrobustcmd{\B}{\fontseries{b}\selectfont}
 	\setlength\tabcolsep{3pt}
 	\begin{tabularx}{\textwidth}{
-			>{\hsize=0.9\hsize}X
-			>{\hsize=1.1\hsize}X
-			>{\hsize=1.0\hsize}X
-			>{\hsize=1.0\hsize}X
-			>{\hsize=1.0\hsize}X
-			>{\hsize=1.0\hsize}X
-			>{\hsize=1.0\hsize}X
-			>{\hsize=1.0\hsize}X
+			>{\hsize=0.8\hsize}C
+			>{\hsize=1.2\hsize}C
+			>{\hsize=1.0\hsize}C
+			>{\hsize=1.0\hsize}C
+			>{\hsize=1.0\hsize}C
+			>{\hsize=1.0\hsize}C
+			>{\hsize=1.0\hsize}C
+			>{\hsize=1.0\hsize}C
 		}
 		\toprule
 		& & \multicolumn{2}{l}{\textbf{Job Application}} & \multicolumn{2}{l}{\textbf{Customer Journey}} & \multicolumn{2}{l}{\textbf{Hospital Admission}} \\
@@ -139,7 +139,7 @@ LDA&10&     0.8754&     0.1370&     0.4833&     0.1783&     0.5859&    27.7591\\
 LDA&20&     0.8892&     0.1045&     0.4886&     0.1780&     0.5920&    27.9961\\
 LDA&100&     0.8892&     0.1045&     0.4878&     0.1772&     0.6027&    28.0485\\
 		\multicolumn{8}{c}{\textit{LSTM baseline}} \\
--&0&     0.7647&     0.2502&     0.4740&     0.1779&     0.5870&  \B  27.3528\\
+\multicolumn{2}{l}{Based on \cite{DBLP:conf/caise/TaxVRD17}+\cite{DBLP:conf/ssci/NavarinVPS17}} &     0.7647&     0.2502&     0.4740&     0.1779&     0.5870&  \B  27.3528\\
 		\bottomrule
 	\end{tabularx}
 	\caption[Experimental results for the next event prediction]{Experimental results for the next event prediction.}
@@ -154,34 +154,6 @@ Compared to the LSTM baseline, the text-aware model is able to improve the predi
 parameterization.
 However, the effect of textual data is varies a lot between the data sets and the prediction tasks.
 A reason for that is, that the textual data in the simulated log correlates with the control flow by design, where in the real-world data the correlation is only assumed and probably significantly lower.
-
-On the job application log the accuracy of the next activity prediction is increased by up to 14.95 percentage points using the textual data.
-In contrast, on the customer journey log the prediction is improved by at most 1.82 percentage points.
-On the hospital admission log the prediction accuracy is improved by at most 0.031 percentage points and even reduced for some models.
-The hospital log has the biggest vocabulary by far with 4\,633 unique words and contains 2\,784 trace variants.
-Therefore, the utilization of textual data has a rather small impact.
-
-The timestamp prediction is significantly improved on the job application log (0.1232 vs 0.2995 MAE), but only a little bit improved on the customer journey log.
-On the hospital admission log the text-aware approach makes worse timestamp prediction on the majority of models.
-
-The choice of text model has a rather small impact on the results.
-Notably, the BoW and LDA model perform most consistently on all data sets and all text encoding lengths.
-The PV model reaches similar results using a hundred dimensional text vector, but performs worse when a small text embedding size of 10 or 20 is used.
-The BoNG model has a similar performance compared to the BoW model and delivers the best results on the customer journey log.
-Nevertheless, the word order awareness of the BoNG model does not necessarily convert to better prediction results on others logs.
-
-In addition, the prediction performance is evaluated per prefix length for each event log.
-Figure \ref{fig:next-activity-prefix} shows the next activity prediction accuracy and next timestamp MAE for every prefix trace of length $1 \leq k \leq 8$.
-For the text-aware models only the best text encoding length is shown in the diagram.
-On the job application event log all text-aware process models almost perfectly predict the next activity after 3 events (i.e. after the application documents are available).
-This shows that all text-aware approaches can unequivocally take advantage of the emails at every decision point in the process, despite the fact that all documents in the log are unique.
-The improvements on the activity prediction lead consequently to significantly better timestamp predictions on this log.
-
-
-
-
-
-
 
 \pgfplotscreateplotcyclelist{colorlist}{%
 	cyan!60!black,every mark/.append style={fill=cyan!60!black},mark=*\\%1
@@ -236,101 +208,123 @@ The improvements on the activity prediction lead consequently to significantly b
 				\legend{}
 			\end{axis}
 		\end{tikzpicture}
-	\caption{Next activity accuracy and timestamp MAE on Job Application data set.}
-	\vspace{0.5cm}
+		\caption{Next activity accuracy and timestamp MAE on Job Application data set.}
+		\vspace{0.5cm}
 	\end{subfigure}
 	\begin{subfigure}{\textwidth}
-	\centering
-	\begin{tikzpicture}[scale=0.9]
-		\begin{axis}[
-			xlabel={Prefix Length},
-			ylabel={Accuracy},
-			legend pos=north west,
-			cycle list name=colorlist,
-			]
-			\addplot table[x=index,y=na-0, col sep= comma] {data/prefix_werk.csv};
-			\addlegendentry{Baseline}
-			\addplot table[x=index,y=naBoW50, col sep= comma] {data/prefix_werk.csv};
-			\addlegendentry{BoW}
-			\addplot table[x=index,y=naBoNG100, col sep= comma] {data/prefix_werk.csv};
-			\addlegendentry{BoNG}
-			\addplot table[x=index,y=naPV100, col sep= comma]  {data/prefix_werk.csv};
-			\addlegendentry{PV}
-			\addplot table[x=index,y=naLDA100, col sep= comma] {data/prefix_werk.csv};
-			\addlegendentry{LDA}
-			\legend{}
-		\end{axis}
-	\end{tikzpicture}%
-	\hfill
-	\begin{tikzpicture}[scale=0.9]
-		\begin{axis}[
-			xlabel={Prefix Length},
-			ylabel={Mean Absolute Error},
-			legend pos=north east,
-			cycle list name=colorlist,
-			]
-			\addplot table[x=index,y=nt-0, col sep= comma] {data/prefix_werk.csv};
-			\addlegendentry{Baseline}
-			\addplot table[x=index,y=ntBoW50, col sep= comma] {data/prefix_werk.csv};
-			\addlegendentry{BoW}
-			\addplot table[x=index,y=ntBoNG100, col sep= comma] {data/prefix_werk.csv};
-			\addlegendentry{BoNG}
-			\addplot table[x=index,y=ntPV100, col sep= comma]  {data/prefix_werk.csv};
-			\addlegendentry{PV}
-			\addplot table[x=index,y=ntLDA10, col sep= comma] {data/prefix_werk.csv};
-			\addlegendentry{LDA}
-		\end{axis}
-	\end{tikzpicture}
-	\caption{Next activity accuracy and timestamp MAE on werk.nl data set.}
-\end{subfigure}
-\begin{subfigure}{\textwidth}
-	\centering
-	\begin{tikzpicture}[scale=0.9]
-		\begin{axis}[
-			xlabel={Prefix Length},
-			ylabel={Accuracy},
-			legend pos=north west,
-			cycle list name=colorlist,
-			]
-			\addplot table[x=index,y=na-0, col sep= comma] {data/prefix_admissions.csv};
-			\addlegendentry{Baseline}
-			\addplot table[x=index,y=naBoW500, col sep= comma] {data/prefix_admissions.csv};
-			\addlegendentry{BoW}
-			\addplot table[x=index,y=naBoNG100, col sep= comma] {data/prefix_admissions.csv};
-			\addlegendentry{BoNG}
-			\addplot table[x=index,y=naPV100, col sep= comma]  {data/prefix_admissions.csv};
-			\addlegendentry{PV}
-			\addplot table[x=index,y=naLDA100, col sep= comma] {data/prefix_admissions.csv};
-			\addlegendentry{LDA}
-			\legend{}
-		\end{axis}
-	\end{tikzpicture}%
-	\hfill
-	\begin{tikzpicture}[scale=0.9]
-		\begin{axis}[
-			xlabel={Prefix Length},
-			ylabel={Mean Absolute Error},
-			legend pos=north east,
-			cycle list name=colorlist,
-			]
-			\addplot table[x=index,y=nt-0, col sep= comma] {data/prefix_admissions.csv};
-			\addlegendentry{Baseline}
-			\addplot table[x=index,y=ntBoW500, col sep= comma] {data/prefix_admissions.csv};
-			\addlegendentry{BoW}
-			\addplot table[x=index,y=ntBoNG50, col sep= comma] {data/prefix_admissions.csv};
-			\addlegendentry{BoNG}
-			\addplot table[x=index,y=ntPV20, col sep= comma]  {data/prefix_admissions.csv};
-			\addlegendentry{PV}
-			\addplot table[x=index,y=ntLDA10, col sep= comma] {data/prefix_admissions.csv};
-			\addlegendentry{LDA}
-			\legend{}
-		\end{axis}
-	\end{tikzpicture}
-	\caption{Next activity accuracy and timestamp MAE on werk.nl data set.}
-\end{subfigure}
+		\centering
+		\begin{tikzpicture}[scale=0.9]
+			\begin{axis}[
+				xlabel={Prefix Length},
+				ylabel={Accuracy},
+				legend pos=north west,
+				cycle list name=colorlist,
+				]
+				\addplot table[x=index,y=na-0, col sep= comma] {data/prefix_werk.csv};
+				\addlegendentry{Baseline}
+				\addplot table[x=index,y=naBoW50, col sep= comma] {data/prefix_werk.csv};
+				\addlegendentry{BoW}
+				\addplot table[x=index,y=naBoNG100, col sep= comma] {data/prefix_werk.csv};
+				\addlegendentry{BoNG}
+				\addplot table[x=index,y=naPV100, col sep= comma]  {data/prefix_werk.csv};
+				\addlegendentry{PV}
+				\addplot table[x=index,y=naLDA100, col sep= comma] {data/prefix_werk.csv};
+				\addlegendentry{LDA}
+				\legend{}
+			\end{axis}
+		\end{tikzpicture}%
+		\hfill
+		\begin{tikzpicture}[scale=0.9]
+			\begin{axis}[
+				xlabel={Prefix Length},
+				ylabel={Mean Absolute Error},
+				legend pos=north east,
+				cycle list name=colorlist,
+				]
+				\addplot table[x=index,y=nt-0, col sep= comma] {data/prefix_werk.csv};
+				\addlegendentry{Baseline}
+				\addplot table[x=index,y=ntBoW50, col sep= comma] {data/prefix_werk.csv};
+				\addlegendentry{BoW}
+				\addplot table[x=index,y=ntBoNG100, col sep= comma] {data/prefix_werk.csv};
+				\addlegendentry{BoNG}
+				\addplot table[x=index,y=ntPV100, col sep= comma]  {data/prefix_werk.csv};
+				\addlegendentry{PV}
+				\addplot table[x=index,y=ntLDA10, col sep= comma] {data/prefix_werk.csv};
+				\addlegendentry{LDA}
+			\end{axis}
+		\end{tikzpicture}
+		\caption{Next activity accuracy and timestamp MAE on werk.nl data set.}
+	\end{subfigure}
+	\begin{subfigure}{\textwidth}
+		\centering
+		\begin{tikzpicture}[scale=0.9]
+			\begin{axis}[
+				xlabel={Prefix Length},
+				ylabel={Accuracy},
+				legend pos=north west,
+				cycle list name=colorlist,
+				]
+				\addplot table[x=index,y=na-0, col sep= comma] {data/prefix_admissions.csv};
+				\addlegendentry{Baseline}
+				\addplot table[x=index,y=naBoW500, col sep= comma] {data/prefix_admissions.csv};
+				\addlegendentry{BoW}
+				\addplot table[x=index,y=naBoNG100, col sep= comma] {data/prefix_admissions.csv};
+				\addlegendentry{BoNG}
+				\addplot table[x=index,y=naPV100, col sep= comma]  {data/prefix_admissions.csv};
+				\addlegendentry{PV}
+				\addplot table[x=index,y=naLDA100, col sep= comma] {data/prefix_admissions.csv};
+				\addlegendentry{LDA}
+				\legend{}
+			\end{axis}
+		\end{tikzpicture}%
+		\hfill
+		\begin{tikzpicture}[scale=0.9]
+			\begin{axis}[
+				xlabel={Prefix Length},
+				ylabel={Mean Absolute Error},
+				legend pos=north east,
+				cycle list name=colorlist,
+				]
+				\addplot table[x=index,y=nt-0, col sep= comma] {data/prefix_admissions.csv};
+				\addlegendentry{Baseline}
+				\addplot table[x=index,y=ntBoW500, col sep= comma] {data/prefix_admissions.csv};
+				\addlegendentry{BoW}
+				\addplot table[x=index,y=ntBoNG50, col sep= comma] {data/prefix_admissions.csv};
+				\addlegendentry{BoNG}
+				\addplot table[x=index,y=ntPV20, col sep= comma]  {data/prefix_admissions.csv};
+				\addlegendentry{PV}
+				\addplot table[x=index,y=ntLDA10, col sep= comma] {data/prefix_admissions.csv};
+				\addlegendentry{LDA}
+				\legend{}
+			\end{axis}
+		\end{tikzpicture}
+		\caption{Next activity accuracy and timestamp MAE on werk.nl data set.}
+	\end{subfigure}
 	\caption[Next activity and timestamp prediction performance subject to the prefix length]{Next activity and timestamp prediction performance subject to the prefix length.}
 	\label{fig:next-activity-prefix}
 \end{figure}
+
+On the job application log the accuracy of the next activity prediction is increased by up to 14.95 percentage points using the textual data.
+In contrast, on the customer journey log the prediction is improved by at most 1.82 percentage points.
+On the hospital admission log the prediction accuracy is improved by at most 0.031 percentage points and even reduced for some models.
+The hospital log has the biggest vocabulary by far with 4\,633 unique words and contains 2\,784 trace variants.
+Therefore, the utilization of textual data has a rather small impact.
+
+The timestamp prediction is significantly improved on the job application log (0.1232 vs 0.2995 MAE), but only a little bit improved on the customer journey log.
+On the hospital admission log the text-aware approach makes worse timestamp prediction on the majority of models.
+
+The choice of text model has a rather small impact on the results.
+Notably, the BoW and LDA model perform most consistently on all data sets and all text encoding lengths.
+The PV model reaches similar results using a hundred dimensional text vector, but performs worse when a small text embedding size of 10 or 20 is used.
+The BoNG model has a similar performance compared to the BoW model and delivers the best results on the customer journey log.
+Nevertheless, the word order awareness of the BoNG model does not necessarily convert to better prediction results on others logs.
+
+In addition, the prediction performance is evaluated per prefix length for each event log.
+Figure \ref{fig:next-activity-prefix} shows the next activity prediction accuracy and next timestamp MAE for every prefix trace of length $1 \leq k \leq 8$.
+For the text-aware models only the best text encoding length is shown in the diagram.
+On the job application event log all text-aware process models almost perfectly predict the next activity after 3 events (i.e. after the application documents are available).
+This shows that all text-aware approaches can unequivocally take advantage of the emails at every decision point in the process, despite the fact that all documents in the log are unique.
+The improvements on the activity prediction lead consequently to significantly better timestamp predictions on this log.
 
 
 
@@ -340,17 +334,17 @@ The improvements on the activity prediction lead consequently to significantly b
 	\newrobustcmd{\B}{\fontseries{b}\selectfont}
 	\setlength\tabcolsep{3pt}
 	\begin{tabularx}{\textwidth}{
-			>{\hsize=0.9\hsize}X
-			>{\hsize=1.1\hsize}X
-			>{\hsize=1.0\hsize}X
-			>{\hsize=1.0\hsize}X
-			>{\hsize=1.0\hsize}X
-			>{\hsize=1.0\hsize}X
-			>{\hsize=1.0\hsize}X
-			>{\hsize=1.0\hsize}X
+			>{\hsize=0.8\hsize}C
+			>{\hsize=1.2\hsize}C
+			>{\hsize=1.0\hsize}C
+			>{\hsize=1.0\hsize}C
+			>{\hsize=1.0\hsize}C
+			>{\hsize=1.0\hsize}C
+			>{\hsize=1.0\hsize}C
+			>{\hsize=1.0\hsize}C
 		}
 		\toprule
-		& & \multicolumn{2}{l}{\textbf{Job Application}} & \multicolumn{2}{l}{\textbf{Customer Journey}} & \multicolumn{2}{l}{\textbf{Hospital Admission}} \\
+		& & \multicolumn{2}{c}{\textbf{Job Application}} & \multicolumn{2}{c}{\textbf{Customer Journey}} & \multicolumn{2}{c}{\textbf{Hospital Admission}} \\
 		Text & Text &Outcome & Cycle & Outcome& Cycle  & Outcome& Cycle  \\
 		Model & Dimension &Accuracy & MAE & Accuracy& MAE  & Accuracy& MAE  \\
 		\midrule
@@ -379,24 +373,6 @@ The case outcome and cycle time prediction is evaluated analogously to next even
 In contrast to the next event prediction, the target values are case properties, i.e. they are the same for every prefix trace of the case.
 As outcome the final activity of the trace is used as described in Section \ref{sec:overview}.
 The results are summarized in Table \ref{tab:outcome-cycle-time}.
-
-On the job application log the text-aware prediction model can predict the outcome of the case with 67.62\% accuracy using the BoW text model compared to 58.36\% accuracy on the baseline approach.
-The MAE on the case cycle time prediction can be reduced to 1.4132 compared to 1.7144 on the baseline approach.
-
-On the customer journey log the text-awareness leads to much smaller improvements.
-The best outcome prediction is realized with the LDA text model (51.65\% accuracy), which improves the prediction by 0.83 percentage points.
-The case cycle time MAE is the lowest using the BoNG model with 0.2995, which improves the baseline prediction by 0.0163 days (= 23.47 minutes).
-Strikingly, some text-aware models have slightly worse predictions like the BoW and BoNG models with 500 dimensional text encodings on the outcome prediction tasks.
-A possible reasons for that is, that with a vocabulary size of 817 after preprocessing also infrequent words are encoded, which provide rather low prediction value.
-
-On the hospital admission log the text-aware approach delivers improvements on the outcome prediction task by up to 1.55 percentage points.
-However, the cycle time prediction is worse for almost all text-aware models except the LDA and BoNG model with 100 dimensional text encodings.
-
-
-
-
-
-
 
 
 \begin{figure}[!htbp]
@@ -541,4 +517,33 @@ However, the cycle time prediction is worse for almost all text-aware models exc
 	\label{fig:outcome-cycle-time-prefix}
 \end{figure}
 
+On the job application log the text-aware prediction model can predict the outcome of the case with 67.62\% accuracy using the BoW text model compared to 58.36\% accuracy on the baseline approach.
+The MAE on the case cycle time prediction can be reduced to 1.4132 compared to 1.7144 on the baseline approach.
+
+On the customer journey log the text-awareness leads to much smaller improvements.
+The best outcome prediction is realized with the LDA text model (51.65\% accuracy), which improves the prediction by 0.83 percentage points.
+The case cycle time MAE is the lowest using the BoNG model with 0.2995, which improves the baseline prediction by 0.0163 days (= 23.47 minutes).
+Strikingly, some text-aware models have slightly worse predictions like the BoW and BoNG models with 500 dimensional text encodings on the outcome prediction tasks.
+A possible reasons for that is that with a vocabulary size of 817 after preprocessing also infrequent words are encoded, which provide rather low prediction value.
+
+On the hospital admission log the text-aware approach delivers improvements on the outcome prediction task by up to 1.55 percentage points using the BoW model.
+However, the cycle time prediction is worse for almost all text-aware models except the LDA and BoNG model with 100 dimensional text encodings.
+As observed during the next timestamp prediction, the text-aware models have difficulties to improve on time-related regression task on this particular log.
+
+Again, the choice of text model has a rather small impact.
+The BoW and LDA models perform slightly better than the BoNG and PV model.
+Notably, the PV model can not achieve the best performance on any log and  prediction task.
+
 \section{Discussion and Key Findings}
+
+The text-aware process prediction model outperforms the baseline approach on all almost all evaluated event logs and prediction tasks.
+The influence of textual data on the prediction performance varies greatly per event log.
+It is observed that the impact of the text consideration on the classification tasks is significantly higher compared to the timestamp regression tasks.
+All evaluated text models are suitable to capture textual data and deliver similar results on most prediction tasks.
+The BoW and LDA text models perform slightly better then the BoNG and PV models on most parameterizations.
+The optimal encoding dimension of textual data varies depending on the data set.
+
+The cycle time prediction on the hospital admission event log is noticeably worse, if textual data is considered.
+This shows that text-aware process prediction does not necessarily guarantee predication improvements.
+On the real-world event log the text-aware models could capitalize mostly on short trace prefixes.
+A potential explanation is that more training data for short trace prefixes is available such that it is easier to generalize for shorter prefixes.
