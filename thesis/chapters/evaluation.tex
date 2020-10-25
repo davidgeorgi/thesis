@@ -125,7 +125,7 @@ The latter can be considered as the current state-of-the-art approach in process
 		Text & Text &Activity & Time & Activity& Time  & Activity& Time  \\
 		Model & Dimension &Accuracy & MAE & Accuracy& MAE  & Accuracy& MAE  \\
 		\midrule
-		\multicolumn{8}{c}{\textit{Text-Aware Process Prediction (LSTM)}} \\
+		\multicolumn{8}{c}{\textit{Text-Aware Process Prediction (LSTM + Text Model)}} \\
 BoW&50&     0.8892&     0.1043&     0.4896&     0.1787&     0.5982&    27.9673\\
 BoW&100& \B    0.8894&     0.1046& \B    0.4906&  \B   0.1767&     0.6045&    27.8268\\
 BoW&500&     0.8890&     0.1067&     0.4842&     0.1796&  \B   0.6134&    30.7915\\
@@ -146,14 +146,14 @@ LDA&100&     0.8892&     0.1045&     0.4878&     0.1772&     0.6027&    28.0485\
 	\label{tab:next-event}
 \end{table}
 
-First, the prediction performance regarding the activity and timestamp of the next event is evaluated.
+First, the prediction performance regarding the activity and timestamp of the next event is evaluated for all prefix traces in the test log.
 The results are summarized in Table \ref{tab:next-event}.
-Each line in the table states the prediction accuracy for the next activity and the mean absolute error in days for the next timestamp prediction of a single model on all evaluated event logs.
+Each line in the table states the prediction accuracy for the next activity and the mean absolute error in days for the next timestamp prediction of a single model on each evaluated event log.
 
-Compared to the LSTM baseline, the text-aware model is able to improve the prediction performance for the next activity and timestamp on all data sets for at least one 
-parameterization.
-However, the effect of textual data is varies a lot between the data sets and the prediction tasks.
-A reason for that is, that the textual data in the simulated log correlates with the control flow by design, where in the real-world data the correlation is only assumed and probably significantly lower.
+Compared to the LSTM baseline, the text-aware model is able to improve the prediction performance for the next activity and timestamp on all data sets with at least one 
+parameterization, apart from the next timestamp prediction on the hospital admission log.
+Markedly, the impact of the consideration of textual data varies a lot between the data sets and the prediction tasks.
+A reason for that is, that the textual data in the simulated log clearly correlates with the control flow by design, where in the real-world event log the correlation is only assumed and probably significantly lower.
 
 \pgfplotscreateplotcyclelist{colorlist}{%
 	cyan!60!black,every mark/.append style={fill=cyan!60!black},mark=*\\%1
@@ -304,21 +304,29 @@ A reason for that is, that the textual data in the simulated log correlates with
 	\label{fig:next-activity-prefix}
 \end{figure}
 
-On the job application log the accuracy of the next activity prediction is increased by up to 14.95 percentage points using the textual data.
-In contrast, on the customer journey log the prediction is improved by at most 1.82 percentage points.
-On the hospital admission log the prediction accuracy is improved by at most 0.031 percentage points and even reduced for some models.
-The hospital log has the biggest vocabulary by far with 4\,633 unique words and contains 2\,784 trace variants.
-Therefore, the utilization of textual data has a rather small impact.
+On the job application log the accuracy of the next activity prediction is increased by up to 12.47 percentage points using the BoW model compared to the LSTM baseline.
+The next timestamp prediction is improved by up to 0.1462 days (around 3,5 hours) with the BoNG encoding.
+The other encoding models perform similarly with the exception of the PV and LDA model in combination with short 10 dimensional text encoding.
+Since this log contains rather longer text documents, the short encodings seem to be not able to represent the textual data sufficiently.
 
-The timestamp prediction is significantly improved on the job application log (0.1232 vs 0.2995 MAE), but only a little bit improved on the customer journey log.
-On the hospital admission log the text-aware approach makes worse timestamp prediction on the majority of models.
+In contrast, on the customer journey log the next activity prediction is improved by at most 1.66 percentage points using BoW model.
+The impact of the text-awareness on next timestamp prediction is negligible.
+The prediction is improved by 0.0012 days (1,73 minutes) using the BoW model, but is also worse for some text models and text encoding sizes.
+Again, the BoW model with 100 dimensional text vectors performs the best compared to the other text models and the baseline.
 
-The choice of text model has a rather small impact on the results.
+On the hospital admission log the prediction accuracy is improved by up to 2.64 percentage points using the BoW model and 500 dimensional text encoding.
+It is observed that on this log the high dimensional encodings tend to perform better.
+This probably comes down to the fact that the hospital log has the biggest vocabulary by far with 4\,633 unique words and therefore larger text encodings are required.
+Regarding the next timestamp prediction, no text-aware approach is able to surpass the baseline approach on this log.
+This is surprising, since the improvements on the next activity prediction can not be translated to improvements on the timestamp predictions.
+
+The choice of text model has a rather small impact on the results on all event logs.
 Notably, the BoW and LDA model perform most consistently on all data sets and all text encoding lengths.
 The PV model reaches similar results using a hundred dimensional text vector, but performs worse when a small text embedding size of 10 or 20 is used.
-The BoNG model has a similar performance compared to the BoW model and delivers the best results on the customer journey log.
-Nevertheless, the word order awareness of the BoNG model does not necessarily convert to better prediction results on others logs.
+The BoNG model has a similar performance compared to the BoW model.
+Nevertheless, the word order awareness of the BoNG model does not lead to better prediction results in general.
 
+---
 In addition, the prediction performance is evaluated per prefix length for each event log.
 Figure \ref{fig:next-activity-prefix} shows the next activity prediction accuracy and next timestamp MAE for every prefix trace of length $1 \leq k \leq 8$.
 For the text-aware models only the best text encoding length is shown in the diagram.
@@ -348,7 +356,7 @@ The improvements on the activity prediction lead consequently to significantly b
 		Text & Text &Outcome & Cycle & Outcome& Cycle  & Outcome& Cycle  \\
 		Model & Dimension &Accuracy & MAE & Accuracy& MAE  & Accuracy& MAE  \\
 		\midrule
-		\multicolumn{8}{c}{\textit{Text-Aware Process Prediction (LSTM)}} \\
+		\multicolumn{8}{c}{\textit{Text-Aware Process Prediction (LSTM + Text Model)}} \\
 BoW&50&  \B   0.6762&     1.4150&     0.5095&     0.3144&     0.6136&    94.8308\\
 BoW&100&     0.6687&     1.4203&     0.5011&     0.3136&     0.6190&    97.2484\\
 BoW&500&     0.6757&     1.4146&     0.4984&     0.3090&  \B   0.6198&   100.8792\\
