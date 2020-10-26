@@ -311,7 +311,7 @@ Since this log contains rather longer text documents, the short encodings seem t
 
 In contrast, on the customer journey log the next activity prediction is improved by at most 1.66 percentage points using BoW model.
 The impact of the text-awareness on next timestamp prediction is negligible.
-The prediction is improved by 0.0012 days (1,73 minutes) using the BoW model, but is also worse for some text models and text encoding sizes.
+The prediction is improved by 0.0012 days (1.73 minutes) using the BoW model, but is also worse for some text models and text encoding sizes.
 Again, the BoW model with 100 dimensional text vectors performs the best compared to the other text models and the baseline.
 
 On the hospital admission log the prediction accuracy is improved by up to 2.64 percentage points using the BoW model and 500 dimensional text encoding.
@@ -326,14 +326,27 @@ The PV model reaches similar results using a hundred dimensional text vector, bu
 The BoNG model has a similar performance compared to the BoW model.
 Nevertheless, the word order awareness of the BoNG model does not lead to better prediction results in general.
 
----
-In addition, the prediction performance is evaluated per prefix length for each event log.
+In addition, the prediction performance is reported per prefix length for each event log.
 Figure \ref{fig:next-activity-prefix} shows the next activity prediction accuracy and next timestamp MAE for every prefix trace of length $1 \leq k \leq 8$.
 For the text-aware models only the best text encoding length is shown in the diagram.
-On the job application event log all text-aware process models almost perfectly predict the next activity after 3 events (i.e. after the application documents are available).
-This shows that all text-aware approaches can unequivocally take advantage of the emails at every decision point in the process, despite the fact that all documents in the log are unique.
+On the job application event log all text-aware process models almost perfectly predict the next activity after three events (i.e. after the application documents are available).
+The baseline approach can not take advantage of the email content and reaches a prediction accuracy around 80\% after the first three events.
+This shows that all text-aware approaches can unequivocally take advantage of the text information at every decision point in the process, despite the fact that all documents in the log are unique.
 The improvements on the activity prediction lead consequently to significantly better timestamp predictions on this log.
 
+On the customer journey log the prediction performance of all models correlate positively with the available prefix length of trace.
+The next activity prediction is improved from under 40\%, when only the first event is available, to over 80\%, after eight events.
+All text-aware prediction models surpass the baseline approach in particular on very short prefix traces of length 3 or shorter.
+In order to generalize from the textual data usually more training data is necessary.
+Since there is always more short prefixes available in the training set, the text-aware models benefit disproportionately on shorter traces.
+The MAE on the next timestamp prediction rapidly drops when more events are available.
+However, no difference between the evaluated models is recognizable on this prediction task.
+
+The hospital admission log is characterized by the alternation of admission and discharge events.
+The text-aware prediction models generate slightly better predictions on admission events, since only these contain the diagnosis that can be utilized by the text-aware models.
+The prediction performance on admission events is slightly increased with longer prefixes, while the accuracy on discharge events decreases.
+Regarding the next timestamp prediction, we see higher error after discharge events and very low errors after admission events.
+This can be explained by the rather short hospital stays compared to longer time periods between two hospitalizations.
 
 
 \section{Outcome and Case Cycle Time Prediction}
@@ -377,10 +390,11 @@ LDA&100&     0.6744&     1.4183&     0.5114&     0.3091&     0.6125& \B   91.107
 	\label{tab:outcome-cycle-time}
 \end{table}
 
-The case outcome and cycle time prediction is evaluated analogously to next event prediction.
-In contrast to the next event prediction, the target values are case properties, i.e. they are the same for every prefix trace of the case.
-As outcome the final activity of the trace is used as described in Section \ref{sec:overview}.
-The results are summarized in Table \ref{tab:outcome-cycle-time}.
+The case outcome and cycle time prediction is evaluated analogously to the next activity and timestamp prediction.
+In contrast to the next event prediction, the target values are case properties, i.e. they are the same for every prefix trace of a case.
+As outcome the final activity of the trace is predicted as described in Section \ref{sec:overview}.
+The MAE of the case cycle time prediction is measured in days.
+The results of all prediction models and all prefix lengths are summarized in Table \ref{tab:outcome-cycle-time}.
 
 
 \begin{figure}[!htbp]
@@ -525,14 +539,15 @@ The results are summarized in Table \ref{tab:outcome-cycle-time}.
 	\label{fig:outcome-cycle-time-prefix}
 \end{figure}
 
-On the job application log the text-aware prediction model can predict the outcome of the case with 67.62\% accuracy using the BoW text model compared to 58.36\% accuracy on the baseline approach.
-The MAE on the case cycle time prediction can be reduced to 1.4132 compared to 1.7144 on the baseline approach.
+On the job application log the text-aware prediction model can predict the outcome of the case with up to 67.62\% accuracy using the BoW text model compared to 58.36\% accuracy on the baseline approach.
+Other text models perform similar to the BoW model except the PV model with 10 dimensional text vectors with only 62.53\% accuracy.
+The MAE on the case cycle time prediction can be reduced to 1.4132 with the LDA model compared to 1.7144 on the baseline approach.
 
-On the customer journey log the text-awareness leads to much smaller improvements.
+On the customer journey log the text-awareness leads to much smaller improvements as it has been observed for the next event prediction .
 The best outcome prediction is realized with the LDA text model (51.65\% accuracy), which improves the prediction by 0.83 percentage points.
 The case cycle time MAE is the lowest using the BoNG model with 0.2995, which improves the baseline prediction by 0.0163 days (= 23.47 minutes).
 Strikingly, some text-aware models have slightly worse predictions like the BoW and BoNG models with 500 dimensional text encodings on the outcome prediction tasks.
-A possible reasons for that is that with a vocabulary size of 817 after preprocessing also infrequent words are encoded, which provide rather low prediction value.
+A possible reasons for that is that with a vocabulary size of 817 after preprocessing also infrequent words are encoded, which provide a rather low prediction value.
 
 On the hospital admission log the text-aware approach delivers improvements on the outcome prediction task by up to 1.55 percentage points using the BoW model.
 However, the cycle time prediction is worse for almost all text-aware models except the LDA and BoNG model with 100 dimensional text encodings.
@@ -540,7 +555,31 @@ As observed during the next timestamp prediction, the text-aware models have dif
 
 Again, the choice of text model has a rather small impact.
 The BoW and LDA models perform slightly better than the BoNG and PV model.
-Notably, the PV model can not achieve the best performance on any log and  prediction task.
+Notably, the PV model can not achieve the best performance on any log and prediction task.
+Compared to the next activity and timestamp prediction, the improvement through the text-awareness is smaller on the case-based prediction tasks.
+
+In addition, the prediction results are computed depending on the prefix length of the traces.
+Figure \ref{fig:outcome-cycle-time-prefix} depicts the outcome accuracy and cycle time MAE on every event log and approach.
+
+On the job application log the accuracy is improved with longer prefixes from under 50\% after the first event to over 80\% after eight events using any text-aware prediction model.
+The accuracy of the baseline approach peaks after five events, but always stays below 70\%.
+The biggest quality improvements of the outcome prediction can be realized within the first three events.
+The MAE on the cycle time prediction is reduced with every event on all models consistently by around 0.4 days per event.
+Nevertheless, the text-aware models are able make similar good predictions two events before the baseline model.
+
+Also on the customer journey log an explicit positive correlation between the prefix length and the prediction performance is observed.
+After the first event the outcome is predicted with under 40\% accuracy, but the prediction is improved noticeably with every additional event.
+After eight events the accuracy of the text-aware models is around 90\%, while the the baseline approach predicts the outcome with 82\% accuracy.
+The cycle time prediction is improved in particular within the first three events for all models.
+The text-aware approach using a BoW or BoNG model has a small advantage for all prefixes.
+After four events the prediction gets slightly worse on all approaches.
+
+The outcome accuracy on the hospital log varies a lot between the admission and discharge events.
+On admission events the outcome accuracy is below 40\% for all prefixes, whereas on discharge events the accuracy is always over 50\% and goes up to 90\%.
+Differently compared to the other logs, the cycle time prediction is getting worse for longer prefixes and the baseline approach predicts better then most text-aware models.
+Since the hospital log contains much more short traces, the prediction performance on longer traces is more imprecise.
+ 
+
 
 \section{Discussion and Key Findings}
 
@@ -548,7 +587,7 @@ The text-aware process prediction model outperforms the baseline approach on all
 The influence of textual data on the prediction performance varies greatly per event log.
 It is observed that the impact of the text consideration on the classification tasks is significantly higher compared to the timestamp regression tasks.
 All evaluated text models are suitable to capture textual data and deliver similar results on most prediction tasks.
-The BoW and LDA text models perform slightly better then the BoNG and PV models on most parameterizations.
+Nevertheless, the BoW and LDA text models perform slightly better then the BoNG and PV models on most parameterizations.
 The optimal encoding dimension of textual data varies depending on the data set.
 
 The cycle time prediction on the hospital admission event log is noticeably worse, if textual data is considered.
