@@ -36,7 +36,7 @@
 %\setlength{\headheight}{14pt}
 %%% TiKZ setup
 \RequirePackage{tikz}
-\usetikzlibrary{calc, shapes, arrows, positioning, patterns, decorations.pathreplacing, backgrounds, petri, automata}
+\usetikzlibrary{calc, shapes, arrows, positioning, patterns, decorations.pathreplacing, backgrounds, petri, automata, matrix}
 
 %$% amstheorem setup (order of the require's matters here!)
 %$ introduce separate theorem-like environments 
