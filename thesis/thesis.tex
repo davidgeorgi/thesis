@@ -24,6 +24,11 @@ twoside
 \newcommand{\xmark}{\text{\ding{55}}}
 \renewcommand{\vec}[1]{\bm{#1}}
 
+\newcommand{\cheading}[1]{\multicolumn{1}{C}{#1}}
+\newcommand{\heading}[1]{\multicolumn{1}{X}{#1}}
+\newcolumntype{C}{>{\centering\arraybackslash}X}
+\newcolumntype{R}{>{\raggedleft\arraybackslash}X}
+
 \begin{document}
 %%% Title page
 \pagenumbering{roman}
@@ -33,11 +38,11 @@ twoside
 %\pagestyle{plain}
 %%% TOC
 
-\chapter*{Acknowledgments} %\addcontentsline{toc}{chapter}{Acknowledgements}
-\input{chapters/acknowledgements.tex}
-
 \chapter*{Abstract}% \addcontentsline{toc}{chapter}{Abstract}
 \input{chapters/abstract.tex}
+
+\chapter*{Acknowledgments} %\addcontentsline{toc}{chapter}{Acknowledgements}
+\input{chapters/acknowledgements.tex}
 
 \pagestyle{plain}
 \tableofcontents

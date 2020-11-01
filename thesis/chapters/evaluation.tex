@@ -12,6 +12,8 @@ The second baseline is the process model-based prediction method originally pres
 This approach constructs an annotated transition system for a log using a sequence, bag or set abstraction.
 Each state of the transition system is annotated with measurements of historical traces, that can be used to predict target values for unseen traces.
 While the original work focuses regression tasks, \citeauthor{DBLP:journals/sosym/TaxTZ20} \cite{DBLP:journals/sosym/TaxTZ20} describe how an annotated transition system can also be used for classification tasks like the next activity prediction.
+For the construction of the state space the eight most recent events of a trace are considered.
+Experiments with different horizon lengths mostly led to worse result, so that these are not reported.
 
 Each prediction model is evaluated in the same consistent procedure.
 In the first step, the event log is separated into a training and test log. 
@@ -38,7 +40,9 @@ For the BoW and BoNG model the encoding length is adjusted by only considering t
 The encoding dimension of the non-textual data depends on the considered attributes and their number of the distinct values in the event logs.
 The Bag of N-Gram model is used with bigrams ($N = 2$) and the Paragraph Vector model is trained for 15 epochs to learn the text representations.
 
-The LSTM network is trained with at most 25 epochs and the learning rate is initialized with 0.001.
+The LSTM network uses 100 hidden neurons per layer.
+Experiments with less (75) and more (125) neurons led to slightly worse results, so that these are not reported.
+The network is trained with at most 25 epochs and the learning rate is initialized with 0.001.
 During the training of the LSTM model, 20\% of the training log is used for validation.
 If the error on the validation log is not decreasing for two epochs in a row, the training rate is reduced by a factor of 10.
 In addition, if the error is not decreasing for three epochs in a row, the training is stopped in order to avoid overfitting.
