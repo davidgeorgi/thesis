@@ -1,18 +1,18 @@
-The prediction of the future course of business processes is a major challenge in business process monitoring.
+The prediction of the future course of business processes is a major challenge in business process mining and process monitoring.
 When textual artifacts of natural language like emails or documents hold process-critical information, purely control flow-oriented approaches are unable to deliver well-founded predictions.
-In order to overcome these limitations, in this thesis a text-aware process prediction model was proposed.
+In order to overcome these limitations, in this thesis a text-aware process prediction model is proposed.
 The model encodes process traces to sequences of meaningful event vectors using the control-flow, timestamp, textual and non-textural data attributes of the events.
 The encoding of textual data is realized by an interchangeable text model.
-Given the encoded log of completed process executions, an LSTM neural network model is trained, that predicts the activity and timestamp of the next event, the case outcome and case cycle time of a running process instance.
+Given an encoded prefix log of historical process executions, an LSTM neural network model is trained, that predicts the activity and timestamp of the next event, the case outcome and case cycle time of a running process instance.
 
-The concept of a text-aware process prediction model was implemented with current open source technology and evaluated on simulated and real-world event data.
-It is shown, that the utilization of textual data can improve the prediction performance and the model outperforms current process prediction approaches on text containing event logs.
-The impact of text-awareness varies noticeably across the evaluated data sets and mainly depends on the degree of correlation between the text data and process course.
-Each considered text model (Bag of Words, Bag of N-Gram, Paragraph Vector and Latent Dirichlet Allocation) has been proven to be viable, whereby the BoW and LDA models performed most consistently even with low-dimensional text vector embeddings.
+The concept of a text-aware process prediction model has been implemented with current open source technology and evaluated on simulated and real-world event data.
+It is shown that the utilization of textual data can improve the prediction performance and the model is able to outperforms state-of-the-art process prediction approaches on many prediction tasks using textual data.
+The impact of text-awareness varies noticeably across the evaluated data sets and mainly depends on the degree of correlation between the textual data and the process course.
+The model benefits particularly with short sequences, since more training data is available for short sequences through the generation of prefixes.
+Each considered text model (Bag of Words, Bag of N-Gram, Paragraph Vector and Latent Dirichlet Allocation) has been proven to be viable, whereby the BoW and LDA models have performed most consistently even with low-dimensional text vector embeddings.
 The proposed technique is robust to outlier traces in the event log and can generalize from structured and chaotic processes.
 
-
-\section{Limitations and Future Research}
+\section{Limitations and Outlook}
 
 The text-aware process prediction model is able to take advantage of textual data in predictive business process monitoring and can improve the prediction quality by exploiting correlations in the (textual) data.
 The generalizability of the evaluation in Chapter \ref{chap:eval} is limited due the small amount of evaluated data sets.

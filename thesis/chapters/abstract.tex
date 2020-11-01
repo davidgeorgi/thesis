@@ -1,5 +1,6 @@
-The prediction of real-time business processes using event data of historical executions is a critical capability of business process monitoring systems.
+The real-time prediction of business processes using event data of historical executions is a critical capability of business process monitoring systems.
 Existing process prediction methods are limited in terms of the type of data they are able to utilize and the prediction tasks they can perform.
+In particular, almost no technique is able to utilize text documents of natural language, which can hold process-critical information.
 This work describes the design, implementation and evaluation of a novel text-aware process prediction model based on long short-term memory (LSTM) neural networks and natural language models.
-The proposed model is able to take categorical, numerical and textual attributes in event data into account to predict the activity and timestamp of the next event, the outcome and the cycle time of a process instance.
-The experiments show that the text-aware model is able to outperform state-of-the-art process prediction on simulated and real-world event logs containing textual data.
+The proposed model is able to take categorical, numerical and textual attributes in event data into account to predict the activity and timestamp of the next event, the outcome and the cycle time of a running process instance.
+Experiments show that the text-aware model is able to outperform state-of-the-art process prediction methods on simulated and real-world event logs containing textual data.
