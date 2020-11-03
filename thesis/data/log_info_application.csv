@@ -1,0 +1,2 @@
+log,cases,trace variants,events,events per trace,median case duration,mean case duration,activities,words pre filtering,words post filtering,vocabulary pre filtering,vocabulary post filtering
+./logs/application.xes,20000,41,118811,5.94055,1.9875677951383923,3.152403012846643,11,3050594,1519199,237,185
