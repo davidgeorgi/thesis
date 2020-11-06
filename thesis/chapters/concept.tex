@@ -12,7 +12,7 @@ The main application scenario for the model is inside of real-time business proc
 
 \section{Overview}\label{sec:overview}
 
-The framework is designed to approximate prediction functions $f_\mathrm{a}, f_\mathrm{t}, f_\mathrm{o}$ and $f_\mathrm{c}$, that predict the next \textbf{a}ctivity, next \textbf{t}imestamp, case \textbf{o}utcome and case \textbf{c}ycle time given any prefix $hd^k(\sigma)$ of length $1 \leq k \leq |\sigma| = n$ of the complete, but unknown trace $\sigma = \langle e_1, \dots, e_{n} \rangle \in \mathcal{E}^+$.
+The framework is designed to approximate functions $f_\mathrm{a}, f_\mathrm{t}, f_\mathrm{o}$ and $f_\mathrm{c}$, that predict the next \textbf{a}ctivity, next \textbf{t}imestamp, case \textbf{o}utcome and case \textbf{c}ycle time given any prefix $hd^k(\sigma)$ of length $1 \leq k \leq |\sigma| = n$ of the complete, but unknown trace $\sigma = \langle e_1, \dots, e_{n} \rangle \in \mathcal{E}^+$.
 The next activity prediction function $f_\mathrm{a}\colon \mathcal{E}^+ \to \mathcal{A} \cup \{\text{END OF PROCESS}\}$ returns the activity of the next event or an artificial END OF PROCESS activity, if the given trace is already completed, precisely:
 \begin{align*}
 f_\mathrm{a}(hd^k(\sigma)) &= 
@@ -60,7 +60,9 @@ Before the textual data of the event log is utilized by the text model, the data
 	\label{fig:framework}
 \end{figure}
 
-Each encoded prefix sequence with its desired prediction target values according to $f_\mathrm{a}, f_\mathrm{t}, f_\mathrm{o}$ and $f_\mathrm{c}$ corresponds to one training example for an LSTM network, that finally realizes the predictions. 
+Each encoded prefix sequence with its desired prediction target values according to $f_\mathrm{a}, f_\mathrm{t}$ and $f_\mathrm{o}$ corresponds to one training example for an LSTM network, that finally realizes the predictions.
+The cycle time $f_\mathrm{c}$ is not predicted directly.
+Instead the remaining time is predicted and added to the already elapsed time.
 The total number of training examples that can be generated out of the log is $\sum_{\sigma \in \eventlog}|\sigma|$, which is exactly the number of events in the log.
 
 In the online phase, the model applies the learned prediction function to predict the activity and time of the next event as well as the outcome and cycle time of new, unseen and unfinished traces in the real-time event log, that is monitored by the business process monitoring system.

@@ -7,13 +7,19 @@ Then, the performance of differently parameterized text-aware prediction models 
 The text-aware process prediction model is evaluated on three event event logs based on four prediction tasks, namely next activity, next timestamp, case cycle time and outcome prediction.
 The text-aware model is compared to two other process prediction methods.
 First, the pure LSTM approach based on the ideas of \citeauthor{DBLP:conf/caise/TaxVRD17} \cite{DBLP:conf/caise/TaxVRD17} and \citeauthor{DBLP:conf/ssci/NavarinVPS17} \cite{DBLP:conf/ssci/NavarinVPS17} is considered, that only uses the activity, timestamp and additional non-textual attributes of each event.
-This approach can be considered as the current state-of-the-art in process prediction, if the prediction performance is the only criteria.
+This approach can be considered as the current state-of-the-art in process prediction, if prediction performance is the only criteria.
+
 The second baseline is the process model-based prediction method originally presented by \citeauthor{DBLP:journals/is/AalstSS11} \cite{DBLP:journals/is/AalstSS11}.
 This approach constructs an annotated transition system for a log using a sequence, bag or set abstraction.
 Each state of the transition system is annotated with measurements of historical traces, that can be used to predict target values for unseen traces.
+During prediction phase, running traces are mapped to the corresponding state of the transition system and the measurements of the state are used to compute a prediction.
 While the original work focuses regression tasks, \citeauthor{DBLP:journals/sosym/TaxTZ20} \cite{DBLP:journals/sosym/TaxTZ20} describe how an annotated transition system can also be used for classification tasks like the next activity prediction.
+For classification tasks, the measurements of each state are used to compute a probability distribution over the prediction target.
+For regression tasks, the median of the measurements of each states are computed.
+Alternatively, other aggregation functions like the mean are possible.
+However, this led to worse results so that these are not reported.
 For the construction of the state space the eight most recent events of a trace are considered.
-Experiments with different horizon lengths mostly led to worse result, so that these are not reported.
+Experiments with different horizon lengths (1,2,4,16) mostly led to worse result, so that these are not reported.
 
 Each prediction model is evaluated in the same consistent procedure.
 In the first step, the event log is separated into a training and test log. 
@@ -35,7 +41,8 @@ An accuracy of 1 and a MAE of 0 is the most desirable.
 
 The text-aware process prediction model is evaluated with all presented text models namely the Bag of Words, Bag of N-Gram, Paragraph Vector and Latent Dirichlet Allocation.
 Each model is tested with three different encoding lengths for textual data.
-The BoW and BoNG models are evaluated with 50, 100 and 500 dimensional text vectors. The PV and LDA models are tested with smaller text encodings of size 10, 20 and 100, since they generate distributed representations.
+The BoW and BoNG models are evaluated with 50, 100 and 500 dimensional text vectors.
+The PV and LDA models are tested with smaller text encodings of size 10, 20 and 100, since they generate distributed representations.
 For the BoW and BoNG model the encoding length is adjusted by only considering the most frequent terms in the vocabulary after preprocessing.
 The encoding dimension of the non-textual data depends on the considered attributes and their number of the distinct values in the event logs.
 The Bag of N-Gram model is used with bigrams ($N = 2$) and the Paragraph Vector model is trained for 15 epochs to learn the text representations.
@@ -146,58 +153,61 @@ Each line in the table states the prediction accuracy for the next activity and 
 		Model & Dimension &Accuracy & MAE & Accuracy& MAE  & Accuracy& MAE  \\
 		\midrule
 		\multicolumn{8}{c}{\textit{Text-Aware Process Prediction (LSTM + Text Model)}} \\
-BoW&50&     0.8892&     0.1043&     0.4896&     0.1787&     0.5982&    27.9673\\
-BoW&100& \B    0.8894&     0.1046& \B    0.4906&  \B   0.1767&     0.6045&    27.8268\\
-BoW&500&     0.8890&     0.1067&     0.4842&     0.1796&  \B   0.6134&    30.7915\\
-BoNG&50&     0.8734&     0.1315&     0.4889&  \B   0.1767&     0.5916&    27.6287\\
-BoNG&100&     0.8870&     0.1087&     0.4875&     0.1783&     0.6010&    27.9706\\
-BoNG&500&     0.8888&  \B   0.1040&     0.4867&     0.1829&     0.6020&    28.3840\\
-PV&10&     0.8316&     0.1749&     0.4802&     0.1789&     0.5877&    28.9150\\
-PV&20&     0.8760&     0.1180&     0.4825&     0.1781&     0.5889&    27.6080\\
-PV&100&     0.8869&     0.1194&     0.4825&     0.1777&     0.5896&    27.4488\\
-LDA&10&     0.8754&     0.1370&     0.4833&     0.1783&     0.5859&    27.7591\\
-LDA&20&     0.8892&     0.1045&     0.4886&     0.1780&     0.5920&    27.9961\\
-LDA&100&     0.8892&     0.1045&     0.4878&     0.1772&     0.6027&    28.0485\\
+BoW&50&     0.8887&     0.1037&     0.4876&  \B   0.1764&     0.5978&    29.0819 \\
+BoW&100&     0.8891&     0.1053&     0.4895&     0.1763&     0.6027&    31.4378 \\
+BoW&500&     0.8888&     0.1037&     0.4882&     0.1798&  \B   0.6101&    27.5495 \\
+BoNG&50&     0.8732&     0.1335&     0.4888&    0.1767&     0.5918&    27.5397 \\
+BoNG&100&     0.8869&     0.1088&     0.4888&     0.1770&     0.6012&    28.3293 \\
+BoNG&500&     0.8885&     0.1053&     0.4849&     0.1773&     0.6048&    27.9720 \\
+PV&10&     0.8342&     0.1814&     0.4804&     0.1812&     0.5865&    29.4610 \\
+PV&20&     0.8774&     0.1175&     0.4805&     0.1785&     0.5829& \B   27.2902 \\
+PV&100&     0.8879&     0.1162&     0.4808&     0.1789&     0.5897&    28.2369 \\
+LDA&10&     0.8886&     0.1033&     0.4832&     0.1786&     0.5876&    28.8553 \\
+LDA&20&     0.8891&     0.1039&     0.4811&     0.1767&     0.5964&    27.8830 \\
+LDA&100&  \B   0.8892&  \B   0.1032&  \B   0.4911&     0.1777&     0.5998&    27.5084 \\
 		\multicolumn{8}{c}{\textit{LSTM Model Prediction Baseline}}  \\
-\multicolumn{2}{l}{LSTM \cite{DBLP:conf/caise/TaxVRD17}+\cite{DBLP:conf/ssci/NavarinVPS17}} & 0.7647&     0.2502&     0.4740&     0.1779&     0.5870&  \B  27.3528\\
+\multicolumn{2}{l}{LSTM \cite{DBLP:conf/caise/TaxVRD17}+\cite{DBLP:conf/ssci/NavarinVPS17}} & 0.7630&     0.2499&     0.4743&     0.1781&     0.5800&    27.7571\\
 		\multicolumn{8}{c}{\textit{Process Model Prediction Baseline (Annotated Transition System)}} \\
-\multicolumn{2}{l}{Sequence \cite{DBLP:journals/is/AalstSS11}+\cite{DBLP:journals/sosym/TaxTZ20}}&     0.7644&     0.2553&     0.4733&     0.2387&     0.5480&    64.0161\\
-\multicolumn{2}{l}{Bag \cite{DBLP:journals/is/AalstSS11}+\cite{DBLP:journals/sosym/TaxTZ20}} &     0.7630&     0.2553&     0.4617&     0.2389&     0.5477&    64.6567\\
-\multicolumn{2}{l}{Set \cite{DBLP:journals/is/AalstSS11}+\cite{DBLP:journals/sosym/TaxTZ20}} &     0.7556&     0.2553&     0.4596&     0.2389&     0.5254&    63.2042\\
+\multicolumn{2}{l}{Sequence \cite{DBLP:journals/is/AalstSS11}+\cite{DBLP:journals/sosym/TaxTZ20}}&   0.7644&     0.2489&     0.4733&     0.1782&     0.5480&    28.6630\\
+\multicolumn{2}{l}{Bag \cite{DBLP:journals/is/AalstSS11}+\cite{DBLP:journals/sosym/TaxTZ20}} &   0.7630&     0.2494&     0.4617&     0.1782&     0.5477&    29.0675\\
+\multicolumn{2}{l}{Set \cite{DBLP:journals/is/AalstSS11}+\cite{DBLP:journals/sosym/TaxTZ20}} &     0.7556&     0.2494&     0.4596&     0.1782&     0.5254&    27.7270\\
 		\bottomrule
 	\end{tabularx}
 	\caption[Experimental results for the next activity and timestamp prediction]{Experimental results for the next activity and timestamp prediction.}
 	\label{tab:next-event}
 \end{table}
 
-Compared to the baseline approaches, the text-aware model is able to improve the prediction performance for the next activity and timestamp on all data sets with at least one 
-parameterization, except for the next timestamp prediction on the hospital admission log.
+Compared to the baseline approaches, the text-aware model is able to improve the next activity and timestamp  prediction on all data sets with at least one parameterization.
 Markedly, the impact of the consideration of textual data varies a lot between the data sets and the prediction tasks.
 A reason for that is, that the textual data in the simulated log clearly correlates with the control flow by design, where in the real-world event logs the correlation is only assumed and probably significantly lower.
 
-On the job application log the accuracy of the next activity prediction is increased by up to 12.47 percentage points using the BoW model compared to the LSTM baseline.
-The next timestamp prediction is improved by up to 0.1462 days (around 3.5 hours) with the BoNG encoding.
-The other encoding models perform similarly with the exception of the PV and LDA model in combination with short 10 dimensional text encodings.
-Since this log contains rather longer text documents, the short encodings seem to be not able to represent the textual data sufficiently.
+On the job application log the next activity prediction accuracy goes up to 88.92\% using the LDA text model.
+This is an improvements of 12.62 percentage points compared to the LSTM baseline.
+The next timestamp prediction is improved by up to 0.1467 days (around 3.5 hours).
+The other encoding models perform similarly with the exception of the PV model in combination with small 10 dimensional text encoding.
+Since this log contains rather longer text documents, the small encoding size seem to be not able to represent the textual data sufficiently.
 The process model baseline approaches using the annotated transition system performs very similar to the LSTM baseline approach.
+The transition system created using a sequence abstraction performs slightly better than the other baselines. 
 The trace abstraction method has a rather small impact on the prediction quality.
 
-In contrast, on the customer journey log the next activity prediction is improved by at most 1.66 percentage points using the BoW model.
+In contrast, on the customer journey log the next activity prediction is improved by at most 1.68 percentage points using the LDA model.
 The impact of the text-awareness on next timestamp prediction is negligible on this log.
-The prediction is improved by 0.0012 days (1.73 minutes) using the BoW model, but is also worse for some text models and text encoding sizes.
-Again, the BoW model with 100 dimensional text vectors performs the best compared to the other text models and the baselines.
-The transition system generates slightly worse next activity predictions, but has a significant higher error on the next timestamp prediction.
-The transition system created using a sequence abstraction has a small advantage compared to the bag and set abstracted transition system.
+Seven out of the twelve text-aware models improve the next timestamp prediction, while five are slightly worse.
+The annotated transition system generates slightly worse next activity predictions, but has a similar error on the next timestamp prediction.
 
-On the hospital admission log the prediction accuracy is improved by up to 2.64 percentage points using the BoW model and a 500 dimensional text encoding compared to the LSTM baseline.
+On the hospital admission log the prediction accuracy is improved by up to 3.01 percentage points using the BoW model and a 500 dimensional text encoding compared to the LSTM baseline.
 It can be observed that on this log the high dimensional encodings tend to perform better.
-This probably comes down to the fact that the hospital log has the biggest vocabulary by far with 4\,633 unique words and therefore larger text encodings are required for the BoW and BoNG model.
-Regarding the next timestamp prediction, no text-aware approach is able to surpass the LSTM baseline approach on this log.
-This is surprising, since the improvements on the next activity prediction can not be translated to improvements on the timestamp prediction.
+This probably comes down to the fact that the hospital log has the biggest vocabulary by far with 4\,633 unique words and therefore larger text encodings are required.
+Regarding the next timestamp prediction, the PV model with 20 dimensional text vectors performs the best.
+However, the positive impact of the textual data is questionable, since some text models also perform worse like the BoW model with 100 dimensional text encoding.
+The process model baselines fall back clearly on the next activity prediction task on the hospital admission log.
+The huge amount of trace variants on this log is disadvantageous for prediction models with a discrete set of states.
+In contrast, the LSTM models can profit from their noise resistance.
+However, the transition systems generate competitive predictions on the next timestamp prediction task.
 
 The choice of text model has a rather small impact on the results on all event logs.
 Notably, the BoW and LDA model perform most consistently on all data sets and all text encoding lengths.
-The PV model reaches similar results using a hundred dimensional text vector, but performs worse when a small text embedding size of 10 or 20 is used.
+The PV model reaches slightly worse results especially when a small text embedding size is used.
 The BoNG model has a similar performance compared to the BoW model.
 Surprisingly, the word order awareness of the BoNG model does not lead to better prediction results in general.
 
@@ -206,7 +216,7 @@ Surprisingly, the word order awareness of the BoNG model does not lead to better
 \definecolor{pv}{RGB}{241,158,177}
 \definecolor{lda}{RGB}{249,210,218}
 
-\definecolor{lstm}{RGB}{80,100,120}
+\definecolor{lstm}{RGB}{100,100,100}
 
 \definecolor{sequence}{RGB}{0,84,159}
 \definecolor{bag}{RGB}{64,127,183}
@@ -219,9 +229,9 @@ Surprisingly, the word order awareness of the BoNG model does not lead to better
 	bong,line width=0.7pt,every mark/.append style={fill=bong},mark=|, mark options={scale=2.4}\\%2
 	pv,line width=0.7pt,every mark/.append style={fill=pv},mark=otimes, mark options={scale=1.4}\\%3
 	lda,line width=0.7pt,every mark/.append style={fill=lda},mark=star, mark options={scale=1.6}\\%4
-	lstm,line width=0.7pt,every mark/.append style={fill=lstm},mark=square, mark options={scale=1.2}\\%5
+	lstm,line width=0.7pt,every mark/.append style={fill=lstm},mark=square, mark options={scale=1.4}\\%5
 	sequence,line width=0.7pt, every mark/.append style={fill=sequence},mark=10-pointed star, mark options={scale=1.2}\\%6
-	bag,line width=0.7pt,every mark/.append style={fill=bag},mark=triangle, mark options={scale=1.6}\\%7
+	bag,line width=0.7pt,every mark/.append style={fill=bag},mark=triangle, mark options={scale=1.8}\\%7
 	set,line width=0.7pt,every mark/.append style={fill=set},mark=oplus, mark options={scale=1.3}\\%8
 }
 
@@ -237,6 +247,7 @@ Surprisingly, the word order awareness of the BoNG model does not lead to better
 				legend columns=-1,
 				legend style={/tikz/every even column/.append style={column sep=0.2cm}, draw=none},
 				cycle list name = colorlist,
+				legend style={at={(10,5)}},
 				legend image post style={sharp plot},
 				]
 				\pgfplotsinvokeforeach{1,...,8}{\addplot coordinates {(0,0)};} 
@@ -264,7 +275,7 @@ Surprisingly, the word order awareness of the BoNG model does not lead to better
 				\addlegendentry{BoNG}
 				\addplot table[x=index,y=naPV100, col sep= comma]  {data/prefix_application.csv};
 				\addlegendentry{PV}
-				\addplot table[x=index,y=naLDA20, col sep= comma] {data/prefix_application.csv};
+				\addplot table[x=index,y=naLDA100, col sep= comma] {data/prefix_application.csv};
 				\addlegendentry{LDA}
 				\addplot table[x=index,y=na-0, col sep= comma] {data/prefix_application.csv};
 				\addlegendentry{LSTM}
@@ -422,8 +433,8 @@ Surprisingly, the word order awareness of the BoNG model does not lead to better
 \end{figure}
 
 In addition, the prediction performance is reported per prefix length for each event log.
-Please note that the results on shorter traces is supported by a much larger set of traces due to prefix generation during the construction of the training data.
 Figure \ref{fig:next-activity-prefix} shows the next activity prediction accuracy and next timestamp MAE for every prefix trace of length $1 \leq k \leq 8$.
+Please note that the results on shorter traces is supported by a much larger set of traces due to prefix generation during the construction of the training and test data sets.
 For the text-aware models only the best text encoding length is shown in the diagram.
 
 On the job application event log all text-aware process models almost perfectly predict the next activity after three events (i.e. after the application documents are available).
@@ -432,22 +443,24 @@ This shows that all text-aware approaches can unequivocally take advantage of th
 The improvements on the activity prediction lead consequently to significantly better timestamp predictions on this log.
 
 On the customer journey log the prediction performance of all models correlate positively with the available prefix length of the trace.
-The next activity prediction is improved from under 40\%, when only the first event is available, to over 80\% after eight events.
+The next activity prediction is improved from under 40\%, when only the first event is available, to over 80\% after eight events for most models.
 All text-aware prediction models surpass the baseline approaches on very short prefix traces of length 3 or shorter.
-In order to generalize from the textual data usually more training data is necessary.
+There are two possible explanations for this.
+First, the events holding textual data seem to appear mostly in the beginning of the traces in this log.
+Furthermore, in order to generalize from the textual data usually more training data is necessary.
 Since there is always more short prefixes available in the training set, the text-aware models benefit disproportionately on shorter traces.
-The transition system created using a set abstraction outperforms the LSTM approaches on longer prefixes.
-The MAE on the next timestamp prediction rapidly drops when more events are available.
-The LSTM approaches have a slight advantage again on shorter prefixes.
-However, no difference between text-aware models and the LSTM baseline is recognizable on this prediction task.
+The transition system created using a sequence abstraction underperforms on shorter prefixes, but outperforms all LSTM approaches on longer prefixes.
+The MAE on the next timestamp prediction rapidly drops when more events are available independent of the prediction model.
+However, no difference between text-aware models, the LSTM baseline and the process model baseline is recognizable on this prediction task.
 
 The hospital admission log is characterized by the alternation of admission and discharge events.
-The text-aware prediction models generate slightly better predictions on admission events, since only these contain the diagnosis, which can be utilized by the text-aware models.
-The prediction performance on admission events is slightly increased with longer prefixes, while the accuracy on discharge events decreases.
+Therefore, the prediction accuracy varies between odd and even prefix lengths.
+The text-aware prediction models generate slightly better predictions on admission events, since only these contain the diagnosis as text attribute, which can be utilized by the text-aware models.
+The prediction performance of the LSTM models on admission events is slightly increased with longer prefixes, while the accuracy on discharge events decreases.
 Regarding the next timestamp prediction, higher errors after discharge events and very low errors after admission events are observed.
 This can be explained by the rather short hospital stays compared to longer time periods between two hospitalizations.
-The annotated transition system clearly falls behind on both prediction task on this log.
-A possible reason for this is, that the huge amount of trace variants on this log is disadvantageous for prediction models with a discrete set of states.
+
+
 
 
 \section{Outcome and Case Cycle Time Prediction}
@@ -477,50 +490,56 @@ The results of all evaluated prediction models are summarized in Table \ref{tab:
 		Model & Dimension &Accuracy & MAE & Accuracy& MAE  & Accuracy& MAE  \\
 		\midrule
 		\multicolumn{8}{c}{\textit{Text-Aware Process Prediction (LSTM + Text Model)}} \\
-		BoW&50&  \B   0.6762&     1.4150&     0.5095&     0.3144&     0.6136&    94.8308\\
-		BoW&100&     0.6687&     1.4203&     0.5011&     0.3136&     0.6190&    97.2484\\
-		BoW&500&     0.6757&     1.4146&     0.4984&     0.3090&  \B   0.6198&   100.8792\\
-		BoNG&50&     0.6632&     1.4495&     0.5115&     0.2995&     0.6149&    95.8228\\
-		BoNG&100&     0.6746&     1.4237&     0.5040&     0.3105&     0.6151&    91.5891\\
-		BoNG&500&     0.6694&     1.4235&     0.4968&     0.3068&     0.6081&    96.1264\\
-		PV&10&     0.6253&     1.5803&     0.5123&     0.3173&     0.6050&    92.6440\\
-		PV&20&     0.6644&     1.4951&     0.5106&     0.3141&     0.6057&    92.7924\\
-		PV&100&     0.6678&     1.4577&     0.5083&     0.3167&     0.6103&    93.0984\\
-		LDA&10&     0.6684&     1.4541&     0.5099&     0.3225&     0.6065&    92.6729\\
-		LDA&20&     0.6750&   \B  1.4132&  \B   0.5165&     0.3129&     0.6057&   101.0274\\
-		LDA&100&     0.6744&     1.4183&     0.5114&     0.3091&     0.6125& \B   91.1070\\
+BoW&50&   0.6757& \B    1.3615&     0.5072&     0.2357&     0.6186&    69.2953\\
+BoW&100&     0.6752&     1.3642&     0.5019&  \B   0.2337& \B    0.6238&    70.9488\\
+BoW&500&     0.6753&     1.3678&     0.4965&     0.2354&     0.6111&    70.1084\\
+BoNG&50&     0.6638&     1.4003&     0.5105&     0.2365&     0.6179&    69.4456\\
+BoNG&100&     0.6737&     1.3700&     0.5120&     0.2373&     0.6160&    69.3619\\
+BoNG&500&     0.6698&     1.3670&     0.5018&     0.2358&     0.6126&    70.6906\\
+PV&10&     0.6200&     1.5122&     0.5106&     0.2424&     0.6075&    73.5219\\
+PV&20&     0.6590&     1.3917&     0.5074&     0.2417&     0.6022&    69.6191\\
+PV&100&     0.6703&     1.3855&     0.5057&     0.2416&     0.6135&    69.4793\\
+LDA&10&   \B    0.6758&     1.3622&     0.5125&     0.2394&     0.6079&  \B  69.1465\\
+LDA&20&     0.6750&     1.3620&  \B   0.5133&     0.2375&     0.6143&    69.6269\\
+LDA&100&     0.6754&     1.3662&     0.5096&     0.2374&     0.6117&    69.3189\\
 		\multicolumn{8}{c}{\textit{LSTM Model Prediction Baseline}}  \\
-\multicolumn{2}{l}{LSTM \cite{DBLP:conf/caise/TaxVRD17}+\cite{DBLP:conf/ssci/NavarinVPS17}} &  0.5836&     1.7144&     0.5083&     0.3158&     0.6043&    91.6329 \\
+\multicolumn{2}{l}{LSTM \cite{DBLP:conf/caise/TaxVRD17}+\cite{DBLP:conf/ssci/NavarinVPS17}} & 0.5851&     1.6765&     0.5116&     0.2455&     0.6035&    70.2978 \\
 		\multicolumn{8}{c}{\textit{Process Model Prediction Baseline (Annotated Transition System)}} \\
-\multicolumn{2}{l}{Sequence \cite{DBLP:journals/is/AalstSS11}+\cite{DBLP:journals/sosym/TaxTZ20}}&     0.5838&     1.8067&     0.5119&     0.2799&     0.5533&   171.5684\\
-\multicolumn{2}{l}{Bag \cite{DBLP:journals/is/AalstSS11}+\cite{DBLP:journals/sosym/TaxTZ20}}&     0.5843&     1.8066&     0.4943&     0.2797&     0.5509&   173.7963\\
-\multicolumn{2}{l}{Set \cite{DBLP:journals/is/AalstSS11}+\cite{DBLP:journals/sosym/TaxTZ20}}&     0.5843&     1.8069&     0.4921&  \B   0.2796&     0.5641&   171.4487\\
+\multicolumn{2}{l}{Sequence \cite{DBLP:journals/is/AalstSS11}+\cite{DBLP:journals/sosym/TaxTZ20}}&    0.5838&     1.6760&     0.5119&     0.2466&     0.5533&    77.1544\\
+\multicolumn{2}{l}{Bag \cite{DBLP:journals/is/AalstSS11}+\cite{DBLP:journals/sosym/TaxTZ20}}&    0.5843&     1.6769&     0.4943&     0.2467&     0.5509&    78.6917\\
+\multicolumn{2}{l}{Set \cite{DBLP:journals/is/AalstSS11}+\cite{DBLP:journals/sosym/TaxTZ20}}&     0.5843&     1.6773&     0.4921&     0.2465&     0.5641&    72.9838\\
 		\bottomrule
 	\end{tabularx}
 	\caption[Experimental results for the outcome and cycle time prediction]{Experimental results for the outcome and cycle time prediction.}
 	\label{tab:outcome-cycle-time}
 \end{table}
 
-On the job application log the text-aware prediction model can predict the outcome of the case with up to 67.62\% accuracy using the BoW text model compared to 58.36\% accuracy on the LSTM baseline approach.
-Other text models perform similar to the BoW model except the PV model with 10 dimensional text vectors with only 62.53\% accuracy.
-The MAE on the case cycle time prediction can be reduced to 1.4132 with the LDA model compared to 1.7144 on the LSTM baseline approach.
-The annotated transition system can predict the outcome with up to 58.43\% accuracy and the cycle time with 1.8066 using the bag abstraction.
+On the job application log the text-aware prediction model can predict the outcome of the case with up to 67.58\% accuracy using the LDA text model compared to 58.36\% accuracy on the LSTM baseline approach.
+Therefore, the the prediction accuracy can be improved by up to 9.07 percentage points.
+Other text models perform similar to the LDA model except the PV model with 10 dimensional text vectors with only 62.00\% accuracy.
+The MAE on the case cycle time prediction can be reduced to 1.3615 days with the BoW model compared to 1.1665 on the LSTM baseline approach.
+The annotated transition system can predict the outcome with up to 58.43\% accuracy (bag abstraction) and the cycle time with 1.6760 MAE (sequence abstraction).
 
 On the customer journey log the text-awareness leads to much smaller improvements as it has been observed for the next event prediction.
-The best outcome prediction is realized with the LDA text model (51.65\% accuracy), which improves the LSTM baseline prediction by 0.83 percentage points.
-The case cycle time MAE using the BoNG model is 0.2995 days, which improves the LSTM baseline prediction by 0.0163 days (= 23.47 minutes).
-Strikingly, some text-aware models have slightly worse predictions like the BoW and BoNG models with 500 dimensional text encodings on the outcome prediction tasks.
-A possible reasons for that is that with a vocabulary size of 817 after preprocessing also infrequent words are encoded, which provide a rather low prediction value.
-The best cycle time prediction on this log is realized by the annotated transition system using a set abstraction with MAE of 0.2796.
+The best outcome prediction is realized with the LDA text model resulting in 51.33\% accuracy.
+Some text-aware models like the BoW variant perform worse on the outcome prediction task compared to the LSTM baseline.
+The case cycle time MAE using the BoW model is 0.2337 days, which improves the LSTM baseline prediction by 0.0118 days (= 16.99 minutes).
+All text-aware models outperform the LSTM baseline by a small amount on the case cycle time prediction.
+The sequence-abstracted transition system predicts the outcome with 51.19\% accuracy and hence stays in line with the LSTM-based models.
+The bag- and set-abstracted models fall back slightly.
+The cycle time prediction of the annotated transition systems are slightly worse compared to the LSTM-based approaches.
 
-On the hospital admission log the text-aware approach delivers improvements on the outcome prediction task by up to 1.55 percentage points using the BoW model.
+On the hospital admission log the text-aware approach delivers an accuracy of 62.38\% on the outcome prediction task using the BoW model.
+This improves the LSTM baseline by 2.03 percentage points using the BoW model.
 However, the cycle time prediction is worse for almost all text-aware models except the LDA and BoNG model with 100 dimensional text encodings.
 As observed during the next timestamp prediction, the text-aware models have difficulties to improve on time-related regression task on this particular log.
-The transition system predicts the outcome with only 56.41\% accuracy and has a huge error on the cycle time prediction of 171.4487 days using the set abstraction.
+The transition system predicts the outcome with only 56.41\% accuracy and has a larger error on the cycle time prediction of 72.9838 days using the set abstraction.
+The other abstraction methods perform worse noticeably.
+Since the log contains many trace variants the stronger set abstraction has an advantage.
 
 Again, the choice of text model has a rather small impact.
 The BoW and LDA models perform slightly better than the BoNG and PV model.
-Notably, the PV model can not achieve the best performance on any log and prediction task.
+Strikingly, the best predictions have always been generated by an text-aware model using either the BoW or the LDA text model.
 Compared to the next activity and timestamp prediction, the improvement through the text-awareness is smaller on the case-based prediction tasks.
 
 In addition, the prediction results are computed depending on the prefix length of the traces.
@@ -544,6 +563,7 @@ This shows that the text-aware approach can improve the earliness of the predict
 				legend columns=-1,
 				legend style={/tikz/every even column/.append style={column sep=0.2cm}, draw=none},
 				cycle list name = colorlist,
+				legend style={at={(10,5)}},
 				legend image post style={sharp plot},
 				]
 				\pgfplotsinvokeforeach{1,...,8}{\addplot coordinates {(0,0)};} 
@@ -730,27 +750,26 @@ This shows that the text-aware approach can improve the earliness of the predict
 
 
 Also on the customer journey log an explicit positive correlation between the prefix length and the prediction performance is observed.
-After the first event the outcome is predicted with under 40\% accuracy, but the prediction is improved noticeably with every additional event.
-After eight events the accuracy of the text-aware models is around 90\%, while the LSTM baseline approach predicts the outcome with 82\% accuracy.
+After the first event the outcome is predicted with under 40\% accuracy independent of the prediction model, but the prediction is improved noticeably with every additional event.
 The sequence-abstracted annotated transition system outperforms the LSTM approaches after six events.
 The other two abstractions perform slightly worse on all prefix lengths.
+The text-aware model and the LSTM baseline perform slightly better on short prefix of length one or two.
 The cycle time prediction is improved in particular within the first three events for all models.
-The text-aware approach using a BoW or BoNG model slightly outperforms the LSTM baseline for all prefixes.
-After four events the prediction gets slightly worse on all LSTM approaches.
-The transition systems can improve the prediction with every new event.
-They outperform all LSTM approaches except for prefixes of a single event.
+The text-aware approaches slightly outperforms the baseline approaches on very short prefixes.
+However, the cycle time prediction performance is very similar for all models after three events on this log.
 
 The outcome accuracy on the hospital log varies a lot between the admission and discharge events.
 The LSTM approaches outperform the transition system especially on longer prefixes.
 The text-aware models capitalize again on shorter traces and perform similar to the LSTM baseline on longer ones.
-Differently compared to the other logs, the cycle time prediction is getting worse for longer prefixes and the baseline approach predicts better then most text-aware models.
+Differently compared to the other logs, the cycle time prediction is getting worse for longer prefixes.
+The process model baselines can compete with the text-aware models on prefixes of length one or two.
+For longer prefixes all transition systems perform significantly worse due to the huge amount of trace variants.
 Since the hospital log contains significantly more shorter traces, the prediction performance on longer traces is more imprecise.
-The transition systems generate stable errors on all prefixes, i.e. they underperform on short traces and outperform on longer ones.
  
 
 \section{Key Findings and Discussion}
 
-The text-aware process prediction model outperforms the baseline approaches on most evaluated event logs and prediction tasks.
+The text-aware process prediction model outperforms the baseline approaches on all event logs and prediction tasks.
 The influence of textual data on the prediction performance varies greatly per event log.
 It is observed that the impact of the text consideration on the classification tasks is significantly higher compared to the time regression tasks.
 All evaluated text models are suitable to capture textual data and deliver similar results on most prediction tasks.
@@ -758,18 +777,17 @@ Nevertheless, the BoW and LDA text models perform slightly better then the BoNG 
 The optimal encoding dimension of textual data varies depending on the data set.
 A bigger vocabulary of words usually requires longer text encodings.
 
-On the hospital admission event log it can be observed, that the cycle time prediction is noticeably worse, if textual data is considered.
+A few parameterizations of the text-aware prediction models perform worse than LSTM baseline on some prediction tasks.
 This shows that text-aware process prediction does not necessarily guarantee predication improvements.
 On the real-world event logs the text-aware models could capitalize mostly on short trace prefixes.
 Since more training data with short prefix traces is available, it is easier for the text-aware model to generalize shorter prefixes.
 Considering the number of events that are available for a prediction, two effects can be observed.
 First, the prediction performance is usually improved when more events of the case are available.
 In particular, after the first few events the predictions are mostly improved a lot.
-However, for longer traces the prediction performance decreases slightly, since there is less knowledge (i.e. training data) for longer traces available.
-It can be observed that the annotated transition system can deal better with the missing training data for longer traces at the costs of worse predictions on shorter traces.
+However, for longer traces the prediction performance can also decrease, since there is less knowledge (i.e. training data) for longer traces available.
 
 The realization of a text-aware process prediction approach using LSTM and text models has advantages and disadvantages.
-The prediction model belongs to the most flexible process prediction methods in term of input data that can be utilized for the prediction.
+The prediction model belongs to the most flexible process prediction methods in terms of input data that can be utilized for the prediction.
 This is a major advantage for processes, where the control flow is driven by additional textual and non-textual data and not only the control-flow.
 Furthermore, the consideration of textual data improves the prediction compared to the current state-of-the-art approach, if the textual data sufficiently correlates with the prediction targets.
 Therefore, using this model can lead to a prediction quality on event logs with textual data that could not be realized before.
