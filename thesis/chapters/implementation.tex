@@ -29,12 +29,16 @@ It is used for event log parsing and its internal event log representation.
 TensorFlow \cite{DBLP:journals/corr/AbadiABBCCCDDDG16} is a dataflow-oriented framework originally developed by Google, which includes a diverse set of neural network models and serves with its LSTM implementation using the Keras API \cite{chollet2015keras}.
 
 Furthermore, the packages NTLK \cite{DBLP:books/daglib/0022921}, Scikit-learn \cite{DBLP:journals/jmlr/PedregosaVGMTGBPWDVPCBPD11} and Gensim \cite{rehurek_lrec} are applied for the preprocessing and encoding of textual data.
-NTLK is used to realize the tokenization, word lemmatization and stop word removal, whereas the implementation of the text models is supported by the Scikit-learn (Bag of Words, Bag of N-Gram) and Gensim (LDA, Paragraph Vector) packages.
+NTLK is used to realize the tokenization, word lemmatization and stop word removal.
+For the lemmatization of English texts the WordNet lemmatizer based on the WordNet database \cite{miller1998wordnet} is utilized to normalize each word.
+In case of other languages the more simplistic Snowball stemming algorithm \cite{porter2001snowball} is chosen instead.
+The stop words\footnote{\, Stop words: https://github.com/nltk/nltk\_data/blob/gh-pages/packages/corpora/stopwords.zip} are provided directly by the NLTK package.
+The implementation of the text models is supported by the Scikit-learn (Bag of Words, Bag of N-Gram) and Gensim (LDA, Paragraph Vector) packages.
 
 
 \section{Model Architecture}\label{sec:model-implementation}
 
-The interface of the text-aware process prediction model (tapp) is realized through a class \texttt{TappModel}, which implements the functions \texttt{fit()},  \texttt{predict()} and  \texttt{evaluate()}, that can be used to fit the model to an event log with historical data, compute prediction for an event log with uncompleted traces and evaluate the performance of the prediction model.
+The interface of the text-aware process prediction model (tapp) is realized through a class \texttt{TappModel}, which implements the functions \texttt{fit()},  \texttt{predict()} and  \texttt{evaluate()}, which can be used to fit the model to an event log with historical data, compute prediction for an event log with uncompleted traces and evaluate the performance of the prediction model.
 The \texttt{TappModel} manages the underlying LSTM model and can be configured with the number of shared and specialized layers as well as the dimension of the hidden neurons per LSTM layer.
 
 \begin{figure}[htbp!]

@@ -6,14 +6,14 @@ Then, the performance of differently parameterized text-aware prediction models 
 
 The text-aware process prediction model is evaluated on three event event logs based on four prediction tasks, namely next activity, next timestamp, case cycle time and outcome prediction.
 The text-aware model is compared to two other process prediction methods.
-First, the pure LSTM approach based on the ideas of \citeauthor{DBLP:conf/caise/TaxVRD17} \cite{DBLP:conf/caise/TaxVRD17} and \citeauthor{DBLP:conf/ssci/NavarinVPS17} \cite{DBLP:conf/ssci/NavarinVPS17} is considered, that only uses the activity, timestamp and additional non-textual attributes of each event.
-This approach can be considered as the current state-of-the-art in process prediction, if prediction performance is the only criteria.
+First, the pure LSTM approach based on the ideas of \citeauthor{DBLP:conf/caise/TaxVRD17} \cite{DBLP:conf/caise/TaxVRD17} and \citeauthor{DBLP:conf/ssci/NavarinVPS17} \cite{DBLP:conf/ssci/NavarinVPS17} is considered, which only uses the activity, timestamp and additional non-textual attributes of each event.
+This approach can be considered the state-of-the-art in process prediction, if prediction performance is the only criteria.
 
 The second baseline is the process model-based prediction method originally presented by \citeauthor{DBLP:journals/is/AalstSS11} \cite{DBLP:journals/is/AalstSS11}.
 This approach constructs an annotated transition system for a log using a sequence, bag or set abstraction.
 Each state of the transition system is annotated with measurements of historical traces, that can be used to predict target values for unseen traces.
 During prediction phase, running traces are mapped to the corresponding state of the transition system and the measurements of the state are used to compute a prediction.
-While the original work focuses regression tasks, \citeauthor{DBLP:journals/sosym/TaxTZ20} \cite{DBLP:journals/sosym/TaxTZ20} describe how an annotated transition system can also be used for classification tasks like the next activity prediction.
+While the original work by \citeauthor{DBLP:journals/is/AalstSS11} focuses on regression tasks, \citeauthor{DBLP:journals/sosym/TaxTZ20} \cite{DBLP:journals/sosym/TaxTZ20} describe how an annotated transition system can also be used for classification tasks like the next activity prediction.
 For classification tasks, the measurements of each state are used to compute a probability distribution over the prediction target.
 For regression tasks, the median of the measurements of each states are computed.
 Alternatively, other aggregation functions like the mean are possible.
@@ -21,10 +21,11 @@ However, this led to worse results so that these are not reported.
 For the construction of the state space the eight most recent events of a trace are considered.
 Experiments with different horizon lengths (1,2,4,16) mostly led to worse result, so that these are not reported.
 
-Each prediction model is evaluated in the same consistent procedure.
+Each prediction model is evaluated with the same consistent procedure.
 In the first step, the event log is separated into a training and test log. 
 The training log consists of the first 2/3 chronologically ordered traces and is used to fit the prediction model to the historical event data.
 The remaining 1/3 of traces are used to measure the prediction performance.
+Because of the temporal dimension in event data and the potential existence of concept drifts, no cross-validation is applied.
 For each trace $\sigma$ in the training and test log all prefixes $hd^k(\sigma)$ of length $1 \leq k \leq |\sigma|$ are considered as instances.
 
 For classification (i.e. categorical prediction) task, like next event and outcome prediction, the accuracy is utilized as metric.
@@ -37,7 +38,7 @@ For regression tasks, like the next event time and the case cycle time predictio
 	\textrm{MAE} = \dfrac{1}{n}\sum_{i=1}^{n}|\hat{y_i} - y_i| \in [0, \infty).
 \end{equation*}
 This error metric is favored, since it gives a more intuitive interpretation and is less sensitive to outliers compared to similar metrics like the mean squared error (MSE).
-An accuracy of 1 and a MAE of 0 is the most desirable.
+An accuracy of 1 and a MAE of 0 is the most desirable result.
 
 The text-aware process prediction model is evaluated with all presented text models namely the Bag of Words, Bag of N-Gram, Paragraph Vector and Latent Dirichlet Allocation.
 Each model is tested with three different encoding lengths for textual data.
@@ -65,10 +66,11 @@ Each event log contains events with textual data and is described in the followi
 An overview of the key properties of the logs is summarized in Table \ref{tab:logs}.
 
 \begin{table}[!htbp]
-	\begin{tabularx}{\textwidth}{l r r r}
+	\setlength\tabcolsep{5pt}
+	\begin{tabularx}{\textwidth}{l c c c}
 		\toprule
-		\textbf{Event Log} & \heading{\textbf{Job}} & \heading{\textbf{Customer}} &\heading{\textbf{Hospital}}  \\
-		& \heading{\textbf{Application}} & \heading{\textbf{Journey}} &\heading{\textbf{Admission}}  \\
+		\textbf{Event Log} & \textbf{Job} & \textbf{Customer} & \textbf{Hospital}  \\
+		& \textbf{Application} & \textbf{Journey} &\textbf{Admission}  \\
 		\midrule
 		Log type & Simulated & Real-world & Real-word\\
 		Cases & 20\,000& 15\,001& 46\,520\\
@@ -96,7 +98,7 @@ First, the applicant starts an application in the company's system.
 Then, the candidate uploads a curriculum vitae (CV) and optionally a cover letter in a random order.
 When the documents have been received, the applicant is either directly rejected by the company or invited to an interview.
 In case of an invitation the applicant responds with an acceptance or rejection email.
-After the interview a decision is made and sent to the applicant that states, if the applicant gets a job offer or is rejected.
+After the interview a decision is made and sent to the applicant that states, whether the applicant gets a job offer or is rejected.
 In case of a job offer, the applicant answers again with an acceptance or rejection email.
 In total the process contains up to 5 text documents (CV, cover letter, accept/reject interview email by the candidate, job offer/reject email by the company and accept/reject job offer email by the candidate).
 
@@ -104,7 +106,7 @@ The timestamp of each event is determined by sampling from a normal distribution
 The CV, cover letter and all emails are available as a text attribute in the event log.
 The text information is generated by sampling 10 times from sets of full and partial sentences depending on the control flow of the process instance.
 For example, if an applicant gets a job offer, the generated email contains text fragments from typical job offer emails.
-If on the other hand the applicant is rejected, the email is generated with sentences from typical rejection emails.
+If, on the other hand, the applicant is rejected, the email is generated with sentences from typical rejection emails.
 With this text generation mechanism, all texts in the event log are unique, but the words and sentences in the texts correlate with the path of the corresponding case.
 Furthermore, noise is added by introducing a 1\% probability after each event that the process stops immediately and is not finished properly.
 
@@ -136,7 +138,7 @@ Each line in the table states the prediction accuracy for the next activity and 
 
 \begin{table}[!htbp]
 	\newrobustcmd{\B}{\fontseries{b}\selectfont}
-	\setlength\tabcolsep{3pt}
+	\setlength\tabcolsep{2pt}
 	\begin{tabularx}{\textwidth}{
 			>{\hsize=0.8\hsize}C
 			>{\hsize=1.2\hsize}C
@@ -150,7 +152,7 @@ Each line in the table states the prediction accuracy for the next activity and 
 		\toprule
 		& & \multicolumn{2}{l}{\textbf{Job Application}} & \multicolumn{2}{l}{\textbf{Customer Journey}} & \multicolumn{2}{l}{\textbf{Hospital Admission}} \\
 		Text & Text &Activity & Time & Activity& Time  & Activity& Time  \\
-		Model & Dimension &Accuracy & MAE & Accuracy& MAE  & Accuracy& MAE  \\
+		Model & Vector Size &Accuracy & MAE (days) & Accuracy& MAE (days)  & Accuracy& MAE (days)  \\
 		\midrule
 		\multicolumn{8}{c}{\textit{Text-Aware Process Prediction (LSTM + Text Model)}} \\
 BoW&50&     0.8887&     0.1037&     0.4876&  \B   0.1764&     0.5978&    29.0819 \\
@@ -179,7 +181,7 @@ LDA&100&  \B   0.8892&  \B   0.1032&  \B   0.4911&     0.1777&     0.5998&    27
 
 Compared to the baseline approaches, the text-aware model is able to improve the next activity and timestamp  prediction on all data sets with at least one parameterization.
 Markedly, the impact of the consideration of textual data varies a lot between the data sets and the prediction tasks.
-A reason for that is, that the textual data in the simulated log clearly correlates with the control flow by design, where in the real-world event logs the correlation is only assumed and probably significantly lower.
+A reason for that might be, that the textual data in the simulated log clearly correlates with the control flow by design, where in the real-world event logs the correlation is only assumed and probably significantly lower.
 
 On the job application log the next activity prediction accuracy goes up to 88.92\% using the LDA text model.
 This is an improvements of 12.62 percentage points compared to the LSTM baseline.
@@ -269,9 +271,9 @@ Surprisingly, the word order awareness of the BoNG model does not lead to better
 				ylabel={Accuracy},
 				cycle list name=colorlist,
 ]	
-				\addplot table[x=index,y=naBoW50, col sep= comma] {data/prefix_application.csv};
+				\addplot table[x=index,y=naBoW100, col sep= comma] {data/prefix_application.csv};
 				\addlegendentry{BoW}
-				\addplot table[x=index,y=naBoNG100, col sep= comma]  {data/prefix_application.csv};
+				\addplot table[x=index,y=naBoNG500, col sep= comma]  {data/prefix_application.csv};
 				\addlegendentry{BoNG}
 				\addplot table[x=index,y=naPV100, col sep= comma]  {data/prefix_application.csv};
 				\addlegendentry{PV}
@@ -292,16 +294,16 @@ Surprisingly, the word order awareness of the BoNG model does not lead to better
 		\begin{tikzpicture}[scale=0.9]
 			\begin{axis}[
 				xlabel={Prefix Length},
-				ylabel={Mean Absolute Error},
+				ylabel={Mean Absolute Error (days)},
 				cycle list name=colorlist,
 				]
 				\addplot table[x=index,y=ntBoW500, col sep= comma] {data/prefix_application.csv};
 				\addlegendentry{BoW}
 				\addplot table[x=index,y=ntBoNG500, col sep= comma]  {data/prefix_application.csv};
 				\addlegendentry{BoNG}
-				\addplot table[x=index,y=ntPV20, col sep= comma]  {data/prefix_application.csv};
+				\addplot table[x=index,y=ntPV100, col sep= comma]  {data/prefix_application.csv};
 				\addlegendentry{PV}
-				\addplot table[x=index,y=ntLDA10, col sep= comma] {data/prefix_application.csv};
+				\addplot table[x=index,y=ntLDA100, col sep= comma] {data/prefix_application.csv};
 				\addlegendentry{LDA}
 				\addplot table[x=index,y=nt-0, col sep= comma] {data/prefix_application.csv};
 				\addlegendentry{LSTM}
@@ -325,7 +327,7 @@ Surprisingly, the word order awareness of the BoNG model does not lead to better
 				ylabel={Accuracy},
 				cycle list name=colorlist,
 				]
-				\addplot table[x=index,y=naBoW50, col sep= comma] {data/prefix_werk.csv};
+				\addplot table[x=index,y=naBoW100, col sep= comma] {data/prefix_werk.csv};
 				\addlegendentry{BoW}
 				\addplot table[x=index,y=naBoNG100, col sep= comma] {data/prefix_werk.csv};
 				\addlegendentry{BoNG}
@@ -348,16 +350,16 @@ Surprisingly, the word order awareness of the BoNG model does not lead to better
 		\begin{tikzpicture}[scale=0.9]
 			\begin{axis}[
 				xlabel={Prefix Length},
-				ylabel={Mean Absolute Error},
+				ylabel={Mean Absolute Error (days)},
 				cycle list name=colorlist,
 				]
 				\addplot table[x=index,y=ntBoW50, col sep= comma] {data/prefix_werk.csv};
 				\addlegendentry{BoW}
-				\addplot table[x=index,y=ntBoNG100, col sep= comma] {data/prefix_werk.csv};
+				\addplot table[x=index,y=ntBoNG50, col sep= comma] {data/prefix_werk.csv};
 				\addlegendentry{BoNG}
-				\addplot table[x=index,y=ntPV100, col sep= comma]  {data/prefix_werk.csv};
+				\addplot table[x=index,y=ntPV20, col sep= comma]  {data/prefix_werk.csv};
 				\addlegendentry{PV}
-				\addplot table[x=index,y=ntLDA10, col sep= comma] {data/prefix_werk.csv};
+				\addplot table[x=index,y=ntLDA20, col sep= comma] {data/prefix_werk.csv};
 				\addlegendentry{LDA}
 				\addplot table[x=index,y=nt-0, col sep= comma] {data/prefix_werk.csv};
 				\addlegendentry{LSTM}
@@ -383,7 +385,7 @@ Surprisingly, the word order awareness of the BoNG model does not lead to better
 				]
 				\addplot table[x=index,y=naBoW500, col sep= comma] {data/prefix_admissions.csv};
 				\addlegendentry{BoW}
-				\addplot table[x=index,y=naBoNG100, col sep= comma] {data/prefix_admissions.csv};
+				\addplot table[x=index,y=naBoNG500, col sep= comma] {data/prefix_admissions.csv};
 				\addlegendentry{BoNG}
 				\addplot table[x=index,y=naPV100, col sep= comma]  {data/prefix_admissions.csv};
 				\addlegendentry{PV}
@@ -404,7 +406,7 @@ Surprisingly, the word order awareness of the BoNG model does not lead to better
 		\begin{tikzpicture}[scale=0.9]
 			\begin{axis}[
 				xlabel={Prefix Length},
-				ylabel={Mean Absolute Error},
+				ylabel={Mean Absolute Error (days)},
 				cycle list name=colorlist,
 				]
 				\addplot table[x=index,y=ntBoW500, col sep= comma] {data/prefix_admissions.csv};
@@ -413,7 +415,7 @@ Surprisingly, the word order awareness of the BoNG model does not lead to better
 				\addlegendentry{BoNG}
 				\addplot table[x=index,y=ntPV20, col sep= comma]  {data/prefix_admissions.csv};
 				\addlegendentry{PV}
-				\addplot table[x=index,y=ntLDA10, col sep= comma] {data/prefix_admissions.csv};
+				\addplot table[x=index,y=ntLDA100, col sep= comma] {data/prefix_admissions.csv};
 				\addlegendentry{LDA}
 				\addplot table[x=index,y=nt-0, col sep= comma] {data/prefix_admissions.csv};
 				\addlegendentry{LSTM}
@@ -438,7 +440,7 @@ Please note that the results on shorter traces is supported by a much larger set
 For the text-aware models only the best text encoding length is shown in the diagram.
 
 On the job application event log all text-aware process models almost perfectly predict the next activity after three events (i.e. after the application documents are available).
-The baseline approaches can not take advantage of the emails and reaches a prediction accuracy of around 80\% after the first three events.
+The baseline approaches cannot take advantage of the emails and reaches a prediction accuracy of around 80\% after the first three events.
 This shows that all text-aware approaches can unequivocally take advantage of the textual data at every decision point in the process, despite the fact that all documents in the log are unique.
 The improvements on the activity prediction lead consequently to significantly better timestamp predictions on this log.
 
@@ -448,7 +450,7 @@ All text-aware prediction models surpass the baseline approaches on very short p
 There are two possible explanations for this.
 First, the events holding textual data seem to appear mostly in the beginning of the traces in this log.
 Furthermore, in order to generalize from the textual data usually more training data is necessary.
-Since there is always more short prefixes available in the training set, the text-aware models benefit disproportionately on shorter traces.
+Since there are always more short prefixes available in the training set, the text-aware models benefit disproportionately on shorter traces.
 The transition system created using a sequence abstraction underperforms on shorter prefixes, but outperforms all LSTM approaches on longer prefixes.
 The MAE on the next timestamp prediction rapidly drops when more events are available independent of the prediction model.
 However, no difference between text-aware models, the LSTM baseline and the process model baseline is recognizable on this prediction task.
@@ -487,7 +489,7 @@ The results of all evaluated prediction models are summarized in Table \ref{tab:
 		\toprule
 		& & \multicolumn{2}{c}{\textbf{Job Application}} & \multicolumn{2}{c}{\textbf{Customer Journey}} & \multicolumn{2}{c}{\textbf{Hospital Admission}} \\
 		Text & Text &Outcome & Cycle & Outcome& Cycle  & Outcome& Cycle  \\
-		Model & Dimension &Accuracy & MAE & Accuracy& MAE  & Accuracy& MAE  \\
+		Model & Vector Size &Accuracy & MAE (days) & Accuracy& MAE (days) & Accuracy& MAE (days) \\
 		\midrule
 		\multicolumn{8}{c}{\textit{Text-Aware Process Prediction (LSTM + Text Model)}} \\
 BoW&50&   0.6757& \B    1.3615&     0.5072&     0.2357&     0.6186&    69.2953\\
@@ -517,8 +519,8 @@ LDA&100&     0.6754&     1.3662&     0.5096&     0.2374&     0.6117&    69.3189\
 On the job application log the text-aware prediction model can predict the outcome of the case with up to 67.58\% accuracy using the LDA text model compared to 58.36\% accuracy on the LSTM baseline approach.
 Therefore, the the prediction accuracy can be improved by up to 9.07 percentage points.
 Other text models perform similar to the LDA model except the PV model with 10 dimensional text vectors with only 62.00\% accuracy.
-The MAE on the case cycle time prediction can be reduced to 1.3615 days with the BoW model compared to 1.1665 on the LSTM baseline approach.
-The annotated transition system can predict the outcome with up to 58.43\% accuracy (bag abstraction) and the cycle time with 1.6760 MAE (sequence abstraction).
+The MAE on the case cycle time prediction can be reduced to 1.3615 days with the BoW model compared to 1.1665 days on the LSTM baseline approach.
+The annotated transition system can predict the outcome with up to 58.43\% accuracy (bag abstraction) and the cycle time with 1.6760 days MAE (sequence abstraction).
 
 On the customer journey log the text-awareness leads to much smaller improvements as it has been observed for the next event prediction.
 The best outcome prediction is realized with the LDA text model resulting in 51.33\% accuracy.
@@ -585,13 +587,13 @@ This shows that the text-aware approach can improve the earliness of the predict
 				ylabel={Accuracy},
 				cycle list name=colorlist,
 				]			
-				\addplot table[x=index,y=oaBoW500, col sep= comma] {data/prefix_application.csv};
+				\addplot table[x=index,y=oaBoW50, col sep= comma] {data/prefix_application.csv};
 				\addlegendentry{BoW}
 				\addplot table[x=index,y=oaBoNG100, col sep= comma]  {data/prefix_application.csv};
 				\addlegendentry{BoNG}
 				\addplot table[x=index,y=oaPV100, col sep= comma]  {data/prefix_application.csv};
 				\addlegendentry{PV}
-				\addplot table[x=index,y=oaLDA20, col sep= comma] {data/prefix_application.csv};
+				\addplot table[x=index,y=oaLDA10, col sep= comma] {data/prefix_application.csv};
 				\addlegendentry{LDA}
 				\addplot table[x=index,y=oa-0, col sep= comma] {data/prefix_application.csv};
 				\addlegendentry{LSTM}
@@ -608,10 +610,10 @@ This shows that the text-aware approach can improve the earliness of the predict
 		\begin{tikzpicture}[scale=0.9]
 			\begin{axis}[
 				xlabel={Prefix Length},
-				ylabel={Mean Absolute Error},
+				ylabel={Mean Absolute Error (days)},
 				cycle list name=colorlist,
 				]			
-				\addplot table[x=index,y=ctBoW500, col sep= comma] {data/prefix_application.csv};
+				\addplot table[x=index,y=ctBoW50, col sep= comma] {data/prefix_application.csv};
 				\addlegendentry{BoW}
 				\addplot table[x=index,y=ctBoNG500, col sep= comma]  {data/prefix_application.csv};
 				\addlegendentry{BoNG}
@@ -643,7 +645,7 @@ This shows that the text-aware approach can improve the earliness of the predict
 				]		
 				\addplot table[x=index,y=oaBoW50, col sep= comma] {data/prefix_werk.csv};
 				\addlegendentry{BoW}
-				\addplot table[x=index,y=oaBoNG50, col sep= comma] {data/prefix_werk.csv};
+				\addplot table[x=index,y=oaBoNG100, col sep= comma] {data/prefix_werk.csv};
 				\addlegendentry{BoNG}
 				\addplot table[x=index,y=oaPV10, col sep= comma]  {data/prefix_werk.csv};
 				\addlegendentry{PV}
@@ -664,14 +666,14 @@ This shows that the text-aware approach can improve the earliness of the predict
 		\begin{tikzpicture}[scale=0.9]
 			\begin{axis}[
 				xlabel={Prefix Length},
-				ylabel={Mean Absolute Error},
+				ylabel={Mean Absolute Error (days)},
 				cycle list name=colorlist,
 				]		
-				\addplot table[x=index,y=ctBoW500, col sep= comma] {data/prefix_werk.csv};
+				\addplot table[x=index,y=ctBoW100, col sep= comma] {data/prefix_werk.csv};
 				\addlegendentry{BoW}
-				\addplot table[x=index,y=ctBoNG50, col sep= comma] {data/prefix_werk.csv};
+				\addplot table[x=index,y=ctBoNG500, col sep= comma] {data/prefix_werk.csv};
 				\addlegendentry{BoNG}
-				\addplot table[x=index,y=ctPV20, col sep= comma]  {data/prefix_werk.csv};
+				\addplot table[x=index,y=ctPV100, col sep= comma]  {data/prefix_werk.csv};
 				\addlegendentry{PV}
 				\addplot table[x=index,y=ctLDA100, col sep= comma] {data/prefix_werk.csv};
 				\addlegendentry{LDA}
@@ -697,13 +699,13 @@ This shows that the text-aware approach can improve the earliness of the predict
 				ylabel={Accuracy},
 				cycle list name=colorlist,
 				]			
-				\addplot table[x=index,y=oaBoW500, col sep= comma] {data/prefix_admissions.csv};
+				\addplot table[x=index,y=oaBoW100, col sep= comma] {data/prefix_admissions.csv};
 				\addlegendentry{BoW}
-				\addplot table[x=index,y=oaBoNG500, col sep= comma] {data/prefix_admissions.csv};
+				\addplot table[x=index,y=oaBoNG50, col sep= comma] {data/prefix_admissions.csv};
 				\addlegendentry{BoNG}
 				\addplot table[x=index,y=oaPV100, col sep= comma]  {data/prefix_admissions.csv};
 				\addlegendentry{PV}
-				\addplot table[x=index,y=oaLDA100, col sep= comma] {data/prefix_admissions.csv};
+				\addplot table[x=index,y=oaLDA20, col sep= comma] {data/prefix_admissions.csv};
 				\addlegendentry{LDA}
 				\addplot table[x=index,y=oa-0, col sep= comma] {data/prefix_admissions.csv};
 				\addlegendentry{LSTM}
@@ -720,12 +722,12 @@ This shows that the text-aware approach can improve the earliness of the predict
 		\begin{tikzpicture}[scale=0.9]
 			\begin{axis}[
 				xlabel={Prefix Length},
-				ylabel={Mean Absolute Error},
+				ylabel={Mean Absolute Error (days)},
 				cycle list name=colorlist,
 				]
-				\addplot table[x=index,y=ctBoW100, col sep= comma] {data/prefix_admissions.csv};
+				\addplot table[x=index,y=ctBoW50, col sep= comma] {data/prefix_admissions.csv};
 				\addlegendentry{BoW}
-				\addplot table[x=index,y=ctBoNG50, col sep= comma] {data/prefix_admissions.csv};
+				\addplot table[x=index,y=ctBoNG100, col sep= comma] {data/prefix_admissions.csv};
 				\addlegendentry{BoNG}
 				\addplot table[x=index,y=ctPV100, col sep= comma]  {data/prefix_admissions.csv};
 				\addlegendentry{PV}
@@ -761,10 +763,10 @@ However, the cycle time prediction performance is very similar for all models af
 The outcome accuracy on the hospital log varies a lot between the admission and discharge events.
 The LSTM approaches outperform the transition system especially on longer prefixes.
 The text-aware models capitalize again on shorter traces and perform similar to the LSTM baseline on longer ones.
-Differently compared to the other logs, the cycle time prediction is getting worse for longer prefixes.
+Differently compared to the other logs, the cycle time prediction gets worse for longer prefixes.
 The process model baselines can compete with the text-aware models on prefixes of length one or two.
 For longer prefixes all transition systems perform significantly worse due to the huge amount of trace variants.
-Since the hospital log contains significantly more shorter traces, the prediction performance on longer traces is more imprecise.
+Since the hospital log contains shorter traces in a significantly higher amount, the prediction performance on longer traces is more imprecise.
  
 
 \section{Key Findings and Discussion}
@@ -780,19 +782,19 @@ A bigger vocabulary of words usually requires longer text encodings.
 A few parameterizations of the text-aware prediction models perform worse than LSTM baseline on some prediction tasks.
 This shows that text-aware process prediction does not necessarily guarantee predication improvements.
 On the real-world event logs the text-aware models could capitalize mostly on short trace prefixes.
-Since more training data with short prefix traces is available, it is easier for the text-aware model to generalize shorter prefixes.
+Since more training data with short prefix traces is available, it is easier for the text-aware model to generalize for shorter prefixes.
 Considering the number of events that are available for a prediction, two effects can be observed.
 First, the prediction performance is usually improved when more events of the case are available.
-In particular, after the first few events the predictions are mostly improved a lot.
+In particular, after the first few events the predictions mostly improve a lot.
 However, for longer traces the prediction performance can also decrease, since there is less knowledge (i.e. training data) for longer traces available.
 
 The realization of a text-aware process prediction approach using LSTM and text models has advantages and disadvantages.
 The prediction model belongs to the most flexible process prediction methods in terms of input data that can be utilized for the prediction.
-This is a major advantage for processes, where the control flow is driven by additional textual and non-textual data and not only the control-flow.
+This is a major advantage for processes, where the control flow is driven by additional textual and non-textual data and not only the control flow.
 Furthermore, the consideration of textual data improves the prediction compared to the current state-of-the-art approach, if the textual data sufficiently correlates with the prediction targets.
 Therefore, using this model can lead to a prediction quality on event logs with textual data that could not be realized before.
 
 Nonetheless, the text-aware process prediction model is a black-box model, which does not give insights about how the input data relates to the final prediction.
 In addition, the hyper parameter space is large, since the LSTM \textit{and} the text model have to be configured, and the training of the LSTM network is resource-heavy.
 Using an annotated transition system can be favorable, when less training data is available, computing resources are very limited or a black-box model is inadequate.
-However, textual data can not be utilized in this case and the prediction performance is noticeably worse on unstructured processes.
+However, textual data cannot be utilized in this case and the prediction performance is noticeably worse on unstructured processes.

@@ -12,16 +12,16 @@ The main application scenario for the model is inside of real-time business proc
 
 \section{Overview}\label{sec:overview}
 
-The framework is designed to approximate functions $f_\mathrm{a}, f_\mathrm{t}, f_\mathrm{o}$ and $f_\mathrm{c}$, that predict the next \textbf{a}ctivity, next \textbf{t}imestamp, case \textbf{o}utcome and case \textbf{c}ycle time given any prefix $hd^k(\sigma)$ of length $1 \leq k \leq |\sigma| = n$ of the complete, but unknown trace $\sigma = \langle e_1, \dots, e_{n} \rangle \in \mathcal{E}^+$.
-The next activity prediction function $f_\mathrm{a}\colon \mathcal{E}^+ \to \mathcal{A} \cup \{\text{END OF PROCESS}\}$ returns the activity of the next event or an artificial END OF PROCESS activity, if the given trace is already completed, precisely:
+The framework is designed to approximate functions $f_\mathrm{a}, f_\mathrm{t}, f_\mathrm{o}$ and $f_\mathrm{c}$, that predict the next \textbf{a}ctivity, next \textbf{t}imestamp, case \textbf{o}utcome and case \textbf{c}ycle time respectively, given any prefix $hd^k(\sigma)$ of length $1 \leq k \leq |\sigma| = n$ of the complete, but unknown trace $\sigma = \langle e_1, \dots, e_{n} \rangle \in \mathcal{E}^+$.
+The next activity prediction function $f_\mathrm{a}\colon \mathcal{E}^+ \to \mathcal{A} \cup \{\blacksquare\}$ returns the activity of the next event or an artificial activity $\blacksquare$, if the given trace is already completed, formally:
 \begin{align*}
 f_\mathrm{a}(hd^k(\sigma)) &= 
 \begin{cases}
-	\text{END OF PROCESS}& \text{if $k = |\sigma|$} \\
+	\blacksquare& \text{if $k = |\sigma|$} \\
 	\pi_\mathcal{A}(\sigma(k+1)) & \text{else} 
 \end{cases}
 \end{align*}
-Furthermore, $f_\mathrm{t} \colon \mathcal{E}^+ \to \mathbb{R}$ returns the timestamp of the next event in relation to the last event in the prefix:
+Furthermore, $f_\mathrm{t} \colon \mathcal{E}^+ \to \mathbb{R}$ returns the time difference between the next event and last event in the prefix to determine the timestamp of the next event:
 \begin{align*}
 f_\mathrm{t}(hd^k(\sigma)) &=
 \begin{cases}
@@ -34,18 +34,18 @@ For example, it can be a binary label describing if the case has been successful
 In some applications the case outcome is defined by the activity of the final event of a case.
 In that scenario, the outcome function $f_\mathrm{o} \colon \mathcal{E}^+ \to \mathcal{A}$ returns the last activity of the trace:
 \begin{align*}
-f_\mathrm{o}(hd^k(\sigma)) &= \pi_\mathcal{A}(tl^1(\sigma(|\sigma|)))
+f_\mathrm{o}(hd^k(\sigma)) &= \pi_\mathcal{A}(\sigma(|\sigma|))
 \end{align*}
 Finally, $f_\mathrm{c} \colon \mathcal{E}^+ \to \mathbb{R}$ returns the total duration of the process, i.e. the time difference between the first and the last event of the trace:
 \begin{align*}
 f_\mathrm{c}(hd^k(\sigma)) &=  \pi_\mathcal{T}(\sigma(|\sigma|))-  \pi_\mathcal{T}(\sigma(1)).
 \end{align*}
 All functions are approximated via an LSTM model using historical event log data, i.e. a set of completed traces with full information about the course of the process instances.
-The goal is to generalize from the completed traces in such a way, that the prediction error is minimized for new, unseen and uncompleted traces.
+The goal is to generalize from the completed traces in such a way that the prediction error is minimized for new, unseen and incomplete traces.
 Due to the probabilistic behavior of real-world processes, the prediction accuracy is always limited by the randomness of the process behavior.
 
 An overview of the framework is shown in Figure \ref{fig:framework}.
-The proposed framework consists of a preprocessing, encoding and prediction model component, which operate in an offline and online phase.
+The proposed framework consists of preprocessing, encoding and prediction model components, which operate in an offline and online phase.
 In the offline phase, a historical event log with completed traces of a process is used to fit the encoding and prediction component.
 Given a historical event log $\eventlog = \{\sigma_1, \dots, \sigma_l\}$ with completed traces, the set of all prefix traces $\eventlog_\mathrm{prefix} = \{ hd^k(\sigma) \mid  \sigma \in \eventlog, 1 \leq k \leq |\sigma|\}$ is computed and each trace is encoded as a sequence of event vectors.
 
@@ -86,7 +86,7 @@ d_{i1}^\mathrm{num}, \dots, d_{ir}^\mathrm{num},
 The activity of the event is represented by a vector $\vec{a_i}$ using \textit{one-hot encoding}.
 More precisely, given the set of possible activities $\mathcal{A}$, an arbitrary but fixed ordering over $\mathcal{A}$ is introduced with a bijective index function $index_\mathcal{A} \colon \mathcal{A} \to \{1, \dots, |\mathcal{A}|\}$.
 Using this function, the activity is encoded as a vector of size $|\mathcal{A}|$, where the component $index_\mathcal{A}(\pi_\mathcal{A}(e))$ has value 1 and all the other components have value 0.
-The function $\mathds{1}_\mathcal{A}\colon \mathcal{A} \to \{0,1\}^\mathcal{A}$ is used to describe the realization of such an one-hot encoding transformation for the set of all activities $\mathcal{A}$.
+The function $\mathds{1}_\mathcal{A}\colon \mathcal{A} \to \{0,1\}^\mathcal{A}$ is used to describe the realization of such a one-hot encoding transformation for the set of all activities $\mathcal{A}$.
 The timestamp of the events are used to compute a six-dimensional vector $\vec{t_i}$ of time-related features, which is explained in detail in Section \ref*{sec:time}.
 
 Additional attributes of the events are encoded based on their type, i.e. if they are numerical, categorical or textual.
@@ -135,7 +135,7 @@ An overview of each feature vector that is part of the event encoding is provide
 
 \section{Capturing Temporal Dependencies}\label{sec:time}
 
-A set of time-based features is computed from the timestamp data in the event log in order to profit from time-related pattern in the process.
+A set of time-based features is computed from the timestamp data in the event log, in order to profit from time-related pattern in the process.
 As part of the complete encoding $\vec{x}_i$ for an event $e_i$ in a prefix trace $\sigma = \langle e_1, \dots, e_k \rangle$, a time vector $\vec{t_i} = (t_i^1, t_i^2,t_i^3,t_i^4,t_i^5,t_i^6)$ of dimension 6 is computed.
 A summary of all time-related features can be seen in Table \ref{tab:time-features}.
 
@@ -186,7 +186,7 @@ Each document in the text corpus is then preprocessed in order to filter out lin
 This step is called \textit{text normalization}  \cite{DBLP:books/lib/JurafskyM09}.
 Finally, the normalized text corpus is used to build up a \textit{vocabulary} and a text vectorization technique is applied to encode the text of the attribute into a fixed-length vector.
 The vocabulary of a text corpus is a set $V$ of all relevant words that appear after preprocessing in the corpus, which is indexed by a bijective index function $index_V \colon V \to \{1, 2, \dots, |V|\}$.
-As text vectorization techniques the \textit{Bag of Words}, \textit{Bag of N-Grams}, \textit{Paragraph Vector} and \textit{Latent Dirichlet Allocation} text models are considered, which are discussed in more detail in the Sections \ref{sec:bow} to \ref{sec:lda}.
+As text vectorization techniques the \textit{Bag of Words}, \textit{Bag of N-Grams}, \textit{Paragraph Vector} and \textit{Latent Dirichlet Allocation} text models are considered, which are discussed in more detail in the Sections \ref{sec:bow} through \ref{sec:lda}.
 
 \subsection{Text Normalization}
 
@@ -198,7 +198,7 @@ In the text normalization step each document of the text corpus is transformed b
 	\item Stop words are filtered out
 \end{enumerate}
 The first step eliminates all capital letters in the text.
-In the tokenenization step a document is split up into a sequence of words.
+In the tokenization step, a document is split up into a sequence of words.
 Each word is then lemmatized, i.e. it is converted to its canonical form.
 The idea is to unify words that have a very similar meaning and filter out grammatical variations.
 For example, the words   \enquote{go}, \enquote{going}, \enquote{goes}, \enquote{gone} and   \enquote{went} are all transformed to the basic form   \enquote{go}.
@@ -220,7 +220,7 @@ Lemmatization significantly reduces the complexity of textual data while accepti
 
 Ultimately, all stop words are filtered out of each document.
 Stop words are words with low information value like  \enquote{the},  \enquote{a},  \enquote{of} or  \enquote{here}.
-Stop word lists are language dependent and can be more or less aggressive at filtering.
+Stop word lists are language and context dependent and can be more or less aggressive at filtering.
 Usually they contains articles, auxiliary verbs, prepositions and generic verbs like  \enquote{be} and  \enquote{have}.
 In addition, punctuation marks and numerical symbols are excluded.
 An example application of the text normalization pipeline is shown in Table \ref{tab:text-preprocessing}.
@@ -237,10 +237,11 @@ The inverse document frequency indicates the specificity of a word in the corpus
 The resulting value is the tf-idf score of a word in a document.
 
 The Bag of Words model is easy to build and effective for certain applications, but limited in several ways.
-First, the model completely ignores the order of words, which is often crucial for understanding the semantic meaning of a sentence. For example, the sentences  \enquote{The patient's health state went from stable to critical.} and  \enquote{The patient's health state went from critical to stable.} would result in the same vector representation, while the meaning is clearly inverted.
-Second, the vector representations are sparse and of high dimensionality since they depend of the size of the vocabulary.
-However, the dimension can be reduced by limiting the size of the vocabulary. For example, words that rarely appear in the corpus can be excluded from the vocabulary.
-Unseen words, that appear during online prediction and are not part of the learned vocabulary are not considered.
+First, the model completely ignores the order of words, which is often crucial for understanding the semantic meaning of a sentence. For example, the sentences  \enquote{The patient's health state went from stable to critical.} and  \enquote{The patient's health state went from critical to stable.} would result in the same vector representation, while the meaning is clearly the opposite.
+Second, the vector representations are sparse and of high dimensionality, since they depend on the size of the vocabulary.
+However, the dimension can be reduced by limiting the size of the vocabulary.
+For example, words that rarely appear in the corpus can be excluded from the vocabulary.
+Unseen words that appear during online prediction and are not part of the learned vocabulary are not considered.
 
 \subsection{Bag of N-Grams}
 
@@ -266,13 +267,13 @@ Several variants of this approach exits, notably the \textit{Continuous Bag of W
 \begin{figure}[!htbp]
 	\centering
 	\includegraphics[width=\textwidth]{figures/paragraph-vector}
-	\caption[Paragraph Vector model]{The Paragraph Vector model in the distributed memory variant (PV-DM) is a neural network that is designed to predict a word $w_t$ from its context ($w_{t-2}, w_{t-1}, w_{t+1}, w_{t+2}$) and derives fixed-length representation of documents and words via the learned matrices $\vec{D}$ and $\vec{W}$. The dimension of the representations are defined before by a parameter $h$.}
+	\caption[Paragraph Vector model]{The Paragraph Vector model in the distributed memory variant (PV-DM) is a neural network that is designed to predict a word $w_t$ from its context ($w_{t-2}, w_{t-1}, w_{t+1}, w_{t+2}$) and derives fixed-length representation of documents and words via the learned matrices $\vec{D}$ and $\vec{W}$. The dimension of the word and document representations are defined a priori.}
 	\label{fig:paragraph-vector}
 \end{figure}
 
-The core idea of the Paragraph Vector model is to extend the model introduced in \cite{DBLP:journals/jmlr/BengioDVJ03} in a way, that an additional document (i.e. paragraph) vector is trained together with the word vectors, that is unique per document.
-Fig. \ref{fig:paragraph-vector} show the architecture of the distributed memory variant of the Paragraph Vector model (PV-DM).
-Its is realized by a neural network, that takes one-hot encoded words and an one-hot encoded document ID as input.
+The core idea of the Paragraph Vector model is to extend the model introduced in \cite{DBLP:journals/jmlr/BengioDVJ03} in such a way that an additional document (i.e. paragraph) vector is trained together with the word vectors, so that it is unique for each document.
+Fig. \ref{fig:paragraph-vector} shows the architecture of the distributed memory variant of the Paragraph Vector model (PV-DM).
+Its is realized by a neural network, which takes one-hot encoded words and a one-hot encoded document ID as input.
 These are mapped to vector representation via weight matrices $\vec{D}$ and $\vec{W}$, which are learned during training with gradient descent.
 The distributed representations are then averaged or concatenated to a vector in order to predict the one-hot encoded target word using another mapping $\vec{W'}$ and a softmax activation function.
 The training set is constructed using a sliding window over every document, such that the input is the context of the target word and the document ID.
@@ -294,8 +295,8 @@ Similar to the BoW model, LDA does not consider the order of words in the docume
 
 \section{Network Architecture and Training}
 The encoded historical prefix event log is used to fit an LSTM model.
-The LSTM network is designed to be trained with all prediction targets (next activity, next event time, case outcome and case cycle time) at once, in order to benefit from correlations between these.
-In the basic variant, the network consists of an input layer, an shared LSTM layer, an specialized LSTM layer for each prediction target and an fully connected output layer for each target.
+The LSTM network is designed to be trained with all prediction targets (next activity, next event time, case outcome and case cycle time) at once, in order to benefit from their correlations.
+In the basic variant, the network consists of an input layer, a shared LSTM layer, a specialized LSTM layer for each prediction target and a fully connected output layer for each target.
 Furthermore, layer normalization \cite{DBLP:journals/corr/BaKH16} can be applied after each LSTM layer, which standardizes the hidden output in order to speed up the training convergence.
 The network architecture is shown in Figure \ref{fig:network}.
 Note that the LSTM layers in the figure are unrolled in time, i.e. the same layer is displayed once for every time step.
@@ -303,7 +304,7 @@ Note that the LSTM layers in the figure are unrolled in time, i.e. the same laye
 \begin{figure}[!htbp]
 	\centering
 	\includegraphics[width=\textwidth]{figures/network}
-	\caption[LSTM model architecture for text-aware process prediction]{LSTM model architecture to simultaneously predict the next activity $(\vec{y_a})$, next event time$(y_t)$, case outcome $(\vec{y_o})$ and case cylce time $(y_c)$ for an encoded prefix trace $\vec{x_1}, \vec{x_2}, \dots, \vec{x_k}$.}
+	\caption[LSTM model architecture for text-aware process prediction]{LSTM model architecture to simultaneously predict the next activity $(\vec{y_a})$, next event time $(y_t)$, case outcome $(\vec{y_o})$ and case cylce time $(y_c)$ for an encoded prefix trace $\vec{x_1}, \vec{x_2}, \dots, \vec{x_k}$.}
 	\label{fig:network}
 \end{figure}
 
@@ -312,24 +313,24 @@ The softmax function normalizes a vector of real numbers into another vector of 
 Hence, the transformed vector can be interpreted as a probability distribution, while keeping the proportions of the original vector.
 The softmax function is described with
 \begin{equation*}\label{key}
-	\text{Softmax}(\vec{x})_i = \frac{\exp(x_i)}{\sum_{j=1}^{n} \exp(x_j)}  \; \text{for} \, i = 1, \dots, n \text{ and } \vec{x}=(x_1, \dots, x_n) \in \mathbb{R}^n.
+	\text{Softmax}(\vec{x})_i = \frac{\exp(x_i)}{\sum_{j=1}^{n} \exp(x_j)}  \qquad \text{for} \, i = 1, \dots, n \text{ and } \vec{x}=(x_1, \dots, x_n) \in \mathbb{R}^n.
 \end{equation*}
 The whole training set of encoded prefix traces is represented for efficiency by a 3-dimensional matrix of real values, where the three dimensions specify the prefix traces, the events per prefix trace and the features per event.
 Since the prefix traces have different length, shorter traces are pre-padded \cite{DBLP:journals/corr/abs-1903-07288} with zero vectors.
 Hence, a prefix trace of encoded events $\vec{x_1}, \vec{x_2}, \dots, \vec{x_n}$  is represented in the training set by a 2-dimensional matrix $(\mathbf{0}, \dots, \mathbf{0},\vec{x_1}, \vec{x_2}, \dots, \vec{x_n})$, such that the zero vectors fill up shorter traces to the length of the longest trace in the training set.
 All prefix traces together form a 3-dimensional training matrix.
 
-The training is realized using a learning algorithm based on stochastic gradient descent and backpropagation through time (BPTT), which update the weights of the network using the update rules of the Adam optimizer with Nesterov momentum \cite{dozat2016incorporating}.
+The training is realized using a learning algorithm based on stochastic gradient descent and backpropagation through time (BPTT), which updates the weights of the network using the update rules of the Adam optimizer with Nesterov momentum \cite{dozat2016incorporating}.
 The loss for numerical prediction values $\hat{y}$ and the true value $y$ is the absolute error $\text{AE}(\hat{y},y)=|\hat{y} - y|$, while the loss for categorical prediction values is computed using the categorical cross entropy error $\text{CE}(\vec{\hat{y}}, \vec{y}) = - \sum_{i=1}^{k} y_i \cdot \log \hat{y}_i$.
 
 \section{Predictive Business Processing Monitoring}
 
-During online business process monitoring, predictions are realized by a forward-pass of the encoded, uncompleted traces through the LSTM model.
+During online business process monitoring, predictions are realized by a forward-pass of the encoded, incompleted traces through the LSTM model.
 The component with the highest value of the softmax outputs for the next activity $(\vec{y_a})$ and the case outcome $(\vec{y_o})$ indicates the categorical prediction.
 The output values for the next event time $(y_t)$ and case duration  $(y_c)$ are clipped to 0 for negative outputs and the normalization is reverted in order to compute the final prediction value.
 
-With every new event, that is registered by the business process monitoring system, the prediction can be updated with another forward-pass through the model.
-This guarantees a continuous forward-projection on running process instances, that is updated whenever new information in form of new events becomes available.
+With every new event that is registered by the business process monitoring system, the prediction can be updated with another forward-pass through the model.
+This guarantees a continuous forward-projection on running process instances, which is updated whenever new information in form of new events becomes available.
 By predicting the timestamp and activity of the next event in an iterative way, the complete future path of running process instance can be predicted.
-The trace of a process instance is assumed to be completed, when the model predicts the artificial END OF PROCESS activity.
-With this technique the model indirectly can predict the completeness of a case.
+The trace of a process instance is assumed to be completed, when the model predicts the artificial $\blacksquare$ activity.
+With this technique the model can indirectly predict the completeness of a case.
