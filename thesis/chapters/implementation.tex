@@ -1,5 +1,5 @@
 This chapter covers the implementation of the text-aware process prediction model presented in the previous chapter.
-In Section \ref{sec:technology} the underlying technology is depicted, whereas in Section \ref{sec:model-implementation} the architecture of the implementation is defined.
+In Section \ref{sec:technology}, the underlying technology is depicted, whereas in Section \ref{sec:model-implementation}, the architecture of the implementation is defined.
 
 \section{Technology}\label{sec:technology}
 
@@ -26,38 +26,38 @@ All packages follow the open-source development model and are mostly community-d
 PM4Py \cite{DBLP:journals/corr/abs-1905-06169} is a Python package developed by the Fraunhofer Institute for Applied Information Technology, which offers a wide range of process mining algorithms and event log operations for the Python environment.
 It is used for event log parsing and its internal event log representation.
 
-TensorFlow \cite{DBLP:journals/corr/AbadiABBCCCDDDG16} is a dataflow-oriented framework originally developed by Google, which includes a diverse set of neural network models and serves with its LSTM implementation using the Keras API \cite{chollet2015keras}.
+TensorFlow \cite{DBLP:journals/corr/AbadiABBCCCDDDG16} is a dataflow-oriented framework originally developed by Google, including a diverse set of neural network models and serves with its LSTM implementation using the Keras API \cite{chollet2015keras}.
 
-Furthermore, the packages NTLK \cite{DBLP:books/daglib/0022921}, Scikit-learn \cite{DBLP:journals/jmlr/PedregosaVGMTGBPWDVPCBPD11} and Gensim \cite{rehurek_lrec} are applied for the preprocessing and encoding of textual data.
+Furthermore, the packages NTLK \cite{DBLP:books/daglib/0022921}, Scikit-learn \cite{DBLP:journals/jmlr/PedregosaVGMTGBPWDVPCBPD11}, and Gensim \cite{rehurek_lrec} are applied for the preprocessing and encoding of textual data.
 NTLK is used to realize the tokenization, word lemmatization and stop word removal.
-For the lemmatization of English texts the WordNet lemmatizer based on the WordNet database \cite{miller1998wordnet} is utilized to normalize each word.
-In case of other languages the more simplistic Snowball stemming algorithm \cite{porter2001snowball} is chosen instead.
+For the lemmatization of English texts, the WordNet lemmatizer based on the WordNet database \cite{miller1998wordnet} is utilized to normalize each word.
+In case of other languages, the more simplistic Snowball stemming algorithm \cite{porter2001snowball} is chosen instead.
 The stop words\footnote{\, Stop words: https://github.com/nltk/nltk\_data/blob/gh-pages/packages/corpora/stopwords.zip} are provided directly by the NLTK package.
 The implementation of the text models is supported by the Scikit-learn (Bag of Words, Bag of N-Gram) and Gensim (LDA, Paragraph Vector) packages.
 
 
 \section{Model Architecture}\label{sec:model-implementation}
 
-The interface of the text-aware process prediction model (tapp) is realized through a class \texttt{TappModel}, which implements the functions \texttt{fit()},  \texttt{predict()} and  \texttt{evaluate()}, which can be used to fit the model to an event log with historical data, compute prediction for an event log with uncompleted traces and evaluate the performance of the prediction model.
+The interface of the text-aware process prediction model (tapp) is realized through a class \texttt{TappModel}, which implements the functions \texttt{fit()},  \texttt{predict()}, and  \texttt{evaluate()}, which can be used to fit the model to an event log with historical data, compute prediction for an event log with uncompleted traces and evaluate the performance of the prediction model.
 The \texttt{TappModel} manages the underlying LSTM model and can be configured with the number of shared and specialized layers as well as the dimension of the hidden neurons per LSTM layer.
 
 \begin{figure}[htbp!]
 	\centering
 	\includegraphics[width=\textwidth]{figures/implementation}
-	\caption[Component diagram of the implementation]{Component diagram of the implementation.}
+	\caption[Component diagram of the implementation]{Component diagram of the implementation. The text-ware process prediction component provides an interface to fit the model and realize predictions. The evaluation component uses this interface to evaluate the prediction performance. The diagram shows the internal Python modules and external Python packages that are part of the implementation.}
 	\label{fig:/implementation}
 \end{figure}
 
-The encoding of traces as described in Section \ref{sec:event}, \ref{sec:time} and \ref{sec:text} is computed in the \texttt{LogEncoder} module, which is controlled by the \texttt{TappModel}.
+The encoding of traces as described in Section \ref{sec:event}, \ref{sec:time}, and \ref{sec:text} is computed in the \texttt{LogEncoder} module, which is controlled by the \texttt{TappModel}.
 The \texttt{LogEncoder} is also fitted to the historical log and can transform traces to the encoded matrix format via functions \texttt{fit()} and \texttt{transform()}.
-It is configured with one out of the four text encoding models described in the Sections \ref{sec:bow} to \ref{sec:lda} (\texttt{BoWTextEncoder},  \texttt{BoNGTextEncoder}, \texttt{LDATextEncoder} and  \texttt{PVTextEncoder}), that realize the vectorization of textual data.
+It is configured with one out of the four text encoding models described in Sections \ref{sec:bow} to \ref{sec:lda} (\texttt{BoWTextEncoder},  \texttt{BoNGTextEncoder}, \texttt{LDATextEncoder}, and \texttt{PVTextEncoder}) that realize the vectorization of textual data.
 Similar to the \texttt{LogEncoder}, the text encoding models offers the functions \texttt{fit()} and \texttt{transform()} to adapt to the historical data and compute the text encodings.
 
-During the fitting phase of the  \texttt{LogEncoder}, all possible values for categorical attribute are indexed and the parameters for the normalization of numerical attributes are computed.
-With regard to the text encoding model, the indexed vocabulary of all words (after preprocessing) in the historical event log is constructed during fitting.
-In case of the Paragraph Vector model, the encoding network is trained with the training corpus.
+During the fitting phase of the  \texttt{LogEncoder}, all possible values for the categorical attributes are indexed, and the parameters for the normalization of numerical attributes are computed.
+Regarding the text encoding model, the indexed vocabulary of all words (after preprocessing) in the historical event log is constructed during fitting.
+In the case of the Paragraph Vector model, the encoding network is trained with the training corpus.
 
 The text-aware process prediction model can be used in any business process monitoring software to provide prediction capabilities using the methods of the \texttt{TappModel}.
 In order to evaluate the performance of the model, an experiment using the \texttt{Evaluation} module is performed, which is described in-depth in Chapter \ref{chap:eval}.
-The module reads an event log using PM4Py, divides it into a training and test log and measures the prediction performance of differently configured instances of the text-aware process prediction model.
+The module reads an event log using PM4Py, divides it into a training and test log, and measures the prediction performance of differently configured instances of the text-aware process prediction model.
 An overview of the different components of the implementation is shown in Figure \ref{fig:/implementation}.

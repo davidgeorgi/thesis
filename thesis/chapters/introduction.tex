@@ -2,25 +2,25 @@
 \section{Motivation}
 
 The rapid growth of data generated and collected in large-scale information systems leads to new opportunities for  society and businesses. 
-By the end of 2020, the total amount of generated data is estimated to be 44 trillion gigabytes of which 90\% has been created in the last two years \cite{datagrowth}.
+By the end of 2020, the total amount of generated data is estimated to be 44 trillion gigabytes, of which 90\% has been created in the last two years \cite{datagrowth}.
 In order to benefit from the massive amount of data, efficient solutions are required.
-These have to be able to extract potential value in form of insights or predictions.
+These have to be able to extract potential value in the form of insights or predictions.
 
 A remarkable subset of this data is described as \textit{event data}, which are recorded by \textit{process-aware information systems} during the execution of processes \cite{DBLP:journals/topnoc/Aalst09}.
 Process-aware information systems are used to define, manage and execute business processes of many organizations.
-With the non stopping rise of digitization of business processes, increasingly more event data becomes utilizable, thus the potential value of this data is rising sharply.
+With the non-stopping rise of digitization of business processes, increasingly more event data becomes utilizable, thus the potential value of this data is rising sharply.
 
-The scientific engagement aiming to discover, analyze and improve real processes based on event data led to \textit{process mining}. Process mining bridges the gab between the data-driven characteristic of data science and the process-centric view of process science  \cite{DBLP:books/sp/Aalst16}.
+The scientific engagement aiming to discover, analyze and improve real processes based on event data led to \textit{process mining}. Process mining bridges the gap between the data-driven characteristic of data science and the process-centric view of process science  \cite{DBLP:books/sp/Aalst16}.
 The ongoing success of process mining in research has been transferred to businesses, which successfully offer or utilize this technology.
-Celonis, which is often considered as one of the biggest commercial providers of process mining, has been valued 2.5 billion dollar only 9 years after the company was founded \cite{celonis}.
+Celonis, which is often considered as one of the biggest commercial providers of process mining, has been valued at 2.5 billion dollar only 9 years after the company was founded \cite{celonis}.
 
-Modern process mining software tends to focus on continuous monitoring of business processes, in contrast to traditional offline and project-based approaches, which are not integrated within the remaining IT infrastructure of a company.
+Modern process mining software tends to focus on continuous monitoring of business processes, in contrast to traditional offline and project-based approaches, which are not integrated within a company’s remaining IT infrastructure.
 The integrated and continuous application of process mining mostly realized by \textit{business process monitoring systems} is a key success factor for many organizations.
-These systems allow to understand and supervise all processes of a company in real-time during their execution.
-The core idea of this approach is to automate process mining and keep a persistent data connection between the information system and the monitoring system, that provides the analytical capabilities.
+These systems allow users to understand and supervise all processes of a company in real-time during their execution.
+The core idea of this approach is to automate process mining and keep a persistent data connection between the information system and the monitoring system, which provides the analytical capabilities.
 Figure \ref{fig:process-monitoring} visualizes such an infrastructure and the interaction between the systems and internal and external process stakeholders.
 The operational employees, customers and connected software systems interact with the process-aware information system and are part of the processes themselves.
-In contrast, executives, data scientist, auditors and investors are supervising the processes using the business process monitoring system.
+In contrast, executives, data scientists, auditors, and investors supervise the processes using the business process monitoring system.
 
 \begin{figure}[tbp!]
 	\centering
@@ -29,8 +29,8 @@ In contrast, executives, data scientist, auditors and investors are supervising 
 	\label{fig:process-monitoring}
 \end{figure}
 
-Traditional process mining tends to be backward-looking \cite{DBLP:conf/scsc/Aalst18}, i.e. the main focus relies on analyzing past executions of a process rather than providing insights for running process instances in form of predictions or recommendations.
-Businesses can develop a competitive advantage, if their process mining solution also offers predictive capabilities to anticipate the future of a running process instance.
+Traditional process mining tends to be backward-looking \cite{DBLP:conf/scsc/Aalst18}, i.e., the main focus relies on analyzing past executions of a process rather than providing insights for running process instances in form of predictions or recommendations.
+Businesses can develop a competitive advantage if their process mining solution also offers predictive capabilities to anticipate the future of a running process instance.
 For example, if it can be expected that a running process instance will likely exceed its deadline, measures can be initiated before damage occurs.
 Therefore, including the forward perspective is crucial for any competitive process mining software, especially in the context of business process monitoring.
 
@@ -38,20 +38,20 @@ Therefore, including the forward perspective is crucial for any competitive proc
 
 Although many approaches for process prediction have been suggested in the literature (see Chapter \ref{chap:related_work}), current solutions are limited regarding the data they are able to consider and the prediction task they can perform.
 Many approaches derive their prediction purely from the control flow of a process instance ignoring additional data attributes in the event log.
-Most notably, almost no approach is able to consider textual data for process prediction.
-However, textual data is highly available in many systems and might hold important information, that can be used to improve the prediction performance.
-For example, millions of emails are sent everyday and their content influences processes inside of organizations.
+Notably, most approaches do not consider textual data for process prediction.
+However, textual data is highly available in many systems and might hold important information that can be used to improve the prediction performance.
+For example, millions of emails are sent every day, and their content influences processes inside of organizations.
 
 In addition, process-critical information like a diagnosis in a hospital often comes in textual form and therefore has to be considered for prediction.
-Most of the existing prediction methods focus on a single prediction task only, for example they just predict the remaining time or cycle time of a process instance.
+Most of the existing prediction methods focus on a single prediction task only; for example, they exclusively predict the remaining time or cycle time of a process instance.
 Depending on the context, information about the next event or the future path of process instance can be of interest.
-In some scenarios, processes instances have an outcome like success/failure or accepted/rejected that can be predicted.
+In some scenarios, process instances have an outcome like success/failure or accepted/rejected that can be predicted.
 
-In data science, predictions are usually derived using \textit{predictive inference} \cite{predinf}, i.e. correlations in past observations are used to estimate target variables for new observations.
-In the context of process mining, past observations come in the form of historical event log data, that has been logged during the execution of a process and describes completed process instances.
+In data science, predictions are usually derived using \textit{predictive inference} \cite{predinf}, i.e., correlations in past observations are used to estimate target variables for new observations.
+In process mining, past observations come in the form of historical event log data that has been logged during the execution of a process and describes completed process instances.
 
 In order to overcome the limitations of existing methods, an advanced prediction model is required.
-Given an event log with past executions of a process holding numerical, categorical and textual data and a running (i.e. not completed) process instance, the process prediction model should be able to perform the following prediction tasks:
+Given an event log with past executions of a process holding numerical, categorical, and textual data and a running (i.e., not completed) process instance, the process prediction model should be able to perform the following prediction tasks:
 
 \begin{itemize}
 	\item Next activity prediction: What will happen next in the running process instance?
@@ -63,27 +63,27 @@ Given an event log with past executions of a process holding numerical, categori
 \begin{figure}[htbp!]
 	\centering
 	\includegraphics[width=\textwidth]{figures/problem-description}
-	\caption[A general process prediction framework]{A general process prediction framework. Predictive business process monitoring includes a prediction model, that is able to predict the future of running cases using historical event data. Current approaches differ in terms of the considered input data, the underlying prediction method and the prediction targets.}
+	\caption[A general process prediction framework]{A general process prediction framework. Predictive business process monitoring includes a prediction model that is able to predict the future of running cases using historical event data. Current approaches differ in terms of the considered input data, the underlying prediction method and the prediction targets.}
 	\label{fig:/problem-description}
 \end{figure}
 
 A general description of such a process prediction model is illustrated in Figure \ref{fig:/problem-description}.
 Existing models follow the same framework, but they are less flexible in terms of input data types and prediction targets.
-Including textual data for process prediction brings up new research questions, which are concretized in the next section.
+Including textual data for process prediction brings up new research questions, concretized in the next section.
 
 \section{Research Questions and Methodology}\label{sec:methodology}
 
 This thesis aims to improve current state-of-art approaches for process prediction in order to extend the capabilities of process monitoring software.
 The main research goal is to design, implement and evaluate a predictive model for event data that is able to take advantage of additional textual data associated with events in the process.
-Since most current approaches are not able to handle textual data, the goal is to investigate if and to what extent textual data can improve the quality of process prediction.
-Furthermore, the impact of different design choices and text models for text-aware process prediction are of interest and potential trade-offs need to be discussed.
+Since most current approaches cannot handle textual data, the goal is to investigate if and to what extent textual data can improve the quality of process prediction.
+Furthermore, the impact of different design choices and text models for text-aware process prediction is of interest and potential trade-offs need to be discussed.
 Finally, the text-aware process prediction model has to be compared to current state-of-the-art process prediction methods.
 
 These goals lead to the formulation of the following three research questions:
 
 \begin{enumerate}
 	\item To what extent can the utilization of textual data improve the performance of process prediction?
-	\item How does the choice of the text model and other parameters influence the prediction results?
+	\item How do the choice of the text model and other parameters influence the prediction results?
 	\item What are the advantages and disadvantages of the approach compared to existing methods?
 \end{enumerate}
 
@@ -91,7 +91,7 @@ Based on these research questions, a text-aware process prediction model is conc
 
 \section{Contribution}
 
-In this thesis two main contributions are made.
+In this thesis, two main contributions are made.
 First, a text-aware process prediction model is designed and implemented, which additionally counts in textual data associated with events.
 The approach is realized by combining LSTM neural networks and text models in order to capitalize on correlations between the process flow and the (textual) data.
 It prioritizes high prediction performance and flexibility, i.e. it is applicable to a wide range of processes in terms of variability, underlying data types and process complexity.
@@ -99,16 +99,16 @@ The implementation of the proposed prediction model is purely based on Python an
 
 The second contribution is a comprehensive evaluation and analysis of the approach based on simulated and real-world event data.
 This includes performance measurements of differently parameterized models and a comparison with existing methods.
-In addition, advantages and limitations of the approach are discussed.
+In addition, the advantages and limitations of the approach are discussed.
 
 \section{Thesis Structure}
 
-This thesis is structured in seven chapters.
-In Chapter \ref{chap:prelim} the basic notations, definitions and concepts used in this work are introduced.
-This includes an brief introduction to process mining, text mining, supervised learning and LSTM neural networks.
-Chapter \ref{chap:related_work} summarizes relevant scientific contributions that focus on process prediction in process mining and gives an overview of already available methods and their capabilities.
-In Chapter \ref{chap:concept} a novel text-aware process prediction model as the main conceptional contribution is presented.
+This thesis is divided into seven chapters.
+In Chapter \ref{chap:prelim}, the basic notations, definitions, and concepts used in this work are introduced.
+This includes a brief introduction to process mining, text mining, supervised learning, and LSTM neural networks.
+Chapter \ref{chap:related_work} summarizes relevant scientific contributions that focus on process prediction in process mining and gives an overview of available methods and their capabilities.
+In Chapter \ref{chap:concept}, a novel text-aware process prediction model as the main conceptional contribution is presented.
 Moreover, Chapter \ref{chap:impl} covers the implementation details of the model on a technical level.
-In Chapter \ref{chap:eval} the performance of the new approach is evaluated and compared to current state-of-the-art prediction methods.
+In Chapter \ref{chap:eval}, the performance of the new approach is evaluated and compared to current state-of-the-art prediction methods.
 Finally, the conclusion is given in Chapter \ref{chap:conclusion} by wrapping up the key achievements and discussing the limitations of the approach.
-Furthermore, an outlook towards future potential research questions on process prediction in the context of business process monitoring is given.
+Furthermore, an outlook towards future potential research questions on process prediction in business process monitoring is given.

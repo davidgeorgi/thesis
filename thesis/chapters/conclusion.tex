@@ -1,43 +1,43 @@
 The prediction of the future course of business processes is a major challenge in business process mining and process monitoring.
-When textual artifacts of natural language like emails or documents hold process-critical information, purely control flow-oriented approaches are limited in delivering well-founded predictions.
-In order to overcome these limitations, in this thesis a text-aware process prediction model is proposed.
-The model encodes process traces of historical process executions to sequences of meaningful event vectors using the control flow, timestamp, textual and non-textural data attributes of the events.
+When textual artifacts of a natural language like emails or documents hold process-critical information, purely control flow-oriented approaches are limited in delivering well-founded predictions.
+In order to overcome these limitations, a text-aware process prediction model is proposed in this thesis.
+The model encodes process traces of historical process executions to sequences of meaningful event vectors using the control flow, timestamp, textual, and non-textual data attributes of the events.
 An interchangeable text model is utilized to realize the vectorization of textual data.
-Given an encoded prefix log of historical process executions, an LSTM neural network model is trained, which predicts the activity and timestamp of the next event, the case outcome and case cycle time of a running process instance.
+Given an encoded prefix log of historical process executions, an LSTM neural network model is trained which predicts the activity and timestamp of the next event, the case outcome, and the case cycle time of a running process instance.
 
 The proposed concept of a text-aware process prediction model has been implemented in Python with current open source technology and evaluated on simulated and real-world event data.
-It is shown that the utilization of textual data can improve the prediction performance and the model is able to outperform state-of-the-art process prediction methods on many prediction tasks using textual data.
+It is shown that the utilization of textual data can improve the prediction performance, and the model is able to outperform state-of-the-art process prediction methods on many prediction tasks using textual data.
 The impact of text-awareness varies noticeably across the evaluated data sets and mainly depends on the degree of correlation between the textual data and the process course.
-The model benefits particularly on short traces, since more training data for short sequences is available through the generation of prefixes during training.
+The model benefits particularly on short traces since more training data for short sequences is available through the generation of prefixes during training.
 
-Four different text models (Bag of Words, Bag of N-Gram, Paragraph Vector and Latent Dirichlet Allocation) have been considered and each has been proven to be viable, whereby the BoW and LDA models have performed most consistently even with low-dimensional text vector embeddings.
+Four different text models (Bag of Words, Bag of N-Gram, Paragraph Vector, and Latent Dirichlet Allocation) have been considered, and each has been proven to be viable, whereby the BoW and LDA models have performed most consistently even with low-dimensional text vector embeddings.
 The proposed technique is robust to outlier traces in the event log and can generalize from structured and unstructured processes.
 
 \section{Limitations and Outlook}
 
-The text-aware process prediction model is able to take advantage of textual data in predictive business process monitoring and can improve the prediction quality by exploiting correlations in the (textual) data.
-The generalizability of the evaluation in Chapter \ref{chap:eval} is limited due the small amount of evaluated data sets.
+The text-aware process prediction model can take advantage of textual data in predictive business process monitoring and improve the prediction quality by exploiting correlations in the (textual) data.
+The generalizability of the evaluation in Chapter \ref{chap:eval} is limited due to the small number of evaluated data sets.
 To further validate the approach, more event logs with textual data need to be evaluated.
 However, the data in common use cases like hospital processes is maintained under high privacy regulations.
 Since textual data cannot be easily anonymized for evaluation and is highly sensitive, data acquisition remains challenging.
 
-In certain contexts, a high and reliable prediction performance is not sufficient as the interpretability of prediction model is necessary.
+In certain contexts, high and reliable prediction performance is not sufficient as the interpretability of the prediction model is necessary.
 LSTM-based methods are usually unable to deliver insights about the construction of the prediction and the influence of individual feature variables.
-The frequently observed trade-off between prediction performance and interpretability in machine learning, is also recognizable in process prediction \cite{DBLP:journals/sosym/TaxTZ20}.
-While in this contribution the prediction performance has been prioritized, interpretable text-aware prediction models could be viable.
-Nevertheless, the utilization of textual data is an additional barrier and current interpretable methods based on process models cannot be naturally extended for this purpose.
+The frequently observed trade-off between prediction performance and interpretability in machine learning is also recognizable in process prediction \cite{DBLP:journals/sosym/TaxTZ20}.
+While the prediction performance has been prioritized in this contribution, interpretable text-aware prediction models could be viable.
+Nevertheless, the utilization of textual data is an additional barrier, and current interpretable methods based on process models cannot be naturally extended for this purpose.
 
-Another problem for the most part unsolved is to identify causality in processes with respect to prediction.
+Another unsolved problem is to identify causality in processes with respect to prediction.
 In order to derive predictions for processes, correlations in the event data are sufficient.
-But when predictive methods are applied to support decision making, it is important to identify the main forces that really \textit{influence} the future of the process.
-The ascertainment of causality is a significant harder problem, since it requires a much deeper understanding of the individual process.
-Therefore, tailor made methods might be necessary that are specific to the field of use.
-Gained insights could then be utilized to improve process prediction by not only considering event data, but also additional background knowledge about the process.
+However, when predictive methods are applied to support decision making, it is important to identify the main forces that really \textit{influence} the future of the process.
+The ascertainment of causality is a significantly harder problem since it requires a much deeper understanding of the individual process.
+Therefore, tailor-made methods might be necessary that are specific to the field of use.
+Gained insights could then be utilized to improve process prediction by not only considering event data but also additional background knowledge about the process.
 
 Finally, the extension with textual data transfers typical challenges of text mining to process prediction.
 Textual data is heterogeneous and has to be interpreted with the corresponding cultural background in mind.
 However, it is hard for computers to read between the lines.
-It might be of interest to evaluate text-aware process prediction in contexts, where the linguistic style is less technical, but rather subtle and personal.
+It might be of interest to evaluate text-aware process prediction in contexts where the linguistic style is less technical but rather subtle and personal.
 In this case, the textual data would be influenced by the cultural background and character traits of the persons involved in the process.
-This raises questions regarding privacy and discrimination, if the data is utilized to predict processes and actions are implemented based on the prediction results.
+This raises questions regarding privacy and discrimination if the data is utilized to predict processes and actions are implemented based on the prediction results.
 Therefore, it is assumed that additional concepts are required to ensure non-discriminatory and responsible text-aware process prediction.
