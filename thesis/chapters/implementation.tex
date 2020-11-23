@@ -32,7 +32,7 @@ Furthermore, the packages NTLK \cite{DBLP:books/daglib/0022921}, Scikit-learn \c
 NTLK is used to realize the tokenization, word lemmatization and stop word removal.
 For the lemmatization of English texts, the WordNet lemmatizer based on the WordNet database \cite{miller1998wordnet} is utilized to normalize each word.
 In case of other languages, the more simplistic Snowball stemming algorithm \cite{porter2001snowball} is chosen instead.
-The stop words\footnote{\, Stop words: https://github.com/nltk/nltk\_data/blob/gh-pages/packages/corpora/stopwords.zip} are provided directly by the NLTK package.
+The stop words are provided directly by the NLTK package\footnote{\, Stop words: https://github.com/nltk/nltk\_data/blob/gh-pages/packages/corpora/stopwords.zip}.
 The implementation of the text models is supported by the Scikit-learn (Bag of Words, Bag of N-Gram) and Gensim (LDA, Paragraph Vector) packages.
 
 
@@ -50,7 +50,7 @@ The \texttt{TappModel} manages the underlying LSTM model and can be configured w
 
 The encoding of traces as described in Section \ref{sec:event}, \ref{sec:time}, and \ref{sec:text} is computed in the \texttt{LogEncoder} module, which is controlled by the \texttt{TappModel}.
 The \texttt{LogEncoder} is also fitted to the historical log and can transform traces to the encoded matrix format via functions \texttt{fit()} and \texttt{transform()}.
-It is configured with one out of the four text encoding models described in Sections \ref{sec:bow} to \ref{sec:lda} (\texttt{BoWTextEncoder},  \texttt{BoNGTextEncoder}, \texttt{LDATextEncoder}, and \texttt{PVTextEncoder}) that realize the vectorization of textual data.
+It is configured with one out of the four text encoding models described in Sections \ref{sec:bow} to \ref{sec:lda} (\texttt{BowTextEncoder},  \texttt{BongTextEncoder}, \texttt{LdaTextEncoder}, and \texttt{PvTextEncoder}) that realize the vectorization of textual data.
 Similar to the \texttt{LogEncoder}, the text encoding models offers the functions \texttt{fit()} and \texttt{transform()} to adapt to the historical data and compute the text encodings.
 
 During the fitting phase of the  \texttt{LogEncoder}, all possible values for the categorical attributes are indexed, and the parameters for the normalization of numerical attributes are computed.

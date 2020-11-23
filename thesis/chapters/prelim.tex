@@ -1,4 +1,5 @@
-In this chapter, the basic concepts of process mining, text mining, supervised learning and long short-term memory networks are presented. Furthermore, necessary formal definitions and notations are introduced.
+In this chapter, the basic concepts of process mining, text mining, supervised learning, and long short-term memory networks are presented.
+Furthermore, necessary formal definitions and notations are introduced.
 
 \section{Processes and Process Mining}
 
@@ -15,27 +16,26 @@ An event can have any number of additional attributes, e.g. an attribute describ
 \begin{table}[htbp!]
 	\small
 	\setlength\tabcolsep{3pt}
-	\begin{tabularx}{\textwidth}{lllllp{4.7cm}l}
+	\begin{tabularx}{\textwidth}{lllllp{4.5cm}}
 		\toprule
-		\textbf{ID} & \textbf{Activity}          & \textbf{Timestamp} & \textbf{Resource} & \textbf{Costs} & \textbf{Comment}  \\
+		\textbf{Case} & \textbf{Activity}          & \textbf{Timestamp} & \textbf{Resource} & \textbf{Costs} & \textbf{Comment}  \\
 		\midrule
 		0                & Register patient           & 2020-02-01 14:12   & SYSTEM            & 0             & -     \\
 		& Consultation               & 2020-02-01 14:34   & J. Brown, MD    & 24.32         & The patient reports persistent nausea.   \\
 		& Blood test                 & 2020-02-01 15:12   & K. Smith         & 14:23         & Test: Complete blood count    \\
 		& Evaluate test  & 2020-02-01 16:35   & J. Brown, MD    & 38.67         &No abnormalities in the complete blood count.   \\
 		& Release patient            & 2020-02-01 17:24   & SYSTEM            & 0             & -  \\
-		&                            &                    &                   &               &     \\
 		\midrule
 		1                & Register patient           & 2020-02-02 08:20   & SYSTEM            & 0             & -  \\
 		& Consultation               & 2020-02-02 14:12   & J. Simpson, MD  & 24.32         & Noticeable tachycardia. No chronic pre-existing conditions are known.    \\
 		& MRI & 2020-02-02 16:10   & S. Taylor, MD   & 352.87        & -    \\
 		& Release patient            & 2020-02-02 18:33   & SYSTEM            & 0             & -   \\
-		&                            &                    &                   &               &     \\
 		\midrule
 		2                & Register patient           & 2020-02-02 09:08   & SYSTEM            & 0             & -    \\
 		& Consultation               & 2020-02-02 09:14   & J. Simpson, MD  & 24.32         & The patient has severe leg injuries due to a motorcycle accident.  \\
 		& Hospitalization       & 2020-02-02 09:20   & M. Johnson      & 130.37        & -     \\
-		...              & ...                        & ...                & ...               & ...           & ...     \\ \bottomrule
+		...              & ...                        & ...                & ...               & ...           & ...     \\
+		\bottomrule
 	\end{tabularx}
 	\caption[Artificial event log of patient treatments in a hospital]{An artificial event log of patient treatments in a hospital. Each row corresponds to one event. The events are grouped by their case IDs, each representing a single patient.}
 	\label{tab:event-log}
@@ -66,18 +66,13 @@ The set $\mathbb{N}$ denotes the set of all natural numbers $\{1, 2, 3, \dots\}$
 The subset of natural numbers up to number $n$ is noted as $[n] = \{1, 2, \dots, n\} \subset \mathbb{N}$ with [0] = $\emptyset$.
 \begin{definition}[Sequence]
 		A \textit{sequence} of length $n \in \mathbb{N}_0$ over a set $A$ is an ordered collection of elements defined by a function $\sigma \colon [n]\to A$, which assigns each index an element of $A$.
+		A sequence  of length $n$ is represented explicitly as $\sigma = \langle a_1, a_2, \dots, a_n\rangle $ with $a_i \in A$ for $1 \leq i \leq n$. In addition, $\langle~\rangle$ is the empty sequence of length $0$.
 \end{definition}
-A sequence  of length $n$ is represented explicitly as $\sigma = \langle a_1, a_2, \dots, a_n\rangle $ with $a_i \in A$ for $1 \leq i \leq n$. In addition, $\langle~\rangle$ is the empty sequence of length $0$.
 Given a set $A$, $A^*$ describes the set of all sequences over $A$.
-%The set $A^0$ is defined as $\{\langle~\rangle\}$, the set that only contains the empty sequence.
-%$A^* = \bigcup\limits_{i\in \mathbb{N}_0} A^i$ is the set of all sequences over $A$ and $A^+ = \bigcup\limits_{i\in \mathbb{N}} A^i = A^* \setminus \{ \langle~\rangle\}$ is the set of all sequences over $A$ with a length of at least 1.
-%The concatenation of sequences $\sigma_1$ and $\sigma_2$ is denoted by $\sigma_1 \cdot \sigma_2$.
 Moreover, the $i$-th element of a sequence $\sigma = \langle a_1, a_2, \dots, a_n\rangle$ is accessed using $\sigma(i)= a_i$ for $1 \leq i \leq n$.
 The length of a sequence is denoted by $|\sigma|$.
 For a sequence $\sigma=\langle a_1, a_2, \dots, a_n\rangle$, the function
 $hd^k(\sigma)= \langle a_1, a_2, \dots, a_k\rangle$ gives the head or prefix of length $k$ of $\sigma$ for $0 \leq k \leq n$.
-% and $tl^k(\sigma)= \langle a_{k+1}, a_{k+2}, \dots, a_n\rangle$ the tail or suffix of length $n-k$ for $0 \leq k \leq n$.
-%Note that $\sigma = hd^k(\sigma) \cdot tl^{k}(\sigma)$ for $0 \leq k \leq n$ and any sequence $\sigma$.
 
 A function $f \colon A \to B$ can be lifted element-wise to sequences over $A$, precisely:
 \begin{equation*}
@@ -87,7 +82,7 @@ f(\sigma) =
 \langle f(a_1), f(a_2), \dots, f(a_n)\rangle & \text{else} 
 \end{cases}
 \end{equation*}
-If an element $a \in A$ appears in a sequence $\sigma \in A^*$, the set membership notation $a \in \sigma$ is used for simplification, i.e. $a \in \sigma = \langle a_1, a_2, \dots a_n \rangle \iff \exists_{1 \leq i \leq n} \colon a = a_i$.
+If an element $a \in A$ appears in a sequence $\sigma \in A^*$, the set membership notation $a \in \sigma$ is used for simplification, i.e., $a \in \sigma = \langle a_1, a_2, \dots a_n \rangle \iff \exists_{1 \leq i \leq n} \colon a = a_i$.
 
 \section{Events, Traces, Event Logs}
 
@@ -113,7 +108,7 @@ The sequence of activities is also called \textit{path} or \textit{trace variant
 	An \textit{event log} $\eventlog = \{ \sigma_1, \sigma _2, \dots, \sigma_l \}$ is a set of traces, where each case ID is unique per trace, precisely $\forall e_i \in \sigma_r \,  \forall e_j \in \sigma_s \, \forall  \sigma_r, \sigma_s \in \eventlog \colon \pi_\mathcal{C}(e_i) = \pi_\mathcal{C}(e_j) \iff \sigma_r = \sigma_s$.
 \end{definition}
 
-\section{Text Mining}
+\section{Text Mining and Natural Language Processing}
 
 With the consideration of textual data in event logs, the concept of \textit{text mining} becomes relevant.
 Text mining describes all techniques that aim to generate value out of unstructured or semi-structured textual data.
@@ -121,21 +116,27 @@ It combines concepts of natural language processing, machine learning, and data 
 
 The base object in text mining is a \textit{document} containing textual data.
 The textual data can be completely unstructured, i.e., it does not conform to a pre-defined data model, or semi-structured, like in an email, where text information is assigned to sender, subject, message, etc.
-In this setting, a document $d \in \Sigma^*$ (i.e. textual data) is a sequence of symbols from a fixed alphabet $\Sigma$.
+In this setting, a document $d \in \Sigma^*$ (i.e., textual data) is a sequence of symbols from a fixed alphabet $\Sigma$.
 A collection of documents is called \textit{text corpus}, which forms the basis for many text mining techniques.
 
-To derive a mathematical representation of textual data that can be interpreted by learning algorithms, a text model has to be applied using the whole text corpus.
-Popular text models for documents are \textit{Bag of Words} \cite{harris1954distributional}, \textit{Bag of N-Gram}, \textit{Paragraph Vector} (a.k.a. Doc2Vec) \cite{DBLP:conf/icml/LeM14}, and \textit{Latent Dirichlet Allocation} \cite{DBLP:journals/jmlr/BleiNJ03}, which are discussed in more detail in the Sections \ref{sec:bow} through \ref{sec:lda}.
-Most models do not work with the raw text data but require a text normalization step, where the text is cleaned from linguistic variation as well as meaningless words and symbols \cite{DBLP:books/lib/JurafskyM09}.
+Besides text mining, \textit{natural language processing} (NLP) is another important research field dealing with textual data.
+While the concepts of text mining and natural language processing have a lot of overlap, both subfields differ in term of the goals they aim to achieve.
+The focus of text mining mainly relies in analyzing statistical patterns and extracting new information from textual data.
+In contrast, natural language processing aims to make computers understand the semantic meaning of natural languages to realize certain applications, like speech recognition or machine translation.
+
+Both subfields share the concept of feature learning aiming to derive mathematical representations of textual data that can be interpreted by learning algorithms.
+To derive such mathematical representations of textual data, a text model has to be applied using the documents of the whole text corpus.
+Popular text models for documents are \textit{Bag of Words} \cite{harris1954distributional}, \textit{Bag of N-Gram} \cite{brown1992class}, \textit{Paragraph Vector} (a.k.a. Doc2Vec) \cite{DBLP:conf/icml/LeM14}, and \textit{Latent Dirichlet Allocation} \cite{DBLP:journals/jmlr/BleiNJ03}, which are discussed in more detail in the Sections \ref{sec:bow} through \ref{sec:lda}.
+Most models do not work with the raw textual data but require a text normalization step, where the text is cleaned from linguistic variation as well as meaningless words and symbols \cite{DBLP:books/lib/JurafskyM09}.
 
 \section{Supervised Learning}
 
-In \textit{supervised learning}, an unknown function is learned (i.e. approximated) from a set of example input-output pairs \cite{DBLP:books/daglib/0023820}.
+In \textit{supervised learning}, an unknown function is learned (i.e., approximated) from a set of example input-output pairs \cite{DBLP:books/daglib/0023820}.
 In contrast, in \textit{unsupervised learning}, no target outputs are available, and the goal is to identify pattern in the data \cite{DBLP:conf/ac/Ghahramani03}.
 
 An input instance in the supervised scenario is usually described by a tuple of \textit{feature variables} $X$, and the output is defined by a \textit{target variable} $y$.
 The target variable $y$ is either continuous (regression problem) or discrete (classification problem).
-Given a \textit{training set} of input-output pairs $\{(X_1, y_1), (X_2, y_2), \dots, (X_m,y_m)\}$ that were generated from an unknown function $y = f(X)$, the goal is to compute a hypothesis function $h(X)$, which is as close as possible to the true function f(X), i.e. $h(X) \approx f(X)$.
+Given a \textit{training set} of input-output pairs $\{(X_1, y_1), (X_2, y_2), \dots, (X_m,y_m)\}$ that were generated from an unknown function $y = f(X)$, the goal is to compute a hypothesis function $h(X)$, which is as close as possible to the true function f(X), i.e., $h(X) \approx f(X)$.
 
 The challenge in supervised learning is to generalize from the training set of input-output pairs in such a way that the learned hypothesis function $h(x)$ can also successfully predict the target variable for unseen problem instances.
 In order to evaluate a hypothesis, the function is tested on a separate \textit{test set} of input-output pairs, which has not been used for the construction of $h(X)$.
@@ -145,9 +146,9 @@ However, if the prediction performance is high on the training set, but the hypo
 In this case, the model fails to generalize.
 In contrast, if the model is too simple to fit any data from the training set, the hypothesis is \textit{underfitting}.
 
-In many real-world applications, the true function $f(X)$ is stochastic, i.e. we need to estimate a conditional probability function $P(Y | X)$ (classification problem) or a conditional expectation $E(Y | X)$ (regression problem) for the prediction.
+In many real-world applications, the true function $f(X)$ is stochastic, i.e., a conditional probability function $P(Y | X)$ (classification problem) or a conditional expectation $E(Y | X)$ (regression problem) needs to be estimated for the prediction.
 Therefore, the prediction quality is always limited by the randomness of the true distribution.
-Typical supervised learning methods are linear regression, support vector machines \cite{DBLP:journals/ml/CortesV95}, decision trees \cite{DBLP:journals/ml/Quinlan86}, or neural networks, including long short-term memory networks \cite{DBLP:journals/neco/HochreiterS97}.
+Typical supervised learning methods are linear regression \cite{galton1886regression}, support vector machines \cite{DBLP:journals/ml/CortesV95}, decision trees \cite{DBLP:journals/ml/Quinlan86}, or neural networks, including long short-term memory networks \cite{DBLP:journals/neco/HochreiterS97}.
 
 \section{Long Short-Term Memory Networks}
 
@@ -194,5 +195,18 @@ The result of the output gate $\vec{o}_t$ is pointwise multiplied with the tanh-
 \begin{equation*}
 	\vec{h}_t = \vec{o}_t \odot \tanh(\vec{c}_t )
 \end{equation*}
-LSTM networks can backpropagate a more stable error with this gating mechanism, such that these networks are much more capable of learning complex functions for sequences compared to standard recurrent neural networks.
-As a machine learning model that naturally supports sequential data, LSTM networks are a suitable prediction model for processes.
+In the training phase, the networks weights are adjusted to minimize the loss for the input-output pairs provided by the training set.
+The total number of passes through the training set is called \textit{epochs}.
+The update rules describing the weight adjustments are defined by the \textit{optimizer} that is used for training.
+The weights are usually updated in the descent direction of the gradient of the loss function.
+
+An important hyperparameter of the optimizer algorithm is the \text{learning rate} that controls the step size of the weight updates.
+Modern optimizer adapt the learning rate during training to speed up convergence and avoid overshooting of minima.
+To avoid overfitting, a set of regularization techniques have been developed.
+For example, \textit{dropout} randomly removes a fraction of weight connections during training, which can reduce overfitting \cite{DBLP:journals/corr/abs-1207-0580}.
+Other techniques, like \textit{early stopping}, implement rules to stop training, if the error on unseen data does not decrease anymore.
+
+LSTM networks can backpropagate a more stable error using their gating mechanism, such that these networks are much more capable of learning complex functions for sequences compared to standard recurrent neural networks.
+As a machine learning model that naturally supports sequential data, LSTM networks are a very suitable prediction model for processes.
+
+

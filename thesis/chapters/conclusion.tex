@@ -3,15 +3,19 @@ When textual artifacts of a natural language like emails or documents hold proce
 In order to overcome these limitations, a text-aware process prediction model is proposed in this thesis.
 The model encodes process traces of historical process executions to sequences of meaningful event vectors using the control flow, timestamp, textual, and non-textual data attributes of the events.
 An interchangeable text model is utilized to realize the vectorization of textual data.
-Given an encoded prefix log of historical process executions, an LSTM neural network model is trained which predicts the activity and timestamp of the next event, the case outcome, and the case cycle time of a running process instance.
+Given an encoded prefix log of historical process executions, an LSTM neural network model is trained which predicts the activity and timestamp of the next event, the outcome, and the cycle time of a running process instance.
 
 The proposed concept of a text-aware process prediction model has been implemented in Python with current open source technology and evaluated on simulated and real-world event data.
 It is shown that the utilization of textual data can improve the prediction performance, and the model is able to outperform state-of-the-art process prediction methods on many prediction tasks using textual data.
 The impact of text-awareness varies noticeably across the evaluated data sets and mainly depends on the degree of correlation between the textual data and the process course.
+For classification tasks, more significant improvements could be achieved than for regression tasks.
 The model benefits particularly on short traces since more training data for short sequences is available through the generation of prefixes during training.
+Furthermore, the prediction model is robust to outlier traces in the event log and can generalize from structured and chaotic processes.
+It is one of the most flexible in terms of the input data that can be used for prediction and the types of prediction targets.
 
-Four different text models (Bag of Words, Bag of N-Gram, Paragraph Vector, and Latent Dirichlet Allocation) have been considered, and each has been proven to be viable, whereby the BoW and LDA models have performed most consistently even with low-dimensional text vector embeddings.
-The proposed technique is robust to outlier traces in the event log and can generalize from structured and unstructured processes.
+Four different text models (Bag of Words, Bag of N-Gram, Paragraph Vector, and Latent Dirichlet Allocation) have been considered to compute vector representations of textual data.
+Each text model has been proven to be viable, whereby the BoW and LDA models have performed most consistently even with low-dimensional text vector embeddings.
+The optimal encoding dimension of textual data depends on, inter alia, the size of the vocabulary, i.e., the number of distinct words in the event logs.
 
 \section{Limitations and Outlook}
 
@@ -29,7 +33,7 @@ Nevertheless, the utilization of textual data is an additional barrier, and curr
 
 Another unsolved problem is to identify causality in processes with respect to prediction.
 In order to derive predictions for processes, correlations in the event data are sufficient.
-However, when predictive methods are applied to support decision making, it is important to identify the main forces that really \textit{influence} the future of the process.
+However, when predictive methods are applied to support decision making, it is important to identify the main forces that really \textit{influence} the future of the process \cite{DBLP:conf/caise/HompesMRDBA17}.
 The ascertainment of causality is a significantly harder problem since it requires a much deeper understanding of the individual process.
 Therefore, tailor-made methods might be necessary that are specific to the field of use.
 Gained insights could then be utilized to improve process prediction by not only considering event data but also additional background knowledge about the process.

@@ -1,0 +1,150 @@
+\begin{appendices}
+	
+
+\chapter{Job Application Process Model}\label{appendix-a}
+
+Figure \ref{fig:/application-process-large} shows the BPMN model of the job application process described in Section \ref{sec:datasets}.
+
+\begin{figure}[htbp!]
+	\centering
+	\includegraphics[width=0.97\textheight, angle=90]{figures/application-process-large}
+	\caption[Enlarged BPMN model of the job application process]{Enlarged BPMN model of the job application process.}
+	\label{fig:/application-process-large}
+\end{figure}
+
+\chapter{Event Log Snippets}\label{appendix-b}
+
+The following tables show snippets of the three event logs described in Section \ref{sec:datasets}.
+
+
+\begin{table}[!h]
+	\tiny
+	\setlength\tabcolsep{2pt}
+	\begin{tabularx}{\textwidth}{lllp{8.5cm}}
+		\toprule
+		\textbf{Case} & \textbf{Activity} & \textbf{Timestamp} & \textbf{Email} \\
+		\midrule
+14587&start application&2025-06-28 04:03:44.597790\\
+14587&upload cv&2025-06-28 04:39:32.836847&i studied data mining i have a degree in data bases i studied data [...] \\
+14587&interview invitation&2025-06-29 15:04:04.041641&\\
+14587&email by applicant&2025-06-29 22:34:55.861625&i am looking forward to let us make an appointment outstanding  [...]\\
+14587&interview&2025-06-30 22:53:10.875933&\\
+14587&decision&2025-07-03 12:40:05.252017&you will be asked to sign a contract would like to formally offer you  [...] \\
+14587&job offer&2025-07-06 00:55:55.570263&\\
+14587&email by applicant&2025-07-06 06:52:56.156498&thank you please send me let us make an appointment please  [...] \\
+14587&job accepted&2025-07-06 09:42:27.776267&\\
+14588&start application&2025-07-29 18:11:59.618476&\\
+14588&upload cv&2025-07-29 18:42:50.763586&i can do negotiation for many years i do presentation i can do  [...] \\
+14588&upload cover letter&2025-07-29 19:01:11.889307&i am confident that i would be a valuable asset to the team  [...] \\
+14588&interview invitation&2025-07-31 01:36:46.319451&\\
+14588&email by applicant&2025-07-31 10:55:21.452244&you can reach out to me please tell me the date when i am  [...] \\
+14588&interview&2025-08-01 07:56:00.594860&\\
+14588&decision&2025-08-03 16:54:16.736287&we received a large number of job applications after carefully [...] \\
+14588&rejection by company&2025-08-03 22:42:14.838405&\\
+14589&start application&2025-07-04 17:01:42.829690&\\
+14589&upload cv&2025-07-04 17:31:12.394144&i studied micro services i have developed skills data models i have  [...] \\
+14589&upload cover letter&2025-07-04 17:48:34.418263&i am available to talk at your convenience i am available to talk   [...]\\
+14589&interview invitation&2025-07-06 04:09:59.775358&\\
+14589&email by applicant&2025-07-06 12:57:27.321095&you can reach out to me if you need additional information please  [...] \\
+14589&interview&2025-07-07 09:24:42.576997&\\
+14589&decision&2025-07-09 13:00:11.681470&we will not be able to hire you thank you for your application for the [...] \\
+14589&rejection by company&2025-07-09 18:01:29.714866&\\
+14590&start application&2025-05-16 07:38:17.143582&\\
+14590&upload cv&2025-05-16 08:09:12.449789&i studied process mining i have a degree in web services my key skill  [...] \\
+14590&interview invitation&2025-05-17 14:33:47.787646&\\
+14590&email by applicant&2025-05-17 23:39:30.979391&it is not possible for me i can not i already found a job i am not  [...]\\
+14590&rejection by applicant&2025-05-18 03:28:38.824214&\\
+		\bottomrule	\end{tabularx}
+	\caption[Snippet of the job application log]{Snippet of the job application log.}
+\end{table}
+
+
+\begin{table}[!h]
+	\tiny
+	\setlength\tabcolsep{2pt}
+	\begin{tabularx}{\textwidth}{lllllp{6.9cm}}
+		\toprule
+		\textbf{Case} & \textbf{Activity}          & \textbf{Timestamp} & \textbf{Age} & \textbf{Gender} & \textbf{Message} \\
+		\midrule
+		40154127&question&2015/12/15 12:24:42.000&50-65&M&Can you send me a copy of the decision?\\
+		40154127&taken&2015/12/30 15:39:36.000&50-65&M&\\
+		40154127&mijn\_sollicitaties&2015/12/30 15:39:42.000&50-65&M&\\
+		40154127&taken&2015/12/30 15:39:46.000&50-65&M&\\
+		40154127&home&2015/12/30 15:39:51.000&50-65&M&\\
+		23245109&question&2015/07/21 09:49:32.000&50-65&M&Law: How is the GAA (Average Number of Labor)?\\
+		23245109&question&2015/07/21 09:54:28.000&50-65&M&Dismissal Procedure: Stops my contract automatically after two years of illness?\\
+		23245109&question&2015/07/21 10:05:43.000&50-65&M&Dismissal: Am I entitled to a transitional allowance?\\
+		23245109&question&2015/07/21 10:05:56.000&50-65&M&Chain Determination: How often may be extended a fixed-term contract?\\
+		23245109&mijn\_werkmap&2015/07/27 09:54:03.000&50-65&M&\\
+		23245109&mijn\_berichten&2015/07/27 09:54:13.000&50-65&M&\\
+		23245109&mijn\_cv&2015/07/27 10:04:20.000&50-65&M&\\
+		21537056&taken&2015/10/30 13:16:48.000&50-65&M&\\
+		21537056&question&2015/10/30 13:22:00.000&50-65&M&How can I add a document/share with my consultant work through the workbook?\\
+		21537056&taken&2015/10/30 13:23:24.000&50-65&M&\\
+		21537056&mijn\_werkmap&2015/10/30 13:24:39.000&50-65&M&\\
+		19290768&question&2015/09/21 12:41:21.000&30-39&V&Filling: What should I do if I made a mistake when filling out the Income Problem?\\
+		19290768&home&2015/09/22 10:09:53.000&30-39&V&\\
+		19290768&taken&2015/09/22 10:10:14.000&30-39&V&\\
+		19290768&home&2015/09/22 10:11:12.000&30-39&V&\\
+		41636987&question&2015/12/23 11:17:08.000&30-39&V&When is/are transferred my unemployment benefits?\\
+		41636987&home&2015/12/23 11:52:50.000&30-39&V&\\
+		41636987&taken&2015/12/23 11:52:53.000&30-39&V&\\
+		41636987&mijn\_berichten&2015/12/23 11:53:17.000&30-39&V&\\
+		41636987&taken&2015/12/23 11:57:55.000&30-39&V&\\
+		53244594&mijn\_berichten&2016/02/25 09:10:40.000&40-49&M&\\
+		53244594&question&2016/02/25 13:27:38.000&40-49&M&When is/are transferred my unemployment benefits?\\
+		53244594&question&2016/02/29 10:04:23.000&40-49&M&Problem: I have to pay sv € 0 and further fill only the amount of holiday pay. What should I do if I get an error?\\
+		53244594&question&2016/02/29 10:10:52.000&40-49&M&Why did you change the amount of my payment?\\
+		\bottomrule
+	\end{tabularx}
+\caption[Snippet of the customer journey log]{Snippet of the customer journey log.}
+\end{table}
+
+
+\begin{table}[!h]
+	\tiny
+	\setlength\tabcolsep{2pt}
+	\begin{tabularx}{\textwidth}{lllllp{3.6cm}}
+		\toprule
+		\textbf{Case} & \textbf{Activity}          & \textbf{Timestamp} & \textbf{Admission Type} & \textbf{Insurance} & \textbf{Diagnosis} \\
+		\midrule
+3&EMERGENCY ROOM ADMIT&2101-10-20 19:08:00&EMERGENCY&Medicare&HYPOTENSION\\
+3&SNF&2101-10-31 13:58:00&EMERGENCY&Medicare&\\
+4&EMERGENCY ROOM ADMIT&2191-03-16 00:28:00&EMERGENCY&Private&FEVER DEHYDRATION FAILURE TO THRIVE\\
+4&HOME WITH HOME IV PROVIDR&2191-03-23 18:41:00&EMERGENCY&Private&\\
+5&PHYS REFERRAL/NORMAL DELI&2103-02-02 04:31:00&NEWBORN&Private&NEWBORN\\
+5&HOME&2103-02-04 12:15:00&NEWBORN&Private&\\
+6&PHYS REFERRAL/NORMAL DELI&2175-05-30 07:15:00&ELECTIVE&Medicare&CHRONIC RENAL FAILURE SDA\\
+6&HOME HEALTH CARE&2175-06-15 16:00:00&ELECTIVE&Medicare&\\
+7&PHYS REFERRAL/NORMAL DELI&2121-05-23 15:05:00&NEWBORN&Private&NEWBORN\\
+7&HOME&2121-05-27 11:57:00&NEWBORN&Private&\\
+8&PHYS REFERRAL/NORMAL DELI&2117-11-20 10:22:00&NEWBORN&Private&NEWBORN\\
+8&HOME&2117-11-24 14:20:00&NEWBORN&Private&\\
+9&EMERGENCY ROOM ADMIT&2149-11-09 13:06:00&EMERGENCY&Medicaid&HEMORRHAGIC CVA\\
+9&DEAD/EXPIRED&2149-11-14 10:15:00&EMERGENCY&Medicaid&\\
+10&PHYS REFERRAL/NORMAL DELI&2103-06-28 11:36:00&NEWBORN&Medicaid&NEWBORN\\
+10&SHORT TERM HOSPITAL&2103-07-06 12:10:00&NEWBORN&Medicaid&\\
+11&EMERGENCY ROOM ADMIT&2178-04-16 06:18:00&EMERGENCY&Private&BRAIN MASS\\
+11&HOME HEALTH CARE&2178-05-11 19:00:00&EMERGENCY&Private&\\
+12&PHYS REFERRAL/NORMAL DELI&2104-08-07 10:15:00&ELECTIVE&Medicare&PANCREATIC CANCER SDA\\
+12&DEAD/EXPIRED&2104-08-20 02:57:00&ELECTIVE&Medicare&\\
+13&TRANSFER FROM HOSP/EXTRAM&2167-01-08 18:43:00&EMERGENCY&Medicaid&CORONARY ARTERY DISEASE\\
+13&HOME HEALTH CARE&2167-01-15 15:15:00&EMERGENCY&Medicaid&\\
+16&PHYS REFERRAL/NORMAL DELI&2178-02-03 06:35:00&NEWBORN&Private&NEWBORN\\
+16&HOME&2178-02-05 10:51:00&NEWBORN&Private&\\
+17&PHYS REFERRAL/NORMAL DELI&2134-12-27 07:15:00&ELECTIVE&Private&PATIENT FORAMEN OVALE PATENT FORAMEN OVALE MINIMALLY INVASIVE SDA\\
+17&HOME HEALTH CARE&2134-12-31 16:05:00&ELECTIVE&Private&\\
+17&EMERGENCY ROOM ADMIT&2135-05-09 14:11:00&EMERGENCY&Private&PERICARDIAL EFFUSION\\
+17&HOME HEALTH CARE&2135-05-13 14:40:00&EMERGENCY&Private&\\
+18&PHYS REFERRAL/NORMAL DELI&2167-10-02 11:18:00&EMERGENCY&Private&HYPOGLYCEMIA SEIZURES\\
+18&HOME&2167-10-04 16:15:00&EMERGENCY&Private&\\
+19&EMERGENCY ROOM ADMIT&2108-08-05 16:25:00&EMERGENCY&Medicare&C 2 FRACTURE\\
+19&REHAB/DISTINCT PART HOSP&2108-08-11 11:29:00&EMERGENCY&Medicare&\\
+20&PHYS REFERRAL/NORMAL DELI&2183-04-28 09:45:00&ELECTIVE&Medicare&CORONARY ARTERY DISEASE CORONARY ARTERY BYPASS GRAFT SDA\\
+20&HOME&183-05-03 14:45:00&ELECTIVE&Medicare&\\
+		\bottomrule
+	\end{tabularx}
+	\caption[Snippet of the hospital admission log]{Snippet of the hospital admission log.}
+\end{table}
+
+\end{appendices}

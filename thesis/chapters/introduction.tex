@@ -37,13 +37,13 @@ Therefore, including the forward perspective is crucial for any competitive proc
 \section{Problem Statement}
 
 Although many approaches for process prediction have been suggested in the literature (see Chapter \ref{chap:related_work}), current solutions are limited regarding the data they are able to consider and the prediction task they can perform.
-Many approaches derive their prediction purely from the control flow of a process instance ignoring additional data attributes in the event log.
+Many approaches derive their prediction purely from the \textit{control flow}, i.e., the sequence of performed activities, of a process instance ignoring additional data attributes in the event log.
 Notably, most approaches do not consider textual data for process prediction.
 However, textual data is highly available in many systems and might hold important information that can be used to improve the prediction performance.
 For example, millions of emails are sent every day, and their content influences processes inside of organizations.
 
 In addition, process-critical information like a diagnosis in a hospital often comes in textual form and therefore has to be considered for prediction.
-Most of the existing prediction methods focus on a single prediction task only; for example, they exclusively predict the remaining time or cycle time of a process instance.
+Most of the existing prediction methods focus on a single prediction task only; for example, they exclusively predict the remaining time or cycle time (time between start and end) of a process instance.
 Depending on the context, information about the next event or the future path of process instance can be of interest.
 In some scenarios, process instances have an outcome like success/failure or accepted/rejected that can be predicted.
 
@@ -56,8 +56,8 @@ Given an event log with past executions of a process holding numerical, categori
 \begin{itemize}
 	\item Next activity prediction: What will happen next in the running process instance?
 	\item Next event time prediction: When will the next event happen?
-	\item Case outcome prediction: What is the outcome of the process instance?
-	\item Case cycle time prediction: What is the total duration of the process instance?
+	\item Outcome prediction: What is the outcome of the process instance?
+	\item Cycle time prediction: What is the total duration of the process instance?
 \end{itemize}
 
 \begin{figure}[htbp!]
@@ -87,18 +87,19 @@ These goals lead to the formulation of the following three research questions:
 	\item What are the advantages and disadvantages of the approach compared to existing methods?
 \end{enumerate}
 
-Based on these research questions, a text-aware process prediction model is conceptualized, implemented and evaluated.
+Based on these research questions, a text-aware process prediction model is conceptualized, implemented and evaluated on simulated and real-word event data.
 
 \section{Contribution}
 
 In this thesis, two main contributions are made.
 First, a text-aware process prediction model is designed and implemented, which additionally counts in textual data associated with events.
 The approach is realized by combining LSTM neural networks and text models in order to capitalize on correlations between the process flow and the (textual) data.
-It prioritizes high prediction performance and flexibility, i.e. it is applicable to a wide range of processes in terms of variability, underlying data types and process complexity.
+It prioritizes high prediction performance and flexibility, i.e., it is applicable to a wide range of processes in terms of variability, underlying data types and process complexity.
 The implementation of the proposed prediction model is purely based on Python and additional open-source packages.
 
 The second contribution is a comprehensive evaluation and analysis of the approach based on simulated and real-world event data.
 This includes performance measurements of differently parameterized models and a comparison with existing methods.
+For this, individual properties of the tested data sets are taken into account.
 In addition, the advantages and limitations of the approach are discussed.
 
 \section{Thesis Structure}
@@ -107,8 +108,9 @@ This thesis is divided into seven chapters.
 In Chapter \ref{chap:prelim}, the basic notations, definitions, and concepts used in this work are introduced.
 This includes a brief introduction to process mining, text mining, supervised learning, and LSTM neural networks.
 Chapter \ref{chap:related_work} summarizes relevant scientific contributions that focus on process prediction in process mining and gives an overview of available methods and their capabilities.
+Additionally, related contributions to text mining and natural language processing are presented.
 In Chapter \ref{chap:concept}, a novel text-aware process prediction model as the main conceptional contribution is presented.
-Moreover, Chapter \ref{chap:impl} covers the implementation details of the model on a technical level.
-In Chapter \ref{chap:eval}, the performance of the new approach is evaluated and compared to current state-of-the-art prediction methods.
+Moreover, Chapter \ref{chap:impl} covers the technology and architecture design of the model on a more technical level.
+In Chapter \ref{chap:eval}, the performance of the novel approach is evaluated and compared to current state-of-the-art prediction methods.
 Finally, the conclusion is given in Chapter \ref{chap:conclusion} by wrapping up the key achievements and discussing the limitations of the approach.
 Furthermore, an outlook towards future potential research questions on process prediction in business process monitoring is given.

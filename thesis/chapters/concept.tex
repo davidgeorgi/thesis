@@ -12,7 +12,7 @@ The main application scenario for the model is inside of real-time business proc
 
 \section{Overview}\label{sec:overview}
 
-The framework is designed to approximate functions $f_\mathrm{a}, f_\mathrm{t}, f_\mathrm{o},$ and $f_\mathrm{c}$ that predict the next activity, next timestamp, case outcome and case cycle time respectively, given any prefix $hd^k(\sigma)$ of length $1 \leq k \leq |\sigma| = n$ of the complete, but unknown trace $\sigma = \langle e_1, \dots, e_{n} \rangle \in \mathcal{E}^+$.
+The framework is designed to approximate functions $f_\mathrm{a}, f_\mathrm{t}, f_\mathrm{o},$ and $f_\mathrm{c}$ that predict the next activity, next timestamp, outcome and cycle time respectively, given any prefix $hd^k(\sigma)$ of length $1 \leq k \leq |\sigma| = n$ of the complete, but unknown trace $\sigma = \langle e_1, \dots, e_{n} \rangle \in \mathcal{E}^+$.
 The next activity prediction function $f_\mathrm{a}\colon \mathcal{E}^+ \to \mathcal{A} \cup \{\blacksquare\}$ returns the activity of the next event or an artificial activity $\blacksquare$ if the given trace is already completed, formally:
 \begin{align*}
 f_\mathrm{a}(hd^k(\sigma)) &= 
@@ -29,9 +29,9 @@ f_\mathrm{t}(hd^k(\sigma)) &=
 \pi_\mathcal{T}(\sigma(k+1)) - \pi_\mathcal{T}(\sigma(k)) & \text{else} 
 \end{cases}
 \end{align*}
-The case outcome of traces depends on the context of the process.
+The outcome of a case depends on the context of the process.
 For example, it can be a binary label describing if the case has been successful or has failed.
-In some applications, the case outcome is defined by the activity of the final event of a case.
+In some applications, the outcome is defined by the activity of the final event of a case.
 In that scenario, the outcome function $f_\mathrm{o} \colon \mathcal{E}^+ \to \mathcal{A}$ returns the last activity of the trace:
 \begin{align*}
 f_\mathrm{o}(hd^k(\sigma)) &= \pi_\mathcal{A}(\sigma(|\sigma|))
@@ -84,7 +84,7 @@ d_{i1}^\mathrm{num}, \dots, d_{ir}^\mathrm{num},
 \vec{d}_{i1}^\mathrm{text}, \dots, \vec{d}_{iu}^\mathrm{text})
 \end{equation*}
 An overview of each feature vector that is part of the event encoding is provided in Table \ref{tab:features}.
-The activity of the event is represented by a vector $\vec{a_i}$ using \textit{one-hot encoding}.
+The activity of the event is represented by a vector $\vec{a_i}$ using \textit{one-hot encoding} \cite{garavaglia1998smart}.
 More precisely, given the set of possible activities $\mathcal{A}$, an arbitrary but fixed ordering over $\mathcal{A}$ is introduced with a bijective index function $index_\mathcal{A} \colon \mathcal{A} \to \{1, \dots, |\mathcal{A}|\}$.
 Using this function, the activity is encoded as a vector of size $|\mathcal{A}|$, where the component $index_\mathcal{A}(\pi_\mathcal{A}(e))$ has value 1 and all the other components have value 0.
 The function $\mathds{1}_\mathcal{A}\colon \mathcal{A} \to \{0,1\}^\mathcal{A}$ is used to describe the realization of such a one-hot encoding transformation for the set of all activities $\mathcal{A}$.
@@ -159,7 +159,7 @@ A summary of all time-related features can be seen in Table \ref{tab:time-featur
 \end{table}
 
 Using these features, time-related correlations can be captured and utilized for prediction.
-The feature $t_i^1$ describes the time difference between the current event $e_i$ and previous event $e_{i-1}$, while $t_i^2$ gives the time difference between the current event and the first event of the case $e_1$, i.e. the time since the start of the case.
+The feature $t_i^1$ describes the time difference between the current event $e_i$ and previous event $e_{i-1}$, while $t_i^2$ gives the time difference between the current event and the first event of the case $e_1$, i.e., the time since the start of the case.
 Furthermore, $t_i^3$ is the time difference between the current event and the first event that is recorded in the log.
 This feature indicates the absolute time position of an event in the recorded data.
 This information is important to detect concept drifts \cite{DBLP:journals/tnn/BoseAZP14} in the process.
@@ -177,13 +177,13 @@ Each feature $t_i^1, \dots, t_i^6$ is min-max normalized such that $t_i^j \in [0
 
 In order to prepare the textual data of the event log for a prediction model, the texts have to be encoded in a compact, finite, and useful numerical vector representation using a text model.
 Useful in that context means that texts with similar semantic meanings should also have similar representations.
-The vector representation of textual data is an important task in \textit{Natural Language Processing} (NLP) \cite{DBLP:books/daglib/0001548}.
+The vector representation of textual data is an important challenge in text mining and natural language processing \cite{DBLP:books/daglib/0001548}.
 Extracting the meaning of textual information remains a challenge even for humans because textual data is unstructured, language-dependent, and domain-specific.
 Many words are ambiguous; for example, the word \enquote{apple} might denote a fruit or a global technology company.
 In addition, grammatical variations and the importance of context in language makes extracting the semantic meaning even more difficult for computers.
 
 In this setting, the text vectorization for textual attributes is realized in a two-step procedure.
-First, all textual data associated with the events in the corresponding textual attribute is collected in a so-called \textit{text corpus}.
+First, all textual data associated with the events in the corresponding textual attribute is collected in the so-called \textit{text corpus}.
 Each document in the text corpus is then preprocessed in order to filter out linguistic noise or useless information.
 This step is called \textit{text normalization}  \cite{DBLP:books/lib/JurafskyM09}.
 Finally, the normalized text corpus is used to build up a \textit{vocabulary}, and a text vectorization technique is applied to encode the text of the attribute into a fixed-length vector.
@@ -234,7 +234,7 @@ In the following, four different text models are presented that are suitable to 
 The \textit{Bag of Words} (BoW) model is a simple text model, representing documents based on the \textit{term frequencies} of its words while ignoring their order \cite{harris1954distributional}.
 Given the learned vocabulary $V$, a document is represented by a vector of size $|V|$, where the $i$-th component gives the number of occurrences in the document of the word indexed with $i$ in the vocabulary.
 
-Since this approach does not reflect the prior distributions of words in the corpus, i.e., how likely certain words appear in a document in general, the term frequencies are usually normalized by the so-called \textit{inverse document frequency} (idf) of a word.
+Since this approach does not reflect the prior distributions of words in the corpus, i.e., how likely certain words appear in a document in general, the term frequencies are usually normalized by the so-called \textit{inverse document frequency} (idf) of a word \cite{DBLP:journals/cacm/SaltonWY75}.
 The inverse document frequency indicates the specificity of a word in the corpus and is computed by dividing the total number of documents by the number of documents that contain the specific word and scaling that value logarithmically.
 The resulting value is the tf-idf score of a word in a document.
 
@@ -248,7 +248,7 @@ Unseen words that appear during online prediction and are not part of the learne
 
 \subsection{Bag of N-Grams}
 
-The \textit{Bag of N-Grams} (BoNG) model is a generalization of the Bag of Words model, which addresses the latter’s missing word order awareness.
+The \textit{Bag of N-Grams} (BoNG) model is a generalization of the Bag of Words model, which addresses the latter’s missing word order awareness \cite{brown1992class}.
 Instead of single words, the vocabulary consists of $n$-tuples of words that appear consecutive in the documents.
 The unigram model ($n=1$) is equivalent to the BoW model.
 For the bigram model ($n=2$), the vocabulary consists of pairs of words that appear next to each other in the documents.
@@ -298,7 +298,7 @@ Similar to the BoW model, LDA does not consider the order of words in the docume
 
 \section{Network Architecture and Training}
 The encoded historical prefix event log is used to fit an LSTM model.
-The LSTM network is designed to be trained with all prediction targets (next activity, next event time, case outcome and case cycle time) together in order to benefit from their correlations.
+The LSTM network is designed to be trained with all prediction targets (next activity, next event time, outcome and cycle time) together in order to benefit from their correlations.
 In the basic variant, the network consists of an input layer, a shared LSTM layer, a specialized LSTM layer for each prediction target, and a fully connected output layer for each target.
 Furthermore, layer normalization \cite{DBLP:journals/corr/BaKH16} can be applied after each LSTM layer, which standardizes the hidden output to speed up the training convergence.
 The network architecture is shown in Figure \ref{fig:network}.
@@ -307,11 +307,11 @@ Note that the LSTM layers in the figure are unrolled in time, i.e., the same lay
 \begin{figure}[!htbp]
 	\centering
 	\includegraphics[width=\textwidth]{figures/network}
-	\caption[LSTM model architecture for text-aware process prediction]{LSTM model architecture to simultaneously predict the next activity $(\vec{y_a})$, next event time $(y_t)$, case outcome $(\vec{y_o})$ and case cycle time $(y_c)$ for an encoded prefix trace $\vec{x_1}, \vec{x_2}, \dots, \vec{x_k}$.}
+	\caption[LSTM model architecture for text-aware process prediction]{LSTM model architecture to simultaneously predict the next activity $(\vec{y_a})$, next event time $(y_t)$, outcome $(\vec{y_o})$ and cycle time $(y_c)$ for an encoded prefix trace $\vec{x_1}, \vec{x_2}, \dots, \vec{x_k}$.}
 	\label{fig:network}
 \end{figure}
 
-The fully connected output layer uses a softmax activation function for the next activity and case outcome prediction to estimate the probability for each target value.
+The fully connected output layer uses a softmax activation function for the next activity and outcome prediction to estimate the probability for each target value.
 The softmax function normalizes a vector of real numbers into another vector of the same dimension, such that all components are in the interval [0,1], and the sum of all components is equal to 1.
 Hence, the transformed vector can be interpreted as a probability distribution while keeping the vector’s original proportions.
 The softmax function is described with
@@ -329,7 +329,7 @@ The loss for numerical prediction values $\hat{y}$ and the true value $y$ is the
 \section{Predictive Business Processing Monitoring}
 
 During online business process monitoring, predictions are realized by a forward-pass of the encoded, incompleted traces through the LSTM model.
-The component with the highest value of the softmax outputs for the next activity $(\vec{y_a})$ and the case outcome $(\vec{y_o})$ indicates the categorical prediction.
+The component with the highest value of the softmax outputs for the next activity $(\vec{y_a})$ and the outcome $(\vec{y_o})$ indicates the categorical prediction.
 The output values for the next event time $(y_t)$ and case duration  $(y_c)$ are clipped to 0 for negative outputs and the normalization is reverted to compute the final prediction value.
 
 With every new event registered by the business process monitoring system, the prediction can be updated with another forward-pass through the model.
