@@ -115,3 +115,32 @@ Then, these vectors can be utilized for other machine learning problems.
 Most recently, pre-trained \textit{transformer} models, like BERT \cite{DBLP:conf/naacl/DevlinCLT19} by \citeauthor{DBLP:conf/naacl/DevlinCLT19}, achieve state-of-the-art performance on many natural language processing tasks.
 These highly parallelizable deep learning models are pre-trained on large text corpora (unsupervised) and then fine-tuned to solve text-related supervised learning problems, like next-sentence prediction or reading comprehension.
 The underlying concepts of the model that lead to the high performance are not yet completely understood \cite{DBLP:conf/emnlp/KovalevaRRR19}.
+
+\section{Contributions to Supervised Learning}
+
+The foundations of supervised learning were laid with \textit{Bayes' theorem} published in \citeyear{bayes1763lii} \cite{bayes1763lii}.
+This theorem was the basis for a wide range of statistical Bayesian methods, like the naive Bayesian classifiers, which can be used to address supervised learning problems.
+The naive Bayesian methods assume independence of the feature variables to efficiently classify instances based on conditional probabilities \cite{hand2001idiot}.
+
+Another early application of supervised learning is the \textit{least square regression} method.
+It can be used to fit the parameters of a function to a data set of points by minimizing the sum of squared residuals.
+The method was originally published by \citeauthor{legendre1805nouvelles} in \citeyear{legendre1805nouvelles} \cite{legendre1805nouvelles}.
+However, there are several indications that Gauß used least square regression ten years before \citeauthor{legendre1805nouvelles} \cite{stigler1981gauss}.
+
+In \citeyear{rosenblatt1957perceptron}, the \textit{perceptron} algorithm was invented by \citeauthor{rosenblatt1957perceptron} \cite{rosenblatt1957perceptron}.
+The perceptron is binary classifier that can learn linearly separable patterns.
+As a single-layer feedforward neural network, the perceptron is not able to learn functions that are not linearly separable, like the XOR function \cite{minsky2017perceptrons}.
+However, with the introduction of multi-layer neural networks, this limitation could be overcome.
+Using the backprogatation algorithm, multi-layer neural networks can approximate any continuous functions within a compact set \cite{DBLP:journals/mcss/Cybenko89}.
+
+Alongside neural networks, decision trees \cite{DBLP:journals/ml/Quinlan86} and support vector machines \cite{DBLP:journals/ml/CortesV95} became popular.
+Decision trees are used to classify instances in the leafs of a tree data structure in dependence of their feature variables.
+The tree can be computed, inter alia, by iteratively splitting tree nodes based on the feature variables of their instances, so that the information gain is maximized.
+Support vector machines are classifiers that separate instances by a hyperplane, so that the margin between the hyperplane and the instances is maximized.
+
+With recurrent neural networks (RNNs), a new class of neural networks was introduced, which is able to process sequences of input data \cite{rumelhart1985learning}.
+By that, these networks can learn dynamic behavior.
+Unlike feedforward neural networks, reccurrent neural networks keep a state across inputs.
+The LSTM neural network is one of the most popular RNN architectures available, which addresses the vanishing gradient problem of many-layered and recurrent neural networks \cite{DBLP:journals/neco/HochreiterS97}.
+
+Today, a rapidly expanding set of supervised learning methods is available to solve complex tasks in computer vision, natural language processing, and many other fields.
