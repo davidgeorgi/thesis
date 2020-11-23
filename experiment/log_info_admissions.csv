@@ -1,2 +1,0 @@
-log,cases,trace variants,events,events per trace,median case duration,mean case duration,activities,words pre filtering,words post filtering,vocabulary pre filtering,vocabulary post filtering
-./logs/admissions.xes,46520,2784,117952,2.535511607910576,7.579166666666667,121.15421268928539,26,171938,165285,4973,4633
