@@ -263,3 +263,4 @@ pdfkeywords={Master's Thesis, David Benedikt Georgi},]{hyperref}
 \RequirePackage{emptypage}
 \RequirePackage{siunitx}
 \RequirePackage{csquotes}
+\RequirePackage[titletoc]{appendix}
