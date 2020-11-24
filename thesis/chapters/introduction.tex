@@ -8,14 +8,14 @@ These have to be able to extract potential value in the form of insights or pred
 
 A remarkable subset of this data is described as \textit{event data}, which are recorded by \textit{process-aware information systems} during the execution of processes \cite{DBLP:journals/topnoc/Aalst09}.
 Process-aware information systems are used to define, manage and execute business processes of many organizations.
-With the non-stopping rise of digitization of business processes, increasingly more event data becomes utilizable, thus the potential value of this data is rising sharply.
+With the non-stopping digitization of business processes, increasingly more event data becomes utilizable, thus the potential value of this data is rising sharply.
 
 The scientific engagement aiming to discover, analyze and improve real processes based on event data led to \textit{process mining}. Process mining bridges the gap between the data-driven characteristic of data science and the process-centric view of process science  \cite{DBLP:books/sp/Aalst16}.
 The ongoing success of process mining in research has been transferred to businesses, which successfully offer or utilize this technology.
 Celonis, which is often considered as one of the biggest commercial providers of process mining, has been valued at 2.5 billion dollar only 9 years after the company was founded \cite{celonis}.
 
 Modern process mining software tends to focus on continuous monitoring of business processes, in contrast to traditional offline and project-based approaches, which are not integrated within a company’s remaining IT infrastructure.
-The integrated and continuous application of process mining mostly realized by \textit{business process monitoring systems} is a key success factor for many organizations.
+The integrated and continuous application of process mining realized by \textit{business process monitoring systems} is a key success factor for many organizations.
 These systems allow users to understand and supervise all processes of a company in real-time during their execution.
 The core idea of this approach is to automate process mining and keep a persistent data connection between the information system and the monitoring system, which provides the analytical capabilities.
 Figure \ref{fig:process-monitoring} visualizes such an infrastructure and the interaction between the systems and internal and external process stakeholders.
@@ -36,13 +36,13 @@ Therefore, including the forward perspective is crucial for any competitive proc
 
 \section{Problem Statement}
 
-Although many approaches for process prediction have been suggested in the literature (see Chapter \ref{chap:related_work}), current solutions are limited regarding the data they are able to consider and the prediction task they can perform.
+Although many approaches for process prediction have been proposed in the literature (see Chapter \ref{chap:related_work}), current solutions are limited regarding the data they are able to consider and the prediction task they can perform.
 Many approaches derive their prediction purely from the \textit{control flow}, i.e., the sequence of performed activities, of a process instance ignoring additional data attributes in the event log.
 Notably, most approaches do not consider textual data for process prediction.
 However, textual data is highly available in many systems and might hold important information that can be used to improve the prediction performance.
 For example, millions of emails are sent every day, and their content influences processes inside of organizations.
 
-In addition, process-critical information like a diagnosis in a hospital often comes in textual form and therefore has to be considered for prediction.
+In addition, process-critical information, like a diagnosis in a hospital, often comes in textual form and therefore has to be considered for prediction.
 Most of the existing prediction methods focus on a single prediction task only; for example, they exclusively predict the remaining time or cycle time (time between start and end) of a process instance.
 Depending on the context, information about the next event or the future path of process instance can be of interest.
 In some scenarios, process instances have an outcome like success/failure or accepted/rejected that can be predicted.
@@ -63,7 +63,7 @@ Given an event log with past executions of a process holding numerical, categori
 \begin{figure}[htbp!]
 	\centering
 	\includegraphics[width=\textwidth]{figures/problem-description}
-	\caption[A general process prediction framework]{A general process prediction framework. Predictive business process monitoring includes a prediction model that is able to predict the future of running cases using historical event data. Current approaches differ in terms of the considered input data, the underlying prediction method and the prediction targets.}
+	\caption[A general process prediction framework]{A general process prediction framework. Predictive business process monitoring includes a prediction model that is able to predict the future of running process instance using historical event data. Current approaches differ in terms of the considered input data, the underlying prediction method, and the prediction targets.}
 	\label{fig:/problem-description}
 \end{figure}
 
@@ -108,9 +108,9 @@ This thesis is divided into seven chapters.
 In Chapter \ref{chap:prelim}, the basic notations, definitions, and concepts used in this work are introduced.
 This includes a brief introduction to process mining, text mining, supervised learning, and LSTM neural networks.
 Chapter \ref{chap:related_work} summarizes relevant scientific contributions that focus on process prediction in process mining and gives an overview of available methods and their capabilities.
-Additionally, related contributions to text mining and natural language processing are presented.
+Additionally, related contributions to text mining, natural language processing, and supervised learning are discussed.
 In Chapter \ref{chap:concept}, a novel text-aware process prediction model as the main conceptional contribution is presented.
-Moreover, Chapter \ref{chap:impl} covers the technology and architecture design of the model on a more technical level.
+Moreover, Chapter \ref{chap:impl} covers the technology and architecture of the model on a more technical level.
 In Chapter \ref{chap:eval}, the performance of the novel approach is evaluated and compared to current state-of-the-art prediction methods.
 Finally, the conclusion is given in Chapter \ref{chap:conclusion} by wrapping up the key achievements and discussing the limitations of the approach.
 Furthermore, an outlook towards future potential research questions on process prediction in business process monitoring is given.

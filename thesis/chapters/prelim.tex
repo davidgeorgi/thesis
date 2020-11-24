@@ -11,8 +11,8 @@ Furthermore, necessary formal definitions and notations are introduced.
 Each performed activity belongs to a specific case and is completed at a certain time \cite{DBLP:conf/bpm/AalstAM11}.
 For example, a case can be a patient treated in a hospital, a customer journey or an online order.
 A timestamp specifies the time on which an activity for a certain case is performed.
-The associated case ID, the performed activity and the timestamp together form an \textit{event}.
-An event can have any number of additional attributes, e.g. an attribute describing the resource that carries out the activity.
+The associated case ID, the performed activity, and the timestamp together form an \textit{event}.
+An event can have any number of additional attributes, for example, an attribute describing the resource that carries out the activity.
 \begin{table}[htbp!]
 	\small
 	\setlength\tabcolsep{3pt}
@@ -62,6 +62,7 @@ These methods add the forward perspective to business process monitoring and dea
 
 \section{Basic Notations and Sequences}
 
+To formalize the concepts described before, a few notations are introduced in the following.
 The set $\mathbb{N}$ denotes the set of all natural numbers $\{1, 2, 3, \dots\}$ and $\mathbb{N}_0 = \mathbb{N} \cup \{0\}$ denotes the set of natural numbers including 0.
 The subset of natural numbers up to number $n$ is noted as $[n] = \{1, 2, \dots, n\} \subset \mathbb{N}$ with [0] = $\emptyset$.
 \begin{definition}[Sequence]
@@ -89,7 +90,7 @@ If an element $a \in A$ appears in a sequence $\sigma \in A^*$, the set membersh
 Based on the definition of sequences, the concepts of events, traces, and event logs can be formalized.
 \begin{definition}[Event]
 An  \textit{event} is a tuple $e = (c,a,t,d_1,\dots, d_m) \in \mathcal{C} \times \mathcal{A}  \times \mathcal{T} \times \mathcal{D}_1 \times \dots \times \mathcal{D}_m =  \mathcal{E}$ where  $c \in \mathcal{C} $ is the case ID, $a \in \mathcal{A}$ is the executed activity and $t \in \mathcal{T}$ is the timestamp of the event.
-The set of possible timestamps is required to be totally ordered by some relation $\leq$.
+The set of possible timestamps $\mathcal{T}$ is required to be totally ordered by some relation $\leq$.
 Furthermore, each event contains a fixed number $m \in \mathbb{N}_0$ of additional attributes $d_1, \dots, d_m$ in their corresponding domains $\mathcal{D}_1, \dots , \mathcal{D}_m$.
 In case that no additional attribute data is available ($m = 0$) the event space $\mathcal{E}$ (set of all possible events) is reduced to its minimal form $\mathcal{C} \times \mathcal{A}  \times \mathcal{T}$.
 \end{definition}
@@ -104,13 +105,14 @@ Each additional attribute is assumed to be numerical, categorical, or textual, i
 A trace can be transformed into a sequence of attributes by applying a projection function to the trace.
 For example, $\pi_\mathcal{A}(\sigma)$ gives the sequence of the activities of the events in $\sigma$.
 The sequence of activities is also called \textit{path} or \textit{trace variant}.
+A trace contains all the data that is logged during the execution of single process instance.
 \begin{definition}[Event Log]
 	An \textit{event log} $\eventlog = \{ \sigma_1, \sigma _2, \dots, \sigma_l \}$ is a set of traces, where each case ID is unique per trace, precisely $\forall e_i \in \sigma_r \,  \forall e_j \in \sigma_s \, \forall  \sigma_r, \sigma_s \in \eventlog \colon \pi_\mathcal{C}(e_i) = \pi_\mathcal{C}(e_j) \iff \sigma_r = \sigma_s$.
 \end{definition}
 
 \section{Text Mining and Natural Language Processing}
 
-With the consideration of textual data in event logs, the concept of \textit{text mining} becomes relevant.
+With the consideration of textual data in event logs, the concepts of \textit{text mining} become relevant.
 Text mining describes all techniques that aim to generate value out of unstructured or semi-structured textual data.
 It combines concepts of natural language processing, machine learning, and data mining \cite{DBLP:books/daglib/0022577}.
 
@@ -155,10 +157,10 @@ Typical supervised learning methods are linear regression \cite{galton1886regres
 Long short-term memory (LSTM) is an advanced recurrent neural network architecture for sequential data originally presented by \citeauthor{DBLP:journals/neco/HochreiterS97} in \citeyear{DBLP:journals/neco/HochreiterS97} \cite{DBLP:journals/neco/HochreiterS97}.
 This approach addresses the well-known vanishing or exploding gradient problem \cite{DBLP:conf/icml/PascanuMB13}  of traditional recurrent neural networks by introducing more complex LSTM cells as hidden units.
 The proposed architecture has been improved several times \cite{DBLP:journals/neco/GersSC00} \cite {DBLP:journals/tnn/GreffSKSS17} and is currently considered as one of the most successful recurrent neural network models.
-Although LSTM networks have been available for a long time, the breakthrough of this technology is dated around 2016, after many success stories of LSTM combined with large data sets and GPU hardware have been reported for sequence to sequence tasks like text translation \cite{DBLP:journals/corr/WuSCLNMKCGMKSJL16}.
+Although LSTM networks have been available for a long time, the breakthrough of this technology is dated around 2016, after many success stories of LSTM networks combined with large data sets and GPU hardware have been reported for sequence to sequence tasks like text translation \cite{DBLP:journals/corr/WuSCLNMKCGMKSJL16}.
 
-Gated recurrent units (GRU) \cite{DBLP:conf/emnlp/ChoMGBBSB14} are the competing gating mechanism by \citeauthor{DBLP:conf/emnlp/ChoMGBBSB14} with fewer parameters and performing similar to LSTM.
-However, more recent studies show that LSTM outperforms GRU consistently in neural machine translation tasks \cite{DBLP:journals/corr/BritzGLL17}.
+Gated recurrent units (GRU) \cite{DBLP:conf/emnlp/ChoMGBBSB14} are the competing gating mechanism by \citeauthor{DBLP:conf/emnlp/ChoMGBBSB14} with fewer parameters and performing similar to LSTM networks.
+However, more recent studies show that LSTM networks outperforms GRU consistently in neural machine translation tasks \cite{DBLP:journals/corr/BritzGLL17}.
 
 A simple feedforward neural network consists of an input layer, arbitrarily many hidden layers and an output layer, where each layer consists of neurons that compute and output the weighted sum of the cells of the previous layer that has been passed to a non-linear activation function \cite{DBLP:journals/nn/Schmidhuber15}.
 These networks can learn and compute complex functions in supervised learning settings, where input and output pattern in form of vectors are provided.
@@ -198,13 +200,13 @@ The result of the output gate $\vec{o}_t$ is pointwise multiplied with the tanh-
 In the training phase, the networks weights are adjusted to minimize the loss for the input-output pairs provided by the training set.
 The total number of passes through the training set is called \textit{epochs}.
 The update rules describing the weight adjustments are defined by the \textit{optimizer} that is used for training.
-The weights are usually updated in the descent direction of the gradient of the loss function.
+The weights are usually updated in the descent direction of the gradient of the selected loss function.
 
 An important hyperparameter of the optimizer algorithm is the \text{learning rate} that controls the step size of the weight updates.
 Modern optimizer adapt the learning rate during training to speed up convergence and avoid overshooting of minima.
 To avoid overfitting, a set of regularization techniques have been developed.
 For example, \textit{dropout} randomly removes a fraction of weight connections during training, which can reduce overfitting \cite{DBLP:journals/corr/abs-1207-0580}.
-Other techniques, like \textit{early stopping}, implement rules to stop training, if the error on unseen data does not decrease anymore.
+Other techniques, like \textit{early stopping}, implement rules to stop training, if the error on unseen data does not decrease anymore \cite{DBLP:series/lncs/Prechelt12}.
 
 LSTM networks can backpropagate a more stable error using their gating mechanism, such that these networks are much more capable of learning complex functions for sequences compared to standard recurrent neural networks.
 As a machine learning model that naturally supports sequential data, LSTM networks are a very suitable prediction model for processes.

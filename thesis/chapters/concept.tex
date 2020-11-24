@@ -3,7 +3,8 @@ While many prediction methods have been applied to event data, almost none of th
 Nevertheless, much textual information in the context of processes is available, such as business emails, documents, or notes by employees or customers.
 These texts in natural language might hold process-critical information and should consequently be considered for process prediction.
 However, taking advantage of textual data remains a major challenge since natural language is predominantly context-sensitive and ambiguous \cite{textminingissues}.
-A first approach has been presented by \citeauthor{DBLP:conf/bpm/TeinemaaDMF16}, which encodes traces with textual data as vectors, and a random forest classifier is learned for each prefix length \cite{DBLP:conf/bpm/TeinemaaDMF16}.
+A first approach has been presented by \citeauthor{DBLP:conf/bpm/TeinemaaDMF16}, which encodes traces with textual data as single vectors.
+Then, a random forest classifier is learned for each prefix length \cite{DBLP:conf/bpm/TeinemaaDMF16}.
 
 This chapter presents a novel approach for text-aware process prediction that considers the control flow and additional numerical, categorical and textual data of the process.
 An exchangeable text model is used to vectorize textual data and take advantage of potential text-related correlations.
@@ -73,7 +74,7 @@ In the offline training phase as well as during online prediction, traces are en
 The prefix log $\eventlog_\mathrm{prefix}$ is encoded as a training set in the offline phase, while in the online phase running cases are encoded for prediction.
 Strictly speaking, an encoding function is realized by the encoding component that transforms prefix traces of length $k$ to vector sequences of the same size, i.e., $encode(\sigma) = \langle \vec{x_1}, \vec{x_2}, \dots, \vec{x_k}\rangle$ with $\sigma = \langle e_1, e_2, \dots, e_k\rangle$ for $k \in \mathbb{N}$.
 Each event $e_i$ is encoded as a fixed-length vector using the activity, timestamp and additional categorical, numerical and textual data that is associated with each event.
-We assume to have $r \in \mathbb{N}_0$ numerical, $s \in \mathbb{N}_0$ categorical and $u \in \mathbb{N}_0$ textual attributes, i.e., $e_i \in \mathcal{C} \times \mathcal{A}  \times \mathcal{T} \times \mathcal{D}_1^\mathrm{num} \times \dots \times \mathcal{D}_r^\mathrm{num}   \times \mathcal{D}_1^\mathrm{cat}  \times  \dots  \times \mathcal{D}_s^\mathrm{cat}   \times \mathcal{D}_1^\mathrm{text}   \times \dots  \times \mathcal{D}_u^\mathrm{text}$.
+It is assumed that each event has $r \in \mathbb{N}_0$ numerical, $s \in \mathbb{N}_0$ categorical and $u \in \mathbb{N}_0$ textual attributes, i.e., $e_i \in \mathcal{C} \times \mathcal{A}  \times \mathcal{T} \times \mathcal{D}_1^\mathrm{num} \times \dots \times \mathcal{D}_r^\mathrm{num}   \times \mathcal{D}_1^\mathrm{cat}  \times  \dots  \times \mathcal{D}_s^\mathrm{cat}   \times \mathcal{D}_1^\mathrm{text}   \times \dots  \times \mathcal{D}_u^\mathrm{text}$.
 Each encoded event vector $\vec{x_i}$ is the concatenation of a set of feature vectors, constructed from the attributes in the event data.
 \begin{equation*}
 \vec{x_i}=(
@@ -170,7 +171,7 @@ Therefore, the knowledge about the event’s absolute time can be used to relate
 The features $t_i^4, t_i^5$ and $t_i^6$ describe the event’s time in relation to the beginning of the day, week, and year.
 They are used to capture daily, weekly, and seasonal trends.
 For example, some activities might only be executed during office hours or before the weekend.
-Also, many businesses expect seasonally fluctuating demand; for example a booking platform for vacation usually has many more customers in summer, affecting the process execution in many ways.
+Also, many businesses expect seasonally fluctuating demand; for example, a booking platform for vacation usually has many more customers in summer, affecting the process execution in many ways.
 Each feature $t_i^1, \dots, t_i^6$ is min-max normalized so that $t_i^j \in [0,1]$ for $j \in [6]$.
 
 \section{Text Vectorization}\label{sec:text}
@@ -183,11 +184,12 @@ Many words are ambiguous; for example, the word \enquote{apple} might denote a f
 In addition, grammatical variations and the importance of context in language makes extracting the semantic meaning even more difficult for computers.
 
 In this setting, the text vectorization for textual attributes is realized in a two-step procedure.
-First, all textual data associated with the events in the corresponding textual attribute is collected in the so-called \textit{text corpus}.
+First, all textual data associated with the events in the corresponding textual attributes is collected in the so-called \textit{text corpus}.
 Each document in the text corpus is then preprocessed in order to filter out linguistic noise or useless information.
 This step is called \textit{text normalization}  \cite{DBLP:books/lib/JurafskyM09}.
 Finally, the normalized text corpus is used to build up a \textit{vocabulary}, and a text vectorization technique is applied to encode the text of the attribute into a fixed-length vector.
-The vocabulary of a text corpus is a set $V$ of all relevant words that appear after preprocessing in the corpus, which is indexed by a bijective index function $index_V \colon V \to \{1, 2, \dots, |V|\}$.
+The vocabulary of a text corpus is a set $V$ of all relevant words that appear in the corpus after preprocessing.
+It is indexed by a bijective index function $index_V \colon V \to \{1, 2, \dots, |V|\}$.
 As text vectorization techniques, the \textit{Bag of Words}, \textit{Bag of N-Grams}, \textit{Paragraph Vector}, and \textit{Latent Dirichlet Allocation} text models are considered, which are discussed in more detail in Sections \ref{sec:bow} through \ref{sec:lda}.
 
 \subsection{Text Normalization}
@@ -242,8 +244,8 @@ The Bag of Words model is easy to build and effective for certain applications b
 First, the model completely ignores the order of words, which is often crucial for understanding the semantic meaning.
 For example, the sentences  \enquote{The patient’s health state went from stable to critical.} and  \enquote{The patient’s health state went from critical to stable.} would result in the same vector representation, while the meaning is clearly the opposite.
 Second, the vector representations are sparse and of high dimensionality, since they depend on the size of the vocabulary.
-However, the dimension can be reduced by limiting the size of the vocabulary.
-For example, words that rarely appear in the corpus can be excluded from the vocabulary.
+However, the dimension can be reduced by limiting the vocabulary's size.
+For example, words that rarely appear in the corpus can be excluded.
 Unseen words that appear during online prediction and are not part of the learned vocabulary are not considered.
 
 \subsection{Bag of N-Grams}
@@ -253,7 +255,7 @@ Instead of single words, the vocabulary consists of $n$-tuples of words that app
 The unigram model ($n=1$) is equivalent to the BoW model.
 For the bigram model ($n=2$), the vocabulary consists of pairs of words that appear next to each other in the documents.
 For example, for the preprocessed document $\langle$\enquote{patient},  \enquote{diagnose},  \enquote{high},  \enquote{blood},  \enquote{pressure}$\rangle$, the pairs (\enquote{patient},  \enquote{diagnose}), (\enquote{diagnose},  \enquote{high}), (\enquote{high},  \enquote{blood}) and (\enquote{blood},  \enquote{pressure}) are added the vocabulary.
-For $n>2$ $n$-tuples are generated accordingly.
+For $n>2$, $n$-tuples are generated accordingly.
 The feature vector is constructed by computing the tf-idf score for each vocabulary entry, like in the BoW model.
 
 Compared to the BoW model, $n$-grams also take the order of words into account, which is beneficial in many scenarios.
@@ -262,7 +264,7 @@ In order to generate more compact vectors, distributed text representations are 
 
 \subsection{Paragraph Vector}
 
-The \textit{Paragraph Vector} model (also known as \textit{Doc2Vec}), originally presented by \citeauthor{DBLP:conf/icml/LeM14} in \citeyear{DBLP:conf/icml/LeM14}, is an unsupervised algorithm that learns distributed fixed length vector representations for documents of variable length using a simple feedforward neural network \cite{DBLP:conf/icml/LeM14}.
+The \textit{Paragraph Vector} model (also known as \textit{Doc2Vec}), originally presented by \citeauthor{DBLP:conf/icml/LeM14} in \citeyear{DBLP:conf/icml/LeM14}, is an unsupervised algorithm that learns distributed fixed-length vector representations for documents of variable length using a simple feedforward neural network \cite{DBLP:conf/icml/LeM14}.
 The idea is inspired by the word embedding model presented by \citeauthor{DBLP:journals/jmlr/BengioDVJ03} \cite{DBLP:journals/jmlr/BengioDVJ03}, which can learn distributed fixed-length vector representations for words.
 In this model, words are mapped to vectors, trained to predict words from their context, i.e., words that appear before or after the target word in the training documents.
 Several variants of this approach exist, notably the \textit{Continuous Bag of Words} model, which ignores the order of the words in the context, and the \textit{Continuous Skip-gram} model, which predicts the skip-gram context for a word vector (also known as \textit{Word2Vec}) \cite{DBLP:journals/corr/abs-1301-3781}.
@@ -270,11 +272,12 @@ Several variants of this approach exist, notably the \textit{Continuous Bag of W
 \begin{figure}[!htbp]
 	\centering
 	\includegraphics[width=\textwidth]{figures/paragraph-vector}
-	\caption[Paragraph Vector model]{The Paragraph Vector model in the distributed memory variant (PV-DM) is a neural network that is designed to predict a word $w_t$ from its context ($w_{t-2}, w_{t-1}, w_{t+1}, w_{t+2}$) and derives fixed-length representation of documents and words via the learned matrices $\vec{D}$ and $\vec{W}$. The dimension of the word and document representations are defined a priori.}
+	\caption[Paragraph Vector model]{The Paragraph Vector model in the distributed memory variant (PV-DM) is a neural network that is designed to predict a word $w_t$ from its context ($w_{t-2}, w_{t-1}, w_{t+1}, w_{t+2}$) and derives fixed-length representations of documents and words via the learned matrices $\vec{D}$ and $\vec{W}$. The dimension of the word and document representations are defined a priori.}
 	\label{fig:paragraph-vector}
 \end{figure}
 
-The core idea of the Paragraph Vector model is to extend the model introduced in \cite{DBLP:journals/jmlr/BengioDVJ03} in such a way that an additional document (i.e., paragraph) vector is trained together with the word vectors, so that it is unique for each document.
+The core idea of the Paragraph Vector model is to extend the model introduced in \cite{DBLP:journals/jmlr/BengioDVJ03} in such a way that an additional document (i.e., paragraph) vector is trained together with the word vectors.
+The document vector is unique for each document.
 Fig. \ref{fig:paragraph-vector} shows the architecture of the distributed memory variant of the Paragraph Vector model (PV-DM).
 It is realized by a neural network, which takes one-hot encoded words and a one-hot encoded document ID as input.
 These are mapped to vector representation via weight matrices $\vec{D}$ and $\vec{W}$, which are learned during training with gradient descent.
@@ -290,22 +293,26 @@ The paragraph vector model tends to perform better than non-distributed models; 
 
 The \textit{Latent Dirichlet Allocation} (LDA) presented by \citeauthor{DBLP:journals/jmlr/BleiNJ03} in \citeyear{DBLP:journals/jmlr/BleiNJ03} \cite{DBLP:journals/jmlr/BleiNJ03} is a generative statistical text model, representing documents as a mixture of a small and fixed number of topics.
 Topics are defined by a multinomial (i.e, categorical) probability distribution over all words in the vocabulary and are learned by the model in an unsupervised manner.
+The number of topics is specified a priori.
+
 The underlying assumption of the LDA model is that the text documents were created by a statistical process that sampled the words of the documents from sampled topics.
 The process can be described in three steps:
 \begin{enumerate}
 	\item For each document, a multinomial topic distribution is drawn from a Dirichlet distribution parameterized by a vector $\vec{\alpha}$.
 	\item For each topic, a multinomial word distribution is drawn from a Dirichlet distribution parameterized by a vector $\vec{\beta}$.
-	\item For each document words are sampled by iteratively drawing a topic from the document’s topic distribution (1) and then drawing a word from the chosen topic distribution (2).
+	\item For each document, the document's words are sampled by iteratively drawing a topic from the document’s topic distribution (1) and then drawing a word from the chosen topic (2).
 \end{enumerate}
 Using the LDA model, a document is encoded as a vector by its topic distribution.
-Its dimension is equal to the number of topics and each component indicates the probability that the corresponding topic distribution was chosen to sample a word in the document.
+Its dimension is equal to the number of topics and each component indicates the probability that the corresponding topic was chosen to sample a word in the document.
 The distributions and, therefore, document encodings, can be learned with statistical inference algorithms like Monte Carlo simulation, variational Bayes or maximum likelihood estimation using the words of each document.
 Compared to the other text models, LDA can generate very compact document encodings since the documents are only described by their degree of affiliation to each topic.
 Similar to the BoW model, LDA does not consider the order of words in the document, which can be disadvantageous for some text corpora.
 
 \section{Network Architecture and Training}
-The encoded historical prefix event log is used to fit an LSTM model.
-The LSTM network is designed to be trained with all prediction targets (next activity, next event time, outcome and cycle time) together in order to benefit from their correlations.
+With the encoding strategy described before, any trace can be transformed to an encoded sequence of event vectors.
+Using the historical event log with completed traces, an encoded historical prefix event log can be computed. 
+Finally, this encoded log is used to fit an LSTM model.
+The LSTM network is designed to be trained with all prediction targets (next activity, next event time, outcome, and cycle time) together in order to benefit from their correlations.
 In the basic variant, the network consists of an input layer, a shared LSTM layer, a specialized LSTM layer for each prediction target, and a fully connected output layer for each target.
 Furthermore, layer normalization \cite{DBLP:journals/corr/BaKH16} can be applied after each LSTM layer, which standardizes the hidden output to speed up the training convergence.
 The network architecture is shown in Figure \ref{fig:network}.
@@ -327,17 +334,18 @@ The softmax function is described with
 \end{equation*}
 The whole training set of encoded prefix traces is represented for efficiency by a 3-dimensional matrix of real values, where the three dimensions specify the prefix traces, the events per prefix trace, and the features per event.
 Since the prefix traces have different lengths, shorter traces are pre-padded \cite{DBLP:journals/corr/abs-1903-07288} with zero vectors.
-Hence, a prefix trace of encoded events $\vec{x_1}, \vec{x_2}, \dots, \vec{x_n}$  is represented in the training set by a 2-dimensional matrix $(\mathbf{0}, \dots, \mathbf{0},\vec{x_1}, \vec{x_2}, \dots, \vec{x_n})$, so that the zero vectors fill up shorter traces to the length of the longest trace in the training set.
+Hence, a prefix trace of encoded events $\vec{x_1}, \vec{x_2}, \dots, \vec{x_k}$  is represented in the training set by a 2-dimensional matrix $(\mathbf{0}, \dots, \mathbf{0},\vec{x_1}, \vec{x_2}, \dots, \vec{x_k})$, so that the zero vectors fill up shorter traces to the length of the longest trace in the training set.
 All prefix traces together form a 3-dimensional training matrix.
 
-The training is realized using a learning algorithm based on stochastic gradient descent and backpropagation through time (BPTT), which updates the weights of the network using the update rules of the Adam optimizer with Nesterov momentum \cite{dozat2016incorporating}.
+The training is realized using a learning algorithm based on gradient descent and backpropagation through time (BPTT) \cite{DBLP:journals/compsys/Mozer89} updating the weights of the network using the update rules of the Adam optimizer with Nesterov momentum \cite{dozat2016incorporating}.
 The loss for numerical prediction values $\hat{y}$ and the true value $y$ is the absolute error $\text{AE}(\hat{y},y)=|\hat{y} - y|$, while the loss for categorical prediction values is computed using the categorical cross-entropy error $\text{CE}(\vec{\hat{y}}, \vec{y}) = - \sum_{i=1}^{k} y_i \cdot \log \hat{y}_i$.
 
 \section{Predictive Business Processing Monitoring}
 
 During online business process monitoring, predictions are realized by a forward-pass of the encoded, incompleted traces through the LSTM model.
 The component with the highest value of the softmax outputs for the next activity $(\vec{y_a})$ and the outcome $(\vec{y_o})$ indicates the categorical prediction.
-The output values for the next event time $(y_t)$ and case duration  $(y_c)$ are clipped to 0 for negative outputs and the normalization is reverted to compute the final prediction value.
+The output values for the next event time $(y_t)$ and case duration $(y_c)$ are clipped to 0 for negative outputs and the normalization is reverted to compute the final prediction value.
+Since the network is trained to predict the remaining time of a process instance, the already elapsed time during the process is added to $y_c$. 
 
 With every new event registered by the business process monitoring system, the prediction can be updated with another forward-pass through the model.
 This guarantees a continuous forward-projection on running process instances which is updated whenever new information in the form of new events becomes available.

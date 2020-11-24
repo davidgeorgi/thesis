@@ -42,7 +42,7 @@
 %$ introduce separate theorem-like environments 
 %using a shared counter tied to the section numbering
 \RequirePackage{textcomp}
-\RequirePackage[pdftitle={Text-Aware Predictive Monitoring of Business Processes with LSTM Neural Networks},
+\RequirePackage[hidelinks, pdftitle={Text-Aware Predictive Monitoring of Business Processes with LSTM Neural Networks},
 pdfauthor={David Benedikt Georgi},
 pdfkeywords={Master's Thesis, David Benedikt Georgi},]{hyperref}
 \RequirePackage{amsmath, amsthm, amssymb,mathrsfs, array}

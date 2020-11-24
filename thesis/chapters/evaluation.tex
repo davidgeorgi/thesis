@@ -4,7 +4,7 @@ Then, the performance of differently parameterized text-aware prediction models 
 
 \section{Evaluation Method}
 
-The text-aware process prediction model is evaluated on three event logs based on four prediction tasks: next activity, next timestamp, outcome and cycle time prediction.
+The text-aware process prediction model is evaluated on three event logs based on four prediction tasks: next activity, next timestamp, outcome, and cycle time prediction.
 The text-aware model is compared to two other process prediction methods.
 First, the pure LSTM approach based on the ideas of \citeauthor{DBLP:conf/caise/TaxVRD17} \cite{DBLP:conf/caise/TaxVRD17} and \citeauthor{DBLP:conf/ssci/NavarinVPS17} \cite{DBLP:conf/ssci/NavarinVPS17} is considered, which only uses the activity, timestamp, and additional non-textual attributes of each event.
 This approach can be considered the state-of-the-art in process prediction if prediction performance is the only criteria.
@@ -14,7 +14,7 @@ This approach constructs an annotated transition system for a log using a sequen
 Each state of the transition system is annotated with measurements of historical traces that can be used to predict target values for unseen traces.
 During the prediction phase, running traces are mapped to the corresponding state of the transition system, and the measurements of the state are used to compute a prediction.
 
-While the original work by \citeauthor{DBLP:journals/is/AalstSS11} focuses on regression tasks, \citeauthor{DBLP:journals/sosym/TaxTZ20} \cite{DBLP:journals/sosym/TaxTZ20} describe how an annotated transition system can also be used for classification tasks like the next activity prediction.
+While the original work by \citeauthor{DBLP:journals/is/AalstSS11} focuses on regression tasks, \citeauthor{DBLP:journals/sosym/TaxTZ20} \cite{DBLP:journals/sosym/TaxTZ20} describe how an annotated transition system can also be used for classification tasks, like the next activity prediction.
 For classification tasks, the measurements of each state are used to compute a probability distribution over the prediction target.
 During prediction, the most likely class is predicted, given the probability distribution of the corresponding state.
 For regression tasks, the mean of the measurements of each state is computed.
@@ -41,7 +41,7 @@ The precision of a binary classifier is the number of true positives divided by 
 \begin{equation*}
 	\textrm{precision} = \dfrac{\textrm{true positives}}{\textrm{true positives} + \textrm{false positives}} \in [0,1].
 \end{equation*}
-The recall is defined as the number of true positives divided by the total number of actually positive instances, precisely
+The recall is defined as the number of true positives divided by the total number of actually positive instances, i.e.,
 \begin{equation*}
 	\textrm{recall} = \dfrac{\textrm{true positives}}{\textrm{true positives} + \textrm{false negatives}} \in [0,1].
 \end{equation*}
@@ -51,7 +51,7 @@ The F$_1$ score combines both metrics. It is defined as the harmonic mean of pre
 \end{equation*}
 The precision, recall and F$_1$ score of a binary classifier can have values between 0 and 1, where 1 is the best possible value.
 The F$_1$ score can be extended for multi-class classification by averaging over the one-vs.-rest F$_1$ scores per class.
-The weighted-average F$_1$ score weights each class-depended F$_1$ score with its support, i.e., the number of true instances per class.
+The weighted-average F$_1$ score weights each class-dependent F$_1$ score with its support, i.e., the number of true instances per class.
 
 \begin{figure}[htbp!]
 	\centering
@@ -69,7 +69,7 @@ Then, the weighted-average F$_1$ score is defined as
 This evaluation metric is preferred over accuracy to address imbalanced distributions of target variables.
 Since only multi-class prediction tasks are considered in this evaluation, F$_1$ is written to describe F$_1^\mathrm{weighted}$ in the following.
 
-For regression tasks, like the next event time and the cycle time prediction, the mean absolute error (MAE) is computed to measure the prediction performance. The mean absolute error indicates the average absolute difference between the predicted value $\hat{y}$ and the true value $y$,  precisely
+For regression tasks, like the next event time and the cycle time prediction, the mean absolute error (MAE) is computed to measure the prediction performance. The mean absolute error indicates the average absolute difference between the predicted value $\hat{y}$ and the true value $y$, i.e.,
 \begin{equation*}
 	\textrm{MAE} = \dfrac{1}{n}\sum_{i=1}^{n}|\hat{y_i} - y_i| \in [0, \infty).
 \end{equation*}
@@ -82,7 +82,7 @@ The BoW and BoNG models are evaluated with 50, 100, and 500 dimensional text vec
 The PV and LDA models are tested with smaller text encodings of size 10, 20, and 100, since they generate distributed representations.
 For the BoW and BoNG model the encoding length is adjusted by only considering the most frequent terms in the vocabulary after preprocessing.
 The encoding dimension of the non-textual data depends on the considered attributes and their number of the distinct values in the event logs.
-The Bag of N-Gram model is used with bigrams ($N = 2$).
+The Bag of N-Gram model is used with bigrams ($n = 2$).
 The Paragraph Vector model is trained for 15 epochs using a sliding window of size 8 to learn the text representations.
 
 The LSTM network uses 100 hidden neurons per layer.
@@ -110,7 +110,7 @@ An overview of the key properties of the logs is summarized in Table \ref{tab:lo
 		\midrule
 		Log type & Simulated & Real-world & Real-word\\
 		Cases & 20\,000& 15\,001& 46\,520\\
-		Trace variants &41 & 1\,001 &2\,784 \\
+		Trace variants &41 & 1001 &2784 \\
 		Events & 118\,811 & 55\,220 & 117\,952\\
 		Events per case (mean) & 5.941& 3.681& 2.536\\
 		Median case duration (days) & 1.9876 & 0.224& 7.579\\
@@ -118,14 +118,14 @@ An overview of the key properties of the logs is summarized in Table \ref{tab:lo
 		Activities & 11 & 18 & 26\\
 		Words before preprocessing & 3\,050\,594 &247\,010 &  171\,938\\
 		Words after preprocessing  &1\,519\,199 &98\,915 & 165\,285\\
-		Vocabulary before preprocessing & 237 & 1\,203 & 4\,973 \\
-		Vocabulary after preprocessing & 185 & 817 & 4\,633\\
+		Vocabulary before preprocessing & 237 & 1203 & 4973 \\
+		Vocabulary after preprocessing & 185 & 817 & 4633\\
 		Text attribute & Email& Customer question & Diagnosis\\
 		Additional non-textual attributes & - & Gender& Admission type\\
 		&  & Age& Insurance\\
 		\bottomrule
 	\end{tabularx}
-	\caption[Overview of evaluated event logs]{Overview of evaluated event logs with their key properties.}
+	\caption[Overview of the evaluated event logs]{Overview of the evaluated event logs with their key properties.}
 	\label{tab:logs}
 \end{table}
 
@@ -139,7 +139,7 @@ In case of a job offer, the applicant answers again with an acceptance or reject
 In total, the process contains up to 5 text documents (CV, cover letter, accept/reject interview email by the candidate, job offer/reject email by the company, and accept/reject job offer email by the candidate).
 
 The timestamp of each event is determined by sampling from a normal distribution, which mean and variance is unique per activity.
-The CV, cover letter and all emails are available as a text attribute in the event log.
+The CV, cover letter, and all emails are available as a text attribute in the event log.
 The text information is generated by sampling 10 times from sets of full and partial sentences depending on the control flow of the process instance.
 For example, if an applicant gets a job offer, the generated email contains text fragments from typical job offer emails.
 If the applicant is rejected, the email is generated with sentences from typical rejection emails instead.
@@ -171,8 +171,8 @@ Admission and discharge events occur alternating, so that every admission event 
 All three logs represent different levels of process complexity and variability.
 The job application log is the most structured log containing 11 different activities, 41 trace variants, and a vocabulary of 185 unique words after preprocessing.
 Therefore, this log can be considered as quite simple and is subsequently easier to predict.
-In contrast, the customer journey log has 18 different activities, 1\,001 trace variants, and 817 unique words.
-The hospital admission log is the most complex with 26 activities, 2\,784 trace variants, and 4\,633 unique words.
+In contrast, the customer journey log has 18 different activities, 1001 trace variants, and 817 unique words.
+The hospital admission log is the most complex with 26 activities, 2784 trace variants, and 4633 unique words.
 Short snippets of all three event logs with the considered data attributes are provided in Appendix \ref{appendix-b}.
 
 \section{Next Activity and Timestamp Prediction}
@@ -231,8 +231,8 @@ A reason for that might be that the textual data in the simulated log clearly co
 On the job application log, the F$_1$ score of the next activity prediction goes up to 0.8830 using the LDA text model.
 This is an improvement of 0.1843 compared to the LSTM baseline.
 The next timestamp prediction is improved by up to 0.1467 days (around 3.5 hours).
-The other encoding models perform similarly with the exception of the PV model in combination with small 10 dimensional text encoding.
-Since this log contains rather long text documents, the small encoding size seems to not be able to represent the textual data sufficiently.
+The other encoding models perform similarly with the exception of the PV model in combination with a small 10 dimensional text encoding.
+Since this log contains rather long text documents, the small encoding size is not able to represent the textual data sufficiently.
 The process model baselines using the annotated transition system perform similarly to the LSTM baseline approach but significantly worse than the text-aware approaches.
 The transition system created using a sequence abstraction performs slightly better than the other baselines.
 Nevertheless, the trace abstraction method has a rather small impact on the prediction quality.
@@ -500,7 +500,7 @@ This shows that all text-aware approaches can unequivocally take advantage of th
 The improvements in the activity prediction lead consequently to significantly better timestamp predictions on this log.
 
 On the customer journey log, the prediction performance of all models correlates positively with the available prefix length of the trace.
-The next activity prediction is improved from under 0.3, when only the first event is available, to over 0.8 after eight events for all models.
+The next activity F$_1$ score is improved from under 0.3, when only the first event is available, to over 0.8 after eight events for all models.
 All text-aware prediction models surpass the baseline approaches on very short prefix traces of length 3 or shorter.
 There are two possible explanations for this.
 First, the events holding textual data seem to appear mostly at the beginning of the traces in this log.
@@ -522,7 +522,7 @@ This can be explained by the rather short hospital stays compared to longer time
 
 The outcome and cycle time prediction are evaluated analogously to the next activity and timestamp prediction.
 In contrast to the next event prediction, the target values are case properties, i.e., they are the same for every prefix trace of a case.
-As an outcome the final activity of the trace is predicted as described in Section \ref{sec:overview}.
+As an outcome, the final activity of the trace is predicted as described in Section \ref{sec:overview}.
 The MAE of the cycle time prediction is measured in days.
 The results of all evaluated prediction models are summarized in Table \ref{tab:outcome-cycle-time}.
 
@@ -581,7 +581,7 @@ The cycle time MAE using the BoW model is 0.2337 days, which improves the LSTM b
 All text-aware models outperform the LSTM baseline by a small amount on the cycle time prediction.
 The sequence-abstracted transition system predicts the outcome with an F$_1$ score of 0.4669 and hence stays in line with the LSTM-based models.
 The bag- and set-abstracted models fall back slightly.
-The cycle time prediction of the annotated transition systems is a bit worse compared to the LSTM-based approaches.
+The cycle time MAE of the annotated transition systems is at least 0.0341 days (= 49 minutes) worse compared to the LSTM-based approaches.
 
 On the hospital admission log, the text-aware approach delivers an F$_1$ score of 0.6187 on the outcome prediction task using the BoW model.
 This improves the LSTM baseline's F$_1$ score by 0.0211.
@@ -592,6 +592,7 @@ The transition systems predict the outcome with an F$_1$ score of up to 0.5588 a
 The other abstraction methods perform noticeably worse.
 Since the log contains many trace variants, the stronger set abstraction has an advantage.
 Nevertheless, the extreme variability in the log creates difficulties for the process model-based approaches.
+Furthermore, the unevenly distributed cycle times of the processes might be disadvantageous for the transition systems.
 
 Again, the choice of text model has a rather small impact.
 The BoW and LDA models perform slightly better than the BoNG and PV model.
@@ -842,7 +843,7 @@ Nevertheless, the text-aware process prediction model with BoW and LDA text mode
 The optimal encoding dimension of textual data varies depending on the data set.
 A larger vocabulary of words usually requires longer text encodings.
 
-A few parameterizations of the text-aware prediction models perform worse than the LSTM baseline on some prediction tasks.
+A few parameterizations of the text-aware prediction models perform worse than the LSTM baseline on some prediction tasks on the hospital log.
 This shows that text-aware process prediction does not necessarily guarantee predication improvements.
 On the real-world event logs, the text-aware models could capitalize mostly on short trace prefixes.
 Since more training data with short prefix traces is available, it is easier for the text-aware model to generalize for shorter prefixes.
